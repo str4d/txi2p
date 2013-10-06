@@ -1,1 +1,2 @@
-A Twisted plugin that provides I2P endpoints using BOB.
+A Twisted plugin that provides I2P endpoints using BOB (or maybe SAM, not
+decided yet).

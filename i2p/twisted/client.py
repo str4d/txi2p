@@ -1,3 +1,6 @@
+# Copyright (c) str4d <str4d@mail.i2p>
+# See COPYING for details.
+
 from twisted.internet import defer, interfaces, protocol
 from zope.interface import implementer
 

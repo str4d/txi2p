@@ -1,3 +1,6 @@
+# Copyright (c) str4d <str4d@mail.i2p>
+# See COPYING for details.
+
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.python import failure
 from twisted.trial import unittest

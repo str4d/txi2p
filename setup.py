@@ -3,6 +3,9 @@
 
 from distutils.core import setup
 
+with open('requirements.txt', 'rb') as infile:
+    install_requires = infile.read().split()
+
 setup(
     name='i2p_twisted',
     description='I2P integration with Twisted.',
@@ -10,6 +13,7 @@ setup(
     author_email='str4d@mail.i2p',
     url='https://github.com/str4d/twisted-i2p',
     license='ISC',
+    install_requires=install_requires,
     packages=['i2p.twisted', 'i2p.twisted.test'] + ['twisted.plugins'],
     version='0.0.1',
 )

@@ -14,9 +14,9 @@ connectionRefusedFailure = failure.Failure(ConnectionRefusedError())
 
 
 
-class I2PBOBEndpointsTestCase(unittest.TestCase):
+class BOBI2PClientEndpointTestCase(unittest.TestCase):
     """
-    Tests for I2P Endpoints backed by the BOB API.
+    Tests for I2P client Endpoint backed by the BOB API.
     """
 
     def test_bobConnectionFailed(self):
@@ -30,4 +30,21 @@ class I2PBOBEndpointsTestCase(unittest.TestCase):
         bobEndpoint = FakeEndpoint()
         endpoint = endpoints.I2PClientEndpoint('foo.i2p', bobEndpoint)
         endpoint.connect(None)
-        self.assertEqual(proxy.transport.value(), 'foo.i2p') # TODO: Fix.
+        self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p') # TODO: Fix.
+
+
+    def test_nonDefaultPort(self):
+        bobEndpoint = FakeEndpoint()
+        endpoint = endpoints.I2PClientEndpoint('foo.i2p', bobEndpoint, 81)
+        endpoint.connect(None)
+        self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p:81') # TODO: Fix
+
+
+    def test_clientDataSent(self):
+        wrappedFac = FakeFactory()
+        bobEndpoint = FakeEndpoint()
+        endpoint = endpoints.I2PClientEndpoint('', bobEndpoint)
+        endpoint.connect(wrappedFac)
+        bobEndpoint.proto.transport.clear()
+        wrappedFac.proto.transport.write('xxxxx')
+        self.assertEqual(bobEndpoint.proto.transport.value(), 'xxxxx')

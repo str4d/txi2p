@@ -10,6 +10,29 @@ def validateDestination(dest):
     pass
 
 
+class BOBSender(object):
+    def __init__(self, transport):
+        self.transport = transport
+
+
+class BOBReceiver(object):
+    def __init(self, sender):
+        self.sender = sender
+
+
+# A Protocol for making an I2P client tunnel via BOB
+I2PClientTunnelCreatorBOBClient = makeProtocol(
+    grammar.i2pClientTunnelCreatorBOBGrammarSource,
+    I2PClientTunnelCreatorBOBSender,
+    I2PClientTunnelCreatorBOBReceiver)
+
+# A Protocol for making an I2P server tunnel via BOB
+I2PServerTunnelCreatorBOBClient = makeProtocol(
+    grammar.i2pServerTunnelCreatorBOBGrammarSource,
+    I2PServerTunnelCreatorBOBSender,
+    I2PServerTunnelCreatorBOBReceiver)
+
+
 class I2PClientFactory(protocol.ClientFactory):
     currentCandidate = None
     canceled = False

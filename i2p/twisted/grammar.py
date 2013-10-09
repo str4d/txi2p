@@ -1,11 +1,13 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+# General I2P grammar
 i2pGrammarSource = r"""
 b64char = :x ?(x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~') -> x
 b64 = <b64char+>
 """
 
+# General BOB grammar
 bobGrammarSource = i2pGrammarSource + r"""
 KEYS    = b64:keys
 KEY     = b64:pubkey
@@ -38,4 +40,12 @@ BOB_status    = (ERROR | OK)
 BOB_stop      = (ERROR | OK)
 BOB_verify    = (ERROR | OK)
 BOB_visit     = (OK)
+"""
+
+# BOB grammar for making an I2P client tunnel
+i2pClientTunnelCreatorBOBGrammarSource = bobGrammarSource + r"""
+"""
+
+# BOB grammar for making an I2P server tunnel
+i2pServerTunnelCreatorBOBGrammarSource = bobGrammarSource + r"""
 """

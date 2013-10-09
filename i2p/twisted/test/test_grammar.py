@@ -17,21 +17,22 @@ def stringParserFromRule(grammar, rule):
 
 
 class TestBOBGrammar(unittest.TestCase):
+    def _test(self, rule, data, expected):
+        parse = stringParserFromRule(bobGrammar, rule)
+        result = parse(data)
+        self.assertEqual(result, expected)
+
     def test_BOB_clear(self):
-        parse = stringParserFromRule(bobGrammar, 'BOB_clear')
-        self.assertEqual(parse('OK cleared\n'), (True, 'cleared'))
-        self.assertEqual(parse('ERROR tunnel is active\n'), (False, 'tunnel is active'))
+        self._test('BOB_clear', 'OK cleared\n', (True, 'cleared'))
+        self._test('BOB_clear', 'ERROR tunnel is active\n', (False, 'tunnel is active'))
 
     def test_BOB_getdest(self):
-        parse = stringParserFromRule(bobGrammar, 'BOB_getdest')
-        self.assertEqual(parse('OK spam\n'), (True, 'spam'))
+        self._test('BOB_getdest', 'OK spam\n', (True, 'spam'))
 
     def test_BOB_getkeys(self):
-        parse = stringParserFromRule(bobGrammar, 'BOB_getkeys')
-        self.assertEqual(parse('OK spameggs\n'), (True, 'spameggs'))
+        self._test('BOB_getkeys', 'OK spameggs\n', (True, 'spameggs'))
 
     def test_BOB_list(self):
-        parse = stringParserFromRule(bobGrammar, 'BOB_list')
-        self.assertEqual(parse('OK Listing done\n'), (True, 'Listing done', []))
-        self.assertEqual(parse('DATA spam\nDATA eggs\nOK Listing done\n'), (True, 'Listing done', ['spam', 'eggs']))
-        self.assertEqual(parse('ERROR ni!\n'), (False, 'ni!', []))
+        self._test('BOB_list', 'OK Listing done\n', (True, 'Listing done', []))
+        self._test('BOB_list', 'DATA spam\nDATA eggs\nOK Listing done\n', (True, 'Listing done', ['spam', 'eggs']))
+        self._test('BOB_list', 'ERROR ni!\n', (False, 'ni!', []))

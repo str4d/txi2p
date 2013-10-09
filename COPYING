@@ -1,6 +1,6 @@
 Copyright (c) 2013, str4d <str4d@mail.i2p>
 
-Overall design and flow of i2p.twisted.client.* was inspired by
+Overall design and flow of txi2p.client.* was inspired by
 https://github.com/habnabit/txsocksx (and some testing code
 was reused).
 Copyright (c) 2010-2013, Aaron Gallagher <_@habnab.it>

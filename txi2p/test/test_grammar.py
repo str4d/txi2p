@@ -5,7 +5,7 @@ import unittest
 
 from parsley import makeGrammar, ParseError
 
-from i2p.twisted.grammar import bobGrammarSource
+from txi2p.grammar import bobGrammarSource
 
 
 bobGrammar = makeGrammar(bobGrammarSource, {})

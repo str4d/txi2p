@@ -7,14 +7,14 @@ with open('requirements.txt', 'rb') as infile:
     install_requires = infile.read().split()
 
 setup(
-    name='i2p_twisted',
-    description='I2P integration with Twisted.',
+    name='txi2p',
+    description='I2P bindings for Twisted.',
     author='str4d',
     author_email='str4d@mail.i2p',
-    url='https://github.com/str4d/twisted-i2p',
+    url='https://github.com/str4d/txi2p',
     license='ISC',
     install_requires=install_requires,
-    packages=['i2p.twisted', 'i2p.twisted.test'] + ['twisted.plugins'],
+    packages=['txi2p', 'txi2p.test'] + ['twisted.plugins'],
     version='0.0.1',
 )
 

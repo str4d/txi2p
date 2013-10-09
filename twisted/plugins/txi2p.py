@@ -4,8 +4,8 @@ from twisted.internet.interfaces import IStreamServerEndpointStringParser
 from twisted.python.compat import _PY3
 from zope.interface import implementer
 
-from i2p.twisted.client import I2PClientEndpoint
-from i2p.twisted.server import I2PServerEndpoint
+from txi2p.client import I2PClientEndpoint
+from txi2p.server import I2PServerEndpoint
 
 if not _PY3:
     from twisted.plugin import IPlugin

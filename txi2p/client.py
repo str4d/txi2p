@@ -69,31 +69,3 @@ class I2PClientFactory(protocol.ClientFactory):
             return
         i2pProtocol.i2pEstablished(proto)
         self.deferred.callback(proto)
-
-
-@implementer(interfaces.IStreamClientEndpoint)
-class I2PClientEndpoint(object):
-    """
-    I2P client endpoint.
-    """
-
-    def __init__(self, dest, bobEndpoint):
-        validateDestination(dest)
-        self.dest = dest
-        self.bobEndpoint = bobEndpoint
-
-    def connect(self, fac):
-        """
-        Connect over I2P.
-
-        The provided factory will have its ``buildProtocol`` method called once
-        an I2P client tunnel has been successfully created.
-
-        If the factory's ``buildProtocol`` returns ``None``, the connection
-        will immediately close.
-        """
-
-        i2pFac = I2PClientFactory(self.dest, fac)
-        d = self.bobEndpoint.connect(i2pFac)
-        d.addCallback(lambda proto: i2pFac.deferred)
-        return d

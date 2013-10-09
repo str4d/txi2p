@@ -8,15 +8,21 @@ from txi2p.client import I2PClientFactory
 from txi2p.server import I2PServerFactory
 
 
+def validateDestination(dest):
+    # TODO: Validate I2P domain, B32 etc.
+    pass
+
+
 @implementer(interfaces.IStreamClientEndpoint)
 class I2PClientEndpoint(object):
     """
     I2P client endpoint.
     """
 
-    def __init__(self, dest, bobEndpoint):
+    def __init__(self, dest, bobEndpoint, port=None):
         validateDestination(dest)
         self.dest = dest
+        self.port = port
         self.bobEndpoint = bobEndpoint
 
     def connect(self, fac):

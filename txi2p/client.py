@@ -1,13 +1,11 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from parsley import makeProtocol
 from twisted.internet import defer, interfaces, protocol
 from zope.interface import implementer
 
-
-def validateDestination(dest):
-    # TODO: Validate I2P domain, B32 etc.
-    pass
+from txi2p import grammar
 
 
 class BOBSender(object):

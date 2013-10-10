@@ -78,104 +78,191 @@ class BOBSender(object):
 
 
 class BOBReceiver(object):
-    currentRule = ''
+    currentRule = 'State_init'
 
     def __init__(self, sender):
         self.sender = sender
 
     def prepareParsing(self, parser):
-        pass
+        # Store the factory for later use
+        self.factory = parser.factory
 
     def finishParsing(self, reason):
         pass
 
+    def initBOB(self, version):
+        """Override this to start protocol logic"""
+        pass
+
     def clear(self, success, info):
-        if success:
-            # Do something
-        else: # Try again. TODO: Limit retries
+        if not success: # Try again. TODO: Limit retries
             self.sender.sendClear()
 
     def getdest(self, success, info):
         if success:
-            # Do something
+            # Save the local Destination
+            self.factory.localDest = info
 
     def getkeys(self, success, info):
         if success:
-            # Do something
+            # Save the keypair
+            self.factory.keypair = info
 
     def getnick(self, success, info):
         if success:
-            # Do something
+            pass
 
     def inhost(self, success, info):
         if success:
-            # Do something
+            pass
 
     def inport(self, success, info):
         if success:
-            # Do something
+            pass
 
     def list(self, success, info, data):
         if success:
-            # Do something
+            pass
 
     def newkeys(self, success, info):
         if success:
-            # Do something
+            # Save the new local Destination
+            self.factory.localDest = info
+            # Get the new keypair
+            self.sender.sendGetkeys()
+            self.currentRule = 'State_getkeys'
 
     def option(self, success, info):
         if success:
-            # Do something
+            pass
 
     def outhost(self, success, info):
         if success:
-            # Do something
+            pass
 
     def outport(self, success, info):
         if success:
-            # Do something
+            pass
 
     def quiet(self, success, info):
         if success:
-            # Do something
+            pass
 
     def quit(self, success, info):
-        # Do something
+        pass
 
     def setkeys(self, success, info):
         if success:
-            # Do something
+            # Update the local Destination
+            self.sender.sendGetdest()
+            self.currentRule = 'State_getdest'
 
     def setnick(self, success, info):
         if success:
-            # Do something
+            print info # XXX: Remove
+            if self.factory.keypair: # If a keypair was provided, use it
+                self.sender.sendSetkeys(self.factory.keypair)
+                self.currentRule = 'State_setkeys'
+            else: # Get a new keypair
+                self.sender.sendNewkeys()
+                self.currentRule = 'State_newkeys'
 
     def show(self, success, info):
         if success:
-            # Do something
+            pass
 
     def showprops(self, success, info):
         if success:
-            # Do something
+            pass
 
     def start(self, success, info):
         if success:
-            # Do something
+            pass
 
     def status(self, success, info):
         if success:
-            # Do something
+            pass
 
     def stop(self, success, info):
         if success:
-            # Do something
+            pass
 
     def verify(self, success, info):
         if success:
-            # Do something
+            pass
 
     def visit(self, success, info):
-        # Do something
+        pass
+
+
+class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
+    def initBOB(self, version):
+        # Set tunnel nickname (and update keypair/localDest state)
+        self.sender.sendSetnick(self.factory.tunnelNick)
+        self.currentRule = 'State_setnick'
+
+    def getdest(self, success, info):
+        super.getdest(success, info)
+        if success:
+            self._setOuthost()
+
+    def getkeys(self, success, info):
+        super.getkeys(success, info)
+        if success:
+            self._setOuthost()
+
+    def _setOuthost():
+        self.sender.sendOuthost(self.factory.outhost)
+        self.currentRule = 'State_outhost'
+
+    def outhost(self, success, info):
+        if success:
+            self.sender.sendOutport(self.factory.outport)
+            self.currentRule = 'State_outport'
+
+    def outport(self, success, info):
+        if success:
+            self.sender.sendStart()
+            self.currentRule = 'State_start'
+
+    def start(self, success, info):
+        if success:
+            print "Client tunnel started"
+
+
+class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
+    def initBOB(self, version):
+        # Set tunnel nickname (and update keypair/localDest state)
+        self.sender.sendSetnick(self.factory.tunnelNick)
+        self.currentRule = 'State_setnick'
+
+    def getdest(self, success, info):
+        super.getdest(success, info)
+        if success:
+            self._setInhost()
+
+    def getkeys(self, success, info):
+        super.getkeys(success, info)
+        if success:
+            self._setInhost()
+
+    def _setInhost():
+        self.sender.sendInhost(self.factory.inhost)
+        self.currentRule = 'State_inhost'
+
+    def inhost(self, success, info):
+        if success:
+            self.sender.sendInport(self.factory.inport)
+            self.currentRule = 'State_inport'
+
+    def inport(self, success, info):
+        if success:
+            self.sender.sendStart()
+            self.currentRule = 'State_start'
+
+    def start(self, success, info):
+        if success:
+            print "Server tunnel started"
 
 
 # A Protocol for making an I2P client tunnel via BOB

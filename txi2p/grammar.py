@@ -17,6 +17,9 @@ OK_KEY  = 'OK' ws KEY:pubkey '\n' -> (True, pubkey)
 OK_KEYS = 'OK' ws KEYS:keys '\n' -> (True, keys)
 DATA    = 'DATA' ws <(~'\n' anything)*>:data '\n' -> data
 
+versionString = <digit+ '.' digit+ '.' digit+>
+BOB_init      = 'BOB' ws versionString:version '\nOK\n' -> version
+
 BOB_clear     = (ERROR | OK_KEY)
 BOB_getdest   = (ERROR | OK_KEY)
 BOB_getkeys   = (ERROR | OK_KEYS)
@@ -40,6 +43,8 @@ BOB_status    = (ERROR | OK)
 BOB_stop      = (ERROR | OK)
 BOB_verify    = (ERROR | OK)
 BOB_visit     = (OK)
+
+State_init      = BOB_init:response      -> receiver.initBOB(*response)
 
 State_clear     = BOB_clear:response     -> receiver.clear(*response)
 State_getdest   = BOB_getdest:response   -> receiver.getdest(*response)

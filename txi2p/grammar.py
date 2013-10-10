@@ -40,12 +40,27 @@ BOB_status    = (ERROR | OK)
 BOB_stop      = (ERROR | OK)
 BOB_verify    = (ERROR | OK)
 BOB_visit     = (OK)
-"""
 
-# BOB grammar for making an I2P client tunnel
-i2pClientTunnelCreatorBOBGrammarSource = bobGrammarSource + r"""
-"""
-
-# BOB grammar for making an I2P server tunnel
-i2pServerTunnelCreatorBOBGrammarSource = bobGrammarSource + r"""
+State_clear     = BOB_clear:response     -> receiver.clear(*response)
+State_getdest   = BOB_getdest:response   -> receiver.getdest(*response)
+State_getkeys   = BOB_getkeys:response   -> receiver.getkeys(*response)
+State_getnick   = BOB_getnick:response   -> receiver.getnick(*response)
+State_inhost    = BOB_inhost:response    -> receiver.inhost(*response)
+State_inport    = BOB_inport:response    -> receiver.inport(*response)
+State_list      = BOB_list:response      -> receiver.list(*response)
+State_newkeys   = BOB_newkeys:response   -> receiver.newkeys(*response)
+State_option    = BOB_option:response    -> receiver.option(*response)
+State_outhost   = BOB_outhost:response   -> receiver.outhost(*response)
+State_outport   = BOB_outport:response   -> receiver.outport(*response)
+State_quiet     = BOB_quiet:response     -> receiver.quiet(*response)
+State_quit      = BOB_quit:response      -> receiver.quit(*response)
+State_setkeys   = BOB_setkeys:response   -> receiver.setkeys(*response)
+State_setnick   = BOB_setnick:response   -> receiver.setnick(*response)
+State_show      = BOB_show:response      -> receiver.show(*response)
+State_showprops = BOB_showprops:response -> receiver.showprops(*response)
+State_start     = BOB_start:response     -> receiver.start(*response)
+State_status    = BOB_status:response    -> receiver.status(*response)
+State_stop      = BOB_stop:response      -> receiver.stop(*response)
+State_verify    = BOB_verify:response    -> receiver.verify(*response)
+State_visit     = BOB_visit:response     -> receiver.visit(*response)
 """

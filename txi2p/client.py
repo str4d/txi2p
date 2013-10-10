@@ -1,34 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from parsley import makeProtocol
 from twisted.internet import defer, interfaces, protocol
 from zope.interface import implementer
-
-from txi2p import grammar
-
-
-class BOBSender(object):
-    def __init__(self, transport):
-        self.transport = transport
-
-
-class BOBReceiver(object):
-    def __init(self, sender):
-        self.sender = sender
-
-
-# A Protocol for making an I2P client tunnel via BOB
-I2PClientTunnelCreatorBOBClient = makeProtocol(
-    grammar.i2pClientTunnelCreatorBOBGrammarSource,
-    I2PClientTunnelCreatorBOBSender,
-    I2PClientTunnelCreatorBOBReceiver)
-
-# A Protocol for making an I2P server tunnel via BOB
-I2PServerTunnelCreatorBOBClient = makeProtocol(
-    grammar.i2pServerTunnelCreatorBOBGrammarSource,
-    I2PServerTunnelCreatorBOBSender,
-    I2PServerTunnelCreatorBOBReceiver)
 
 
 class I2PClientFactory(protocol.ClientFactory):

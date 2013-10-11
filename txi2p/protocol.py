@@ -207,50 +207,6 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
     def getdest(self, success, info):
         super.getdest(success, info)
         if success:
-            self._setOuthost()
-
-    def getkeys(self, success, info):
-        super.getkeys(success, info)
-        if success:
-            self._setOuthost()
-
-    def _setOuthost():
-        if hasattr(self.factory, 'outhost'):
-            self.sender.sendOuthost(self.factory.outhost)
-            self.currentRule = 'State_outhost'
-        else:
-            print 'Factory has no outhost'
-
-    def outhost(self, success, info):
-        if success:
-            if hasattr(self.factory, 'outport'):
-                self.sender.sendOutport(self.factory.outport)
-                self.currentRule = 'State_outport'
-            else:
-                print 'Factory has no outport'
-
-    def outport(self, success, info):
-        if success:
-            self.sender.sendStart()
-            self.currentRule = 'State_start'
-
-    def start(self, success, info):
-        if success:
-            print "Client tunnel started"
-
-
-class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
-    def initBOB(self, version):
-        if hasattr(self.factory, 'tunnelNick'):
-            # Set tunnel nickname (and update keypair/localDest state)
-            self.sender.sendSetnick(self.factory.tunnelNick)
-            self.currentRule = 'State_setnick'
-        else:
-            print 'Factory has no tunnelNick'
-
-    def getdest(self, success, info):
-        super.getdest(success, info)
-        if success:
             self._setInhost()
 
     def getkeys(self, success, info):
@@ -274,6 +230,50 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
                 print 'Factory has no inport'
 
     def inport(self, success, info):
+        if success:
+            self.sender.sendStart()
+            self.currentRule = 'State_start'
+
+    def start(self, success, info):
+        if success:
+            print "Client tunnel started"
+
+
+class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
+    def initBOB(self, version):
+        if hasattr(self.factory, 'tunnelNick'):
+            # Set tunnel nickname (and update keypair/localDest state)
+            self.sender.sendSetnick(self.factory.tunnelNick)
+            self.currentRule = 'State_setnick'
+        else:
+            print 'Factory has no tunnelNick'
+
+    def getdest(self, success, info):
+        super.getdest(success, info)
+        if success:
+            self._setOuthost()
+
+    def getkeys(self, success, info):
+        super.getkeys(success, info)
+        if success:
+            self._setOuthost()
+
+    def _setOuthost():
+        if hasattr(self.factory, 'outhost'):
+            self.sender.sendOuthost(self.factory.outhost)
+            self.currentRule = 'State_outhost'
+        else:
+            print 'Factory has no outhost'
+
+    def outhost(self, success, info):
+        if success:
+            if hasattr(self.factory, 'outport'):
+                self.sender.sendOutport(self.factory.outport)
+                self.currentRule = 'State_outport'
+            else:
+                print 'Factory has no outport'
+
+    def outport(self, success, info):
         if success:
             self.sender.sendStart()
             self.currentRule = 'State_start'

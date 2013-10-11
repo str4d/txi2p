@@ -197,9 +197,12 @@ class BOBReceiver(object):
 
 class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
     def initBOB(self, version):
-        # Set tunnel nickname (and update keypair/localDest state)
-        self.sender.sendSetnick(self.factory.tunnelNick)
-        self.currentRule = 'State_setnick'
+        if hasattr(self.factory, 'tunnelNick'):
+            # Set tunnel nickname (and update keypair/localDest state)
+            self.sender.sendSetnick(self.factory.tunnelNick)
+            self.currentRule = 'State_setnick'
+        else:
+            print 'Factory has no tunnelNick'
 
     def getdest(self, success, info):
         super.getdest(success, info)
@@ -212,13 +215,19 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
             self._setOuthost()
 
     def _setOuthost():
-        self.sender.sendOuthost(self.factory.outhost)
-        self.currentRule = 'State_outhost'
+        if hasattr(self.factory, 'outhost'):
+            self.sender.sendOuthost(self.factory.outhost)
+            self.currentRule = 'State_outhost'
+        else:
+            print 'Factory has no outhost'
 
     def outhost(self, success, info):
         if success:
-            self.sender.sendOutport(self.factory.outport)
-            self.currentRule = 'State_outport'
+            if hasattr(self.factory, 'outport'):
+                self.sender.sendOutport(self.factory.outport)
+                self.currentRule = 'State_outport'
+            else:
+                print 'Factory has no outport'
 
     def outport(self, success, info):
         if success:
@@ -232,9 +241,12 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
 
 class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
     def initBOB(self, version):
-        # Set tunnel nickname (and update keypair/localDest state)
-        self.sender.sendSetnick(self.factory.tunnelNick)
-        self.currentRule = 'State_setnick'
+        if hasattr(self.factory, 'tunnelNick'):
+            # Set tunnel nickname (and update keypair/localDest state)
+            self.sender.sendSetnick(self.factory.tunnelNick)
+            self.currentRule = 'State_setnick'
+        else:
+            print 'Factory has no tunnelNick'
 
     def getdest(self, success, info):
         super.getdest(success, info)
@@ -247,13 +259,19 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             self._setInhost()
 
     def _setInhost():
-        self.sender.sendInhost(self.factory.inhost)
-        self.currentRule = 'State_inhost'
+        if hasattr(self.factory, 'inhost'):
+            self.sender.sendInhost(self.factory.inhost)
+            self.currentRule = 'State_inhost'
+        else:
+            print 'Factory has no inhost'
 
     def inhost(self, success, info):
         if success:
-            self.sender.sendInport(self.factory.inport)
-            self.currentRule = 'State_inport'
+            if hasattr(self.factory, 'inport'):
+                self.sender.sendInport(self.factory.inport)
+                self.currentRule = 'State_inport'
+            else:
+                print 'Factory has no inport'
 
     def inport(self, success, info):
         if success:

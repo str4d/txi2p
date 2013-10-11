@@ -4,8 +4,8 @@
 from twisted.internet import defer, interfaces, protocol
 from zope.interface import implementer
 
-from txi2p.client import I2PClientFactory
-from txi2p.server import I2PServerFactory
+from txi2p.client import BOBI2PClientFactory
+from txi2p.server import BOBI2PServerFactory
 
 
 def validateDestination(dest):
@@ -19,11 +19,14 @@ class I2PClientEndpoint(object):
     I2P client endpoint.
     """
 
-    def __init__(self, dest, bobEndpoint, port=None):
+    def __init__(self, reactor, dest, port=None,
+                 bob=True, bobEndpoint='tcp:127.0.0.1:2827'):
         validateDestination(dest)
-        self.dest = dest
-        self.port = port
-        self.bobEndpoint = bobEndpoint
+        self._reactor = reactor
+        self._dest = dest
+        self._port = port
+        self._bob = bob
+        self._bobString = bobEndpoint
 
     def connect(self, fac):
         """
@@ -36,8 +39,10 @@ class I2PClientEndpoint(object):
         will immediately close.
         """
 
-        i2pFac = I2PClientFactory(self.dest, fac)
-        d = self.bobEndpoint.connect(i2pFac)
+        if self._bob:
+            bobEndpoint = clientFromString(self._reactor, self._bobString)
+            i2pFac = BOBI2PClientFactory(fac, self._dest)
+            d = bobEndpoint.connect(i2pFac)
         d.addCallback(lambda proto: i2pFac.deferred)
         return d
 
@@ -48,10 +53,12 @@ class I2PServerEndpoint(object):
     I2P server endpoint.
     """
 
-    # TODO: Implement properly
-    def __init__(self, STUFF, bobEndpoint):
-        self.STUFF = STUFF
-        self.bobEndpoint = bobEndpoint
+    def __init__(self, reactor, keypairPath,
+                 bob=True, bobEndpoint='tcp:127.0.0.1:2827'):
+        self._reactor = reactor
+        self._keypairPath = keypairPath
+        self._bob = bob
+        self._bobString = bobEndpoint
 
     def listen(self, fac):
         """
@@ -64,7 +71,9 @@ class I2PServerEndpoint(object):
         will immediately close.
         """
 
-        i2pFac = I2PServerFactory(self.STUFF, fac) # TODO: Implement properly
-        d = self.bobEndpoint.connect(i2pFac)
+        if self._bob:
+            bobEndpoint = clientFromString(self._reactor, self._bobString)
+            i2pFac = BOBI2PServerFactory(fac, self._keypairPath)
+            d = bobEndpoint.connect(i2pFac)
         d.addCallback(lambda proto: i2pFac.deferred)
         return d

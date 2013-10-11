@@ -1,27 +1,30 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet import defer, interfaces, protocol
-from zope.interface import implementer
+from twisted.internet.defer import Deferred
+from twisted.internet.protocol import Factory
+
+from txi2p.protocol import I2PClientTunnelCreatorBOBClient
 
 
-class I2PClientFactory(protocol.ClientFactory):
-    currentCandidate = None
+class BOBI2PClientFactory(ClientFactory):
+    protocol = I2PClientTunnelCreatorBOBClient
+    bobProto = None
     canceled = False
 
     def _cancel(self, d):
-        self.currentCandidate.sender.transport.abortConnection()
+        self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, dest, providedFactory):
+    def __init__(self, clientFactory, dest):
+        self.clientFactory = clientFactory
         self.dest = dest
-        self.providedFactory = providedFactory
-        self.deferred = defer.Deferred(self._cancel);
+        self.deferred = Deferred(self._cancel);
 
     def buildProtocol(self, addr):
-        proto = None # TODO: Make protocol!
+        proto = protocol()
         proto.factory = self
-        self.currentCandidate = proto
+        self.bobProto = proto
         return proto
 
     def i2pConnectionFailed(self, reason):

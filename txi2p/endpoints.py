@@ -1,14 +1,11 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet import defer, interfaces, protocol
-from twisted.internet.endpoints import clientFromString
+from twisted.internet import interfaces
 from zope.interface import implementer
 
 from txi2p.client import BOBI2PClientFactory
 from txi2p.server import BOBI2PServerFactory
-
-DEFAULT_BOB_ENDPOINT = 'tcp:127.0.0.1:2827'
 
 
 def validateDestination(dest):
@@ -22,12 +19,11 @@ class BOBI2PClientEndpoint(object):
     I2P client endpoint backed by the BOB API.
     """
 
-    def __init__(self, reactor, dest, port=None, bobEndpoint=DEFAULT_BOB_ENDPOINT):
+    def __init__(self, bobEndpoint, dest, port=None):
         validateDestination(dest)
-        self._reactor = reactor
+        self._bobEndpoint = bobEndpoint
         self._dest = dest
         self._port = port
-        self._bobString = bobEndpoint
 
     def connect(self, fac):
         """
@@ -40,9 +36,8 @@ class BOBI2PClientEndpoint(object):
         will immediately close.
         """
 
-        bobEndpoint = clientFromString(self._reactor, self._bobString)
-        i2pFac = BOBI2PClientFactory(fac, self._dest, self._port, self._bobString)
-        d = bobEndpoint.connect(i2pFac)
+        i2pFac = BOBI2PClientFactory(fac, self._bobEndpoint, self._dest, self._port)
+        d = self._bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # real IProtocol to be returned after tunnel creation,
         # and pass it to any further registered callbacks.
@@ -56,10 +51,9 @@ class BOBI2PServerEndpoint(object):
     I2P server endpoint backed by the BOB API.
     """
 
-    def __init__(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT):
-        self._reactor = reactor
+    def __init__(self, bobEndpoint, keypairPath):
+        self._bobEndpoint = bobEndpoint
         self._keypairPath = keypairPath
-        self._bobString = bobEndpoint
 
     def listen(self, fac):
         """
@@ -72,9 +66,8 @@ class BOBI2PServerEndpoint(object):
         will immediately close.
         """
 
-        bobEndpoint = clientFromString(self._reactor, self._bobString)
-        i2pFac = BOBI2PServerFactory(fac, self._keypairPath, self._bobString)
-        d = bobEndpoint.connect(i2pFac)
+        i2pFac = BOBI2PServerFactory(fac, self._bobEndpoint, self._keypairPath)
+        d = self._bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # IListeningPort to be returned after tunnel creation,
         # and pass it to any further registered callbacks.

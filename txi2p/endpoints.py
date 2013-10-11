@@ -41,7 +41,7 @@ class BOBI2PClientEndpoint(object):
         """
 
         bobEndpoint = clientFromString(self._reactor, self._bobString)
-        i2pFac = BOBI2PClientFactory(fac, self._dest)
+        i2pFac = BOBI2PClientFactory(fac, self._dest, self._port, self._bobString)
         d = bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # real IProtocol to be returned after tunnel creation,
@@ -73,7 +73,7 @@ class BOBI2PServerEndpoint(object):
         """
 
         bobEndpoint = clientFromString(self._reactor, self._bobString)
-        i2pFac = BOBI2PServerFactory(fac, self._keypairPath)
+        i2pFac = BOBI2PServerFactory(fac, self._keypairPath, self._bobString)
         d = bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # IListeningPort to be returned after tunnel creation,

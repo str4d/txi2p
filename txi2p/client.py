@@ -16,9 +16,11 @@ class BOBI2PClientFactory(ClientFactory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, clientFactory, dest):
+    def __init__(self, clientFactory, dest, port, bobString):
         self.clientFactory = clientFactory
         self.dest = dest
+        self.port = port
+        self.bobString = bobString
         self.deferred = Deferred(self._cancel);
 
     def buildProtocol(self, addr):
@@ -37,7 +39,7 @@ class BOBI2PClientFactory(ClientFactory):
 
     def i2pConnectionEstablished(self, i2pProtocol):
         # We have a connection! Use it.
-        proto = self.providedFactory.buildProtocol(
+        proto = self.clientFactory.buildProtocol(
             i2pProtocol.sender.transport.getPeer()) # TODO: Understand this - need to use the new tunnel, not BOB.
         if proto is None:
             self.deferred.cancel()

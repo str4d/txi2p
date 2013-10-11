@@ -20,23 +20,26 @@ class BOBI2PClientEndpointTestCase(unittest.TestCase):
     """
 
     def test_bobConnectionFailed(self):
+        reactor = object()
         bobEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
-        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, '')
+        endpoint = endpoints.BOBI2PClientEndpoint(reactor, bobEndpoint, '')
         d = endpoint.connect(None)
         return self.assertFailure(d, ConnectionRefusedError)
 
 
     def test_destination(self):
+        reactor = object()
         bobEndpoint = FakeEndpoint()
-        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, 'foo.i2p')
+        endpoint = endpoints.BOBI2PClientEndpoint(reactor, bobEndpoint, 'foo.i2p')
         endpoint.connect(None)
         self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p') # TODO: Fix.
 
 
     def test_clientDataSent(self):
+        reactor = object()
         wrappedFac = FakeFactory()
         bobEndpoint = FakeEndpoint()
-        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, '')
+        endpoint = endpoints.BOBI2PClientEndpoint(reactor, bobEndpoint, '')
         endpoint.connect(wrappedFac)
         bobEndpoint.proto.transport.clear()
         wrappedFac.proto.transport.write('xxxxx')

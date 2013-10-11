@@ -2,6 +2,7 @@
 # See COPYING for details.
 
 from twisted.internet.defer import Deferred
+from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.protocol import ClientFactory
 
 from txi2p.protocol import I2PClientTunnelCreatorBOBClient
@@ -16,9 +17,10 @@ class BOBI2PClientFactory(ClientFactory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, clientFactory, bobEndpoint, dest):
-        self.clientFactory = clientFactory
-        self.bobEndpoint = bobEndpoint
+    def __init__(self, reactor, clientFactory, bobEndpoint, dest):
+        self._reactor = reactor
+        self._clientFactory = clientFactory
+        self._bobEndpoint = bobEndpoint
         self.dest = dest
         self.deferred = Deferred(self._cancel);
 
@@ -36,12 +38,15 @@ class BOBI2PClientFactory(ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         self.i2pConnectionFailed(reason)
 
-    def i2pConnectionEstablished(self, i2pProtocol):
-        # We have a connection! Use it.
-        proto = self.clientFactory.buildProtocol(
-            i2pProtocol.sender.transport.getPeer()) # TODO: Understand this - need to use the new tunnel, not BOB.
-        if proto is None:
+    def i2pTunnelCreated(self):
+        # BOB is now listening for a tunnel.
+        # BOB only listens on TCP4 (for now).
+        clientEndpoint = TCP4ClientEndpoint(self._reactor, self.inhost, self.inport)
+        # Wrap the client Factory.
+        wrappedFactory = self._clientFactory # TODO: Write wrapper
+        d = clientEndpoint.connect(wrappedFactory)
+        if d is None: # Shouldn't happen? Should the proto None check be a callback?
             self.deferred.cancel()
             return
-        i2pProtocol.i2pEstablished(proto)
-        self.deferred.callback(proto)
+        # Return the Deferred, which will return an IProtocol.
+        self.deferred.callback(d)

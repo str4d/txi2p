@@ -237,6 +237,7 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
     def start(self, success, info):
         if success:
             print "Client tunnel started"
+            self.factory.i2pTunnelCreated()
 
 
 class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
@@ -281,6 +282,7 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
     def start(self, success, info):
         if success:
             print "Server tunnel started"
+            self.factory.i2pTunnelCreated()
 
 
 # A Protocol for making an I2P client tunnel via BOB

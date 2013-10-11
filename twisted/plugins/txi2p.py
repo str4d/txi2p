@@ -21,7 +21,7 @@ class _I2PClientParser(object):
     prefix = 'i2pbob'
 
     def _parseClient(self, reactor, dest, bobEndpoint=DEFAULT_BOB_ENDPOINT):
-        return BOBI2PClientEndpoint(clientFromString(reactor, bobEndpoint),
+        return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
                                     dest)
 
     def parseStreamClient(self, reactor, *args, **kwargs):
@@ -36,7 +36,7 @@ class _I2PServerParser(object):
     prefix = 'i2pbob'
 
     def _parseServer(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT):
-        return BOBI2PServerEndpoint(clientFromString(reactor, bobEndpoint),
+        return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
                                     keypairPath)
 
     def parseStreamServer(self, reactor, *args, **kwargs):

@@ -2,6 +2,7 @@
 # See COPYING for details.
 
 from twisted.internet import defer, interfaces, protocol
+from twisted.internet.endpoints import clientFromString
 from zope.interface import implementer
 
 from txi2p.client import BOBI2PClientFactory

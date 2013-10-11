@@ -7,7 +7,7 @@ b64char = :x ?(x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456
 b64 = <b64char+>
 """
 
-# General BOB grammar
+# BOB grammar
 bobGrammarSource = i2pGrammarSource + r"""
 KEYS    = b64:keys
 KEY     = b64:pubkey

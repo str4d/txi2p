@@ -285,12 +285,12 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
 
 # A Protocol for making an I2P client tunnel via BOB
 I2PClientTunnelCreatorBOBClient = makeProtocol(
-    grammar.i2pTunnelBOBGrammarSource,
+    grammar.bobGrammarSource,
     BOBSender,
     I2PClientTunnelCreatorBOBReceiver)
 
 # A Protocol for making an I2P server tunnel via BOB
 I2PServerTunnelCreatorBOBClient = makeProtocol(
-    grammar.i2pTunnelBOBGrammarSource,
+    grammar.bobGrammarSource,
     BOBSender,
     I2PServerTunnelCreatorBOBReceiver)

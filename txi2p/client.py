@@ -2,7 +2,7 @@
 # See COPYING for details.
 
 from twisted.internet.defer import Deferred
-from twisted.internet.protocol import Factory
+from twisted.internet.protocol import ClientFactory
 
 from txi2p.protocol import I2PClientTunnelCreatorBOBClient
 

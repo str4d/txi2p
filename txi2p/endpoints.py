@@ -19,11 +19,10 @@ class BOBI2PClientEndpoint(object):
     I2P client endpoint backed by the BOB API.
     """
 
-    def __init__(self, bobEndpoint, dest, port=None):
+    def __init__(self, bobEndpoint, dest):
         validateDestination(dest)
         self._bobEndpoint = bobEndpoint
         self._dest = dest
-        self._port = port
 
     def connect(self, fac):
         """
@@ -36,7 +35,7 @@ class BOBI2PClientEndpoint(object):
         will immediately close.
         """
 
-        i2pFac = BOBI2PClientFactory(fac, self._bobEndpoint, self._dest, self._port)
+        i2pFac = BOBI2PClientFactory(fac, self._bobEndpoint, self._dest)
         d = self._bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # real IProtocol to be returned after tunnel creation,

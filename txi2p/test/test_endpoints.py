@@ -33,13 +33,6 @@ class BOBI2PClientEndpointTestCase(unittest.TestCase):
         self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p') # TODO: Fix.
 
 
-    def test_nonDefaultPort(self):
-        bobEndpoint = FakeEndpoint()
-        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, 'foo.i2p', 81)
-        endpoint.connect(None)
-        self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p:81') # TODO: Fix
-
-
     def test_clientDataSent(self):
         wrappedFac = FakeFactory()
         bobEndpoint = FakeEndpoint()

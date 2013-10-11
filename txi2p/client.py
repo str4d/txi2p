@@ -16,11 +16,10 @@ class BOBI2PClientFactory(ClientFactory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, clientFactory, bobEndpoint, dest, port):
+    def __init__(self, clientFactory, bobEndpoint, dest):
         self.clientFactory = clientFactory
         self.bobEndpoint = bobEndpoint
         self.dest = dest
-        self.port = port
         self.deferred = Deferred(self._cancel);
 
     def buildProtocol(self, addr):

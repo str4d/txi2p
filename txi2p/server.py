@@ -16,10 +16,10 @@ class BOBI2PServerFactory(Factory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, serverFactory, keypairPath, bobString):
+    def __init__(self, serverFactory, bobEndpoint, keypairPath):
         self.serverFactory = serverFactory
+        self.bobEndpoint = bobEndpoint
         self.keypairPath = keypairPath
-        self.bobString = bobString
         self.deferred = Deferred(self._cancel)
 
     def startFactory(self):

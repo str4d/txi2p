@@ -8,6 +8,8 @@ from zope.interface import implementer
 from txi2p.client import BOBI2PClientFactory
 from txi2p.server import BOBI2PServerFactory
 
+DEFAULT_BOB_ENDPOINT = 'tcp:127.0.0.1:2827'
+
 
 def validateDestination(dest):
     # TODO: Validate I2P domain, B32 etc.
@@ -15,18 +17,16 @@ def validateDestination(dest):
 
 
 @implementer(interfaces.IStreamClientEndpoint)
-class I2PClientEndpoint(object):
+class BOBI2PClientEndpoint(object):
     """
-    I2P client endpoint.
+    I2P client endpoint backed by the BOB API.
     """
 
-    def __init__(self, reactor, dest, port=None,
-                 bob=True, bobEndpoint='tcp:127.0.0.1:2827'):
+    def __init__(self, reactor, dest, port=None, bobEndpoint=DEFAULT_BOB_ENDPOINT):
         validateDestination(dest)
         self._reactor = reactor
         self._dest = dest
         self._port = port
-        self._bob = bob
         self._bobString = bobEndpoint
 
     def connect(self, fac):
@@ -40,25 +40,25 @@ class I2PClientEndpoint(object):
         will immediately close.
         """
 
-        if self._bob:
-            bobEndpoint = clientFromString(self._reactor, self._bobString)
-            i2pFac = BOBI2PClientFactory(fac, self._dest)
-            d = bobEndpoint.connect(i2pFac)
+        bobEndpoint = clientFromString(self._reactor, self._bobString)
+        i2pFac = BOBI2PClientFactory(fac, self._dest)
+        d = bobEndpoint.connect(i2pFac)
+        # Once the BOB IProtocol is returned, wait for the
+        # real IProtocol to be returned after tunnel creation,
+        # and pass it to any further registered callbacks.
         d.addCallback(lambda proto: i2pFac.deferred)
         return d
 
 
 @implementer(interfaces.IStreamServerEndpoint)
-class I2PServerEndpoint(object):
+class BOBI2PServerEndpoint(object):
     """
-    I2P server endpoint.
+    I2P server endpoint backed by the BOB API.
     """
 
-    def __init__(self, reactor, keypairPath,
-                 bob=True, bobEndpoint='tcp:127.0.0.1:2827'):
+    def __init__(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT):
         self._reactor = reactor
         self._keypairPath = keypairPath
-        self._bob = bob
         self._bobString = bobEndpoint
 
     def listen(self, fac):
@@ -72,9 +72,11 @@ class I2PServerEndpoint(object):
         will immediately close.
         """
 
-        if self._bob:
-            bobEndpoint = clientFromString(self._reactor, self._bobString)
-            i2pFac = BOBI2PServerFactory(fac, self._keypairPath)
-            d = bobEndpoint.connect(i2pFac)
+        bobEndpoint = clientFromString(self._reactor, self._bobString)
+        i2pFac = BOBI2PServerFactory(fac, self._keypairPath)
+        d = bobEndpoint.connect(i2pFac)
+        # Once the BOB IProtocol is returned, wait for the
+        # IListeningPort to be returned after tunnel creation,
+        # and pass it to any further registered callbacks.
         d.addCallback(lambda proto: i2pFac.deferred)
         return d

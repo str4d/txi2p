@@ -4,8 +4,7 @@ from twisted.internet.interfaces import IStreamServerEndpointStringParser
 from twisted.python.compat import _PY3
 from zope.interface import implementer
 
-from txi2p.client import I2PClientEndpoint
-from txi2p.server import I2PServerEndpoint
+from txi2p.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint, DEFAULT_BOB_ENDPOINT
 
 if not _PY3:
     from twisted.plugin import IPlugin
@@ -17,13 +16,10 @@ else:
 
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
 class _I2PClientParser(object):
-    prefix = 'i2p'
+    prefix = 'i2pbob'
 
-    # TODO: Other parameters? Define endpoint description string.
-    def _parseClient(self, reactor, dest, bobHost='127.0.0.1', bobPort='2827'):
-        bobPort = int(bobPort)
-        bobEndpoint = TCP4ClientEndpoint(reactor, bobHost, bobPort)
-        return I2PClientEndpoint(dest, bobEndpoint)
+    def _parseClient(self, reactor, dest, port=None, bobEndpoint=DEFAULT_BOB_ENDPOINT):
+        return BOBI2PClientEndpoint(dest, port, bobEndpoint)
 
     def parseStreamClient(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has
@@ -34,13 +30,10 @@ class _I2PClientParser(object):
 
 @implementer(IPlugin, IStreamServerEndpointStringParser)
 class _I2PServerParser(object):
-    prefix = 'i2p'
+    prefix = 'i2pbob'
 
-    # TODO: Implement properly
-    def _parseServer(self, reactor, STUFF, bobHost='127.0.0.1', bobPort='2827'):
-        bobPort = int(bobPort)
-        bobEndpoint = TCP4ClientEndpoint(reactor, bobHost, bobPort)
-        return I2PServerEndpoint(STUFF, bobEndpoint)
+    def _parseServer(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT):
+        return I2PServerEndpoint(reactor, keypairPath, bobEndpoint)
 
     def parseStreamServer(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has

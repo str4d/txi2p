@@ -21,21 +21,21 @@ class BOBI2PClientEndpointTestCase(unittest.TestCase):
 
     def test_bobConnectionFailed(self):
         bobEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
-        endpoint = endpoints.I2PClientEndpoint('', bobEndpoint)
+        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, '')
         d = endpoint.connect(None)
         return self.assertFailure(d, ConnectionRefusedError)
 
 
     def test_destination(self):
         bobEndpoint = FakeEndpoint()
-        endpoint = endpoints.I2PClientEndpoint('foo.i2p', bobEndpoint)
+        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, 'foo.i2p')
         endpoint.connect(None)
         self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p') # TODO: Fix.
 
 
     def test_nonDefaultPort(self):
         bobEndpoint = FakeEndpoint()
-        endpoint = endpoints.I2PClientEndpoint('foo.i2p', bobEndpoint, 81)
+        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, 'foo.i2p', 81)
         endpoint.connect(None)
         self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p:81') # TODO: Fix
 
@@ -43,7 +43,7 @@ class BOBI2PClientEndpointTestCase(unittest.TestCase):
     def test_clientDataSent(self):
         wrappedFac = FakeFactory()
         bobEndpoint = FakeEndpoint()
-        endpoint = endpoints.I2PClientEndpoint('', bobEndpoint)
+        endpoint = endpoints.BOBI2PClientEndpoint(bobEndpoint, '')
         endpoint.connect(wrappedFac)
         bobEndpoint.proto.transport.clear()
         wrappedFac.proto.transport.write('xxxxx')

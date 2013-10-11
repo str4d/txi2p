@@ -31,7 +31,7 @@ class BOBI2PServerFactory(Factory):
             self.keypair = None
 
     def buildProtocol(self, addr):
-        proto = protocol()
+        proto = self.protocol()
         proto.factory = self
         self.bobProto = proto
         return proto

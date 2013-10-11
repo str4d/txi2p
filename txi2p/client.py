@@ -24,7 +24,7 @@ class BOBI2PClientFactory(ClientFactory):
         self.deferred = Deferred(self._cancel);
 
     def buildProtocol(self, addr):
-        proto = protocol()
+        proto = self.protocol()
         proto.factory = self
         self.bobProto = proto
         return proto

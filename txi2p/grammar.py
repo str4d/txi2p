@@ -11,14 +11,14 @@ b64 = <b64char+>
 bobGrammarSource = i2pGrammarSource + r"""
 KEYS    = b64:keys
 KEY     = b64:pubkey
-ERROR   = 'ERROR' ws <(~'\n' anything)*>:desc '\n' -> (False, desc)
-OK      = 'OK' ws <(~'\n' anything)*>:info '\n' -> (True, info)
-OK_KEY  = 'OK' ws KEY:pubkey '\n' -> (True, pubkey)
-OK_KEYS = 'OK' ws KEYS:keys '\n' -> (True, keys)
-DATA    = 'DATA' ws <(~'\n' anything)*>:data '\n' -> data
+ERROR   = 'ERROR ' <(~'\n' anything)*>:desc '\n' -> (False, desc)
+OK      = 'OK ' <(~'\n' anything)*>:info '\n' -> (True, info)
+OK_KEY  = 'OK ' KEY:pubkey '\n' -> (True, pubkey)
+OK_KEYS = 'OK ' KEYS:keys '\n' -> (True, keys)
+DATA    = 'DATA ' <(~'\n' anything)*>:data '\n' -> data
 
 versionString = <digit+ '.' digit+ '.' digit+>
-BOB_init      = 'BOB' ws versionString:version '\nOK\n' -> version
+BOB_init      = 'BOB ' versionString:version '\nOK\n' -> version
 
 BOB_clear     = (ERROR | OK_KEY)
 BOB_getdest   = (ERROR | OK_KEY)
@@ -44,7 +44,7 @@ BOB_stop      = (ERROR | OK)
 BOB_verify    = (ERROR | OK)
 BOB_visit     = (OK)
 
-State_init      = BOB_init:response      -> receiver.initBOB(*response)
+State_init      = BOB_init:version      -> receiver.initBOB(version)
 
 State_clear     = BOB_clear:response     -> receiver.clear(*response)
 State_getdest   = BOB_getdest:response   -> receiver.getdest(*response)

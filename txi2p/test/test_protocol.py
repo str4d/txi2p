@@ -19,8 +19,46 @@ class TestI2PClientTunnelCreatorBOBClient(unittest.TestCase):
         proto.makeConnection(transport)
         return fac, proto
 
-    def test_init(self):
+    def test_initBOB(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
         proto.dataReceived('BOB 00.00.10\nOK\n')
         self.assertEqual(proto.transport.value(), 'setnick spam\n')
+
+    def test_nickSetWithKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.keypair = 'eggs'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'setkeys eggs\n')
+
+    def test_destFetchedAfterNickSetWithKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.keypair = 'eggs'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'getdest\n')
+
+    def test_nickSetWithNoKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'newkeys\n')
+
+    def test_keypairFetchedAfterNickSetWithNoKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        self.assertEqual(proto.transport.value(), 'getkeys\n')

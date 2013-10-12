@@ -88,7 +88,7 @@ class BOBReceiver(object):
         self.factory = parser.factory
 
     def finishParsing(self, reason):
-        pass
+        print reason
 
     def initBOB(self, version):
         """Override this to start protocol logic"""

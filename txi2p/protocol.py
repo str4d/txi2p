@@ -295,6 +295,32 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             print "Server tunnel started"
             self.factory.i2pTunnelCreated()
 
+class I2PTunnelRemoverBOBReceiver(BOBReceiver):
+    def initBOB(self, version):
+        if hasattr(self.factory, 'tunnelNick'):
+            # Get tunnel for nickname
+            self.sender.sendGetnick(self.factory.tunnelNick)
+            self.currentRule = 'State_setnick'
+        else:
+            print 'Factory has no tunnelNick'
+
+    def getnick(self, success, info):
+        super.getnick(success, info)
+        if success:
+            self.sender.sendStop()
+            self.currentRule = 'State_stop'
+
+    def stop(self, success, info):
+        super.stop(success, info)
+        if success:
+            self.sender.sendClear()
+            self.currentRule = 'State_clear'
+
+    def clear(self, success, info):
+        super.stop(success, info)
+        if success:
+            print 'Tunnel removed'
+
 
 # A Protocol for making an I2P client tunnel via BOB
 I2PClientTunnelCreatorBOBClient = makeProtocol(
@@ -307,3 +333,9 @@ I2PServerTunnelCreatorBOBClient = makeProtocol(
     grammar.bobGrammarSource,
     BOBSender,
     I2PServerTunnelCreatorBOBReceiver)
+
+# A Protocol for removing a BOB I2P tunnel
+I2PTunnelRemoverBOBClient = makeProtocol(
+    grammar.bobGrammarSource,
+    BOBSender,
+    I2PTunnelRemoverBOBReceiver)

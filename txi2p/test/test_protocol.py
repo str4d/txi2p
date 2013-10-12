@@ -1,18 +1,18 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from twisted.internet.protocol import ClientFactory
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
 from txi2p.protocol import (I2PClientTunnelCreatorBOBClient,
                             I2PServerTunnelCreatorBOBClient)
-from txi2p.test.util import FakeBOBI2PClientFactory
 
 
-class BOBClientWithSetnickMixin(object):
+class ProtoTestMixin(object):
     def makeProto(self, *a, **kw):
         protoClass = kw.pop('_protoClass', self.protocol)
-        fac = FakeBOBI2PClientFactory(*a, **kw)
+        fac = ClientFactory(*a, **kw)
         fac.protocol = protoClass
         proto = fac.buildProtocol(None)
         transport = proto_helpers.StringTransport()
@@ -20,6 +20,7 @@ class BOBClientWithSetnickMixin(object):
         proto.makeConnection(transport)
         return fac, proto
 
+class BOBClientWithSetnickMixin(ProtoTestMixin):
     def test_initBOB(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'

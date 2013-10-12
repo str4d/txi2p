@@ -4,13 +4,14 @@
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
-from txi2p.protocol import I2PClientTunnelCreatorBOBClient
+from txi2p.protocol import (I2PClientTunnelCreatorBOBClient,
+                            I2PServerTunnelCreatorBOBClient)
 from txi2p.test.util import FakeBOBI2PClientFactory
 
 
-class TestI2PClientTunnelCreatorBOBClient(unittest.TestCase):
+class BOBClientWithSetnickMixin(object):
     def makeProto(self, *a, **kw):
-        protoClass = kw.pop('_protoClass', I2PClientTunnelCreatorBOBClient)
+        protoClass = kw.pop('_protoClass', self.protocol)
         fac = FakeBOBI2PClientFactory(*a, **kw)
         fac.protocol = protoClass
         proto = fac.buildProtocol(None)
@@ -62,3 +63,11 @@ class TestI2PClientTunnelCreatorBOBClient(unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         self.assertEqual(proto.transport.value(), 'getkeys\n')
+
+
+class TestI2PClientTunnelCreatorBOBClient(BOBClientWithSetnickMixin, unittest.TestCase):
+    protocol = I2PClientTunnelCreatorBOBClient
+
+
+class TestI2PServerTunnelCreatorBOBClient(BOBClientWithSetnickMixin, unittest.TestCase):
+    protocol = I2PServerTunnelCreatorBOBClient

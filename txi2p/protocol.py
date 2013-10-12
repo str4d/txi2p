@@ -168,8 +168,7 @@ class BOBReceiver(object):
 
     def setnick(self, success, info):
         if success:
-            print info # XXX: Remove
-            if self.factory.keypair: # If a keypair was provided, use it
+            if hasattr(self.factory, 'keypair'): # If a keypair was provided, use it
                 self.sender.sendSetkeys(self.factory.keypair)
                 self.currentRule = 'State_setkeys'
             else: # Get a new keypair

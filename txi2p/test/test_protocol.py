@@ -69,6 +69,128 @@ class BOBClientWithSetnickMixin(ProtoTestMixin):
 class TestI2PClientTunnelCreatorBOBClient(BOBClientWithSetnickMixin, unittest.TestCase):
     protocol = I2PClientTunnelCreatorBOBClient
 
+    def test_inhostSetAfterNickSetWithKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.keypair = 'eggs'
+        fac.inhost = 'camelot'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The Destination
+        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+
+    def test_inhostSetAfterNickSetWithNoKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.inhost = 'camelot'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+
+    def test_inportSet(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.inhost = 'camelot'
+        fac.inport = '1234'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'inport 1234\n')
+
+    def test_startRequested(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.inhost = 'camelot'
+        fac.inport = '1234'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'start\n')
+
 
 class TestI2PServerTunnelCreatorBOBClient(BOBClientWithSetnickMixin, unittest.TestCase):
     protocol = I2PServerTunnelCreatorBOBClient
+
+    def test_outhostSetAfterNickSetWithKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.keypair = 'eggs'
+        fac.outhost = 'camelot'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The Destination
+        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+
+    def test_outhostSetAfterNickSetWithNoKeypair(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.outhost = 'camelot'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+
+    def test_outportSet(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.outhost = 'camelot'
+        fac.outport = '1234'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'outport 1234\n')
+
+    def test_startRequested(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.outhost = 'camelot'
+        fac.outport = '1234'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'start\n')

@@ -1,8 +1,18 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet import defer
+from twisted.internet import defer, protocol
 from twisted.test import proto_helpers
+
+from txi2p.protocol import I2PClientTunnelCreatorBOBClient
+
+
+class FakeBOBI2PClientFactory(protocol.ClientFactory):
+    protocol = I2PClientTunnelCreatorBOBClient
+
+    def __init__(self, dest=''):
+        self.dest = dest
+
 
 class FakeEndpoint(object):
     def __init__(self, failure=None):

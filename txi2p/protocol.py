@@ -96,33 +96,38 @@ class BOBReceiver(object):
 
     def clear(self, success, info):
         if not success: # Try again. TODO: Limit retries
+            print info
             self.sender.sendClear()
 
     def getdest(self, success, info):
         if success:
             # Save the local Destination
             self.factory.localDest = info
+        else:
+            print info
 
     def getkeys(self, success, info):
         if success:
             # Save the keypair
             self.factory.keypair = info
+        else:
+            print info
 
     def getnick(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def inhost(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def inport(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def list(self, success, info, data):
-        if success:
-            pass
+        if not success:
+            print info
 
     def newkeys(self, success, info):
         if success:
@@ -131,22 +136,24 @@ class BOBReceiver(object):
             # Get the new keypair
             self.sender.sendGetkeys()
             self.currentRule = 'State_getkeys'
+        else:
+            print info
 
     def option(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def outhost(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def outport(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def quiet(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def quit(self, success, info):
         pass
@@ -156,6 +163,8 @@ class BOBReceiver(object):
             # Update the local Destination
             self.sender.sendGetdest()
             self.currentRule = 'State_getdest'
+        else:
+            print info
 
     def setnick(self, success, info):
         if success:
@@ -166,30 +175,32 @@ class BOBReceiver(object):
             else: # Get a new keypair
                 self.sender.sendNewkeys()
                 self.currentRule = 'State_newkeys'
+        else:
+            print info
 
     def show(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def showprops(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def start(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def status(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def stop(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def verify(self, success, info):
-        if success:
-            pass
+        if not success:
+            print info
 
     def visit(self, success, info):
         pass

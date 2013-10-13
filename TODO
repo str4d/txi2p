@@ -1,5 +1,4 @@
 - Reorganize code
-  - Move code from tx.client and tx.server into better module name
   - Reorganize to group by API (for when SAM is added)
 - Work out how BOB will not choose conflicting in/outports
   - No state can be stored between endpoint instances?
@@ -10,4 +9,3 @@
   - serverFactory: Strip and save remote client dest before server uses data
   - Override getHost()/getPeer() somewhere to provide I2P Destinations
   - In stopFactory() launch another bobEndpoint to take down tunnel
-    - Write new BOB Factory to take down arbitrary tunnel

@@ -6,7 +6,8 @@ from twisted.test import proto_helpers
 from twisted.trial import unittest
 
 from txi2p.protocol import (I2PClientTunnelCreatorBOBClient,
-                            I2PServerTunnelCreatorBOBClient)
+                            I2PServerTunnelCreatorBOBClient,
+                            I2PTunnelRemoverBOBClient)
 
 
 class ProtoTestMixin(object):
@@ -21,7 +22,7 @@ class ProtoTestMixin(object):
         return fac, proto
 
 class BOBClientWithSetnickMixin(ProtoTestMixin):
-    def test_initBOB(self):
+    def test_initBOBSetsNick(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
         proto.dataReceived('BOB 00.00.10\nOK\n')
@@ -194,3 +195,43 @@ class TestI2PServerTunnelCreatorBOBClient(BOBClientWithSetnickMixin, unittest.Te
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         self.assertEqual(proto.transport.value(), 'start\n')
+
+
+class TestI2PTunnelRemoverBOBClient(ProtoTestMixin, unittest.TestCase):
+    protocol = I2PTunnelRemoverBOBClient
+
+    def test_initBOBGetsNick(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        self.assertEqual(proto.transport.value(), 'getnick spam\n')
+
+    def test_stopRequested(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'stop\n')
+
+    def test_clearRequested(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'clear\n')
+
+    def test_clearRequestRepeated(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('ERROR tunnel shutting down\n')
+        self.assertEqual(proto.transport.value(), 'clear\n')

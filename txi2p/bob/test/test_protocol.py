@@ -5,9 +5,9 @@ from twisted.internet.protocol import ClientFactory
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
-from txi2p.protocol import (I2PClientTunnelCreatorBOBClient,
-                            I2PServerTunnelCreatorBOBClient,
-                            I2PTunnelRemoverBOBClient)
+from txi2p.bob.protocol import (I2PClientTunnelCreatorBOBClient,
+                                I2PServerTunnelCreatorBOBClient,
+                                I2PTunnelRemoverBOBClient)
 
 
 class ProtoTestMixin(object):

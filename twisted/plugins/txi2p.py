@@ -4,7 +4,7 @@ from twisted.internet.interfaces import IStreamServerEndpointStringParser
 from twisted.python.compat import _PY3
 from zope.interface import implementer
 
-from txi2p.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
+from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
 
 DEFAULT_BOB_ENDPOINT = 'tcp:127.0.0.1:2827'
 

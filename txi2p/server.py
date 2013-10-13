@@ -5,7 +5,7 @@ from twisted.internet.defer import Deferred
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from twisted.internet.protocol import Factory
 
-from txi2p.protocol import I2PServerTunnelCreatorBOBClient
+from txi2p.bob.protocol import I2PServerTunnelCreatorBOBClient
 
 
 class BOBI2PServerFactory(Factory):

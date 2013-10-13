@@ -90,20 +90,6 @@ class BOBReceiver(object):
     def finishParsing(self, reason):
         print reason
 
-    def newkeys(self, success, info):
-        if success:
-            # Save the new local Destination
-            self.factory.localDest = info
-            # Get the new keypair
-            self.sender.sendGetkeys()
-            self.currentRule = 'State_getkeys'
-
-    def setkeys(self, success, info):
-        if success:
-            # Update the local Destination
-            self.sender.sendGetdest()
-            self.currentRule = 'State_getdest'
-
     def setnick(self, success, info):
         if success:
             if hasattr(self.factory, 'keypair'): # If a keypair was provided, use it
@@ -112,6 +98,20 @@ class BOBReceiver(object):
             else: # Get a new keypair
                 self.sender.sendNewkeys()
                 self.currentRule = 'State_newkeys'
+
+    def setkeys(self, success, info):
+        if success:
+            # Update the local Destination
+            self.sender.sendGetdest()
+            self.currentRule = 'State_getdest'
+
+    def newkeys(self, success, info):
+        if success:
+            # Save the new local Destination
+            self.factory.localDest = info
+            # Get the new keypair
+            self.sender.sendGetkeys()
+            self.currentRule = 'State_getkeys'
 
 
 class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):

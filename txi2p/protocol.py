@@ -135,7 +135,7 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
             self.factory.keypair = info
             self._setInhost()
 
-    def _setInhost():
+    def _setInhost(self):
         if hasattr(self.factory, 'inhost'):
             self.sender.sendInhost(self.factory.inhost)
             self.currentRule = 'State_inhost'
@@ -182,7 +182,7 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             self.factory.keypair = info
             self._setOuthost()
 
-    def _setOuthost():
+    def _setOuthost(self):
         if hasattr(self.factory, 'outhost'):
             self.sender.sendOuthost(self.factory.outhost)
             self.currentRule = 'State_outhost'

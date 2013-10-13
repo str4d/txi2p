@@ -4,8 +4,7 @@
 from twisted.internet import interfaces
 from zope.interface import implementer
 
-from txi2p.client import BOBI2PClientFactory
-from txi2p.server import BOBI2PServerFactory
+from txi2p.bob.factory import BOBI2PClientFactory, BOBI2PServerFactory
 
 
 def validateDestination(dest):

@@ -212,7 +212,7 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
         if hasattr(self.factory, 'tunnelNick'):
             # Get tunnel for nickname
             self.sender.sendGetnick(self.factory.tunnelNick)
-            self.currentRule = 'State_setnick'
+            self.currentRule = 'State_getnick'
         else:
             print 'Factory has no tunnelNick'
 

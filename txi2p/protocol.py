@@ -62,7 +62,7 @@ class BOBSender(object):
         self.transport.write('showprops\n')
 
     def sendStart(self):
-        self.transport.write('\n')
+        self.transport.write('start\n')
 
     def sendStatus(self, tunnelNick):
         self.transport.write('status %s\n' % tunnelNick)

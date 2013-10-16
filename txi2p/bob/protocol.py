@@ -90,6 +90,10 @@ class BOBReceiver(object):
     def finishParsing(self, reason):
         print reason
 
+    def initBOB(self, version):
+        self.sender.sendList()
+        self.currentRule = 'State_list'
+
     def setnick(self, success, info):
         if success:
             if hasattr(self.factory, 'keypair'): # If a keypair was provided, use it
@@ -115,13 +119,14 @@ class BOBReceiver(object):
 
 
 class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
-    def initBOB(self, version):
-        if hasattr(self.factory, 'tunnelNick'):
-            # Set tunnel nickname (and update keypair/localDest state)
-            self.sender.sendSetnick(self.factory.tunnelNick)
-            self.currentRule = 'State_setnick'
-        else:
-            print 'Factory has no tunnelNick'
+    def list(self, success, info, data):
+        if success:
+            if hasattr(self.factory, 'tunnelNick'):
+                # Set tunnel nickname (and update keypair/localDest state)
+                self.sender.sendSetnick(self.factory.tunnelNick)
+                self.currentRule = 'State_setnick'
+            else:
+                print 'Factory has no tunnelNick'
 
     def getdest(self, success, info):
         if success:
@@ -162,13 +167,14 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
 
 
 class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
-    def initBOB(self, version):
-        if hasattr(self.factory, 'tunnelNick'):
-            # Set tunnel nickname (and update keypair/localDest state)
-            self.sender.sendSetnick(self.factory.tunnelNick)
-            self.currentRule = 'State_setnick'
-        else:
-            print 'Factory has no tunnelNick'
+    def list(self, success, info, data):
+        if success:
+            if hasattr(self.factory, 'tunnelNick'):
+                # Set tunnel nickname (and update keypair/localDest state)
+                self.sender.sendSetnick(self.factory.tunnelNick)
+                self.currentRule = 'State_setnick'
+            else:
+                print 'Factory has no tunnelNick'
 
     def getdest(self, success, info):
         if success:
@@ -208,13 +214,14 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             self.factory.i2pTunnelCreated()
 
 class I2PTunnelRemoverBOBReceiver(BOBReceiver):
-    def initBOB(self, version):
-        if hasattr(self.factory, 'tunnelNick'):
-            # Get tunnel for nickname
-            self.sender.sendGetnick(self.factory.tunnelNick)
-            self.currentRule = 'State_getnick'
-        else:
-            print 'Factory has no tunnelNick'
+    def list(self, success, info, data):
+        if success:
+            if hasattr(self.factory, 'tunnelNick'):
+                # Get tunnel for nickname
+                self.sender.sendGetnick(self.factory.tunnelNick)
+                self.currentRule = 'State_getnick'
+            else:
+                print 'Factory has no tunnelNick'
 
     def getnick(self, success, info):
         if success:

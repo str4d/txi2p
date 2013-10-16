@@ -90,7 +90,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
         self.assertEqual(proto.transport.value(), 'getnick spam\n')
 
-    def test_nickFetchedForRunningTunnel(self):
+    def test_stopRequestedForRunningTunnel(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
         proto.dataReceived('BOB 00.00.10\nOK\n')
@@ -100,7 +100,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK HTTP 418\n')
         self.assertEqual(proto.transport.value(), 'stop\n')
 
-    def test_nickFetchedForStoppedTunnel(self):
+    def test_stopNotRequestedForStoppedTunnel(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
         proto.dataReceived('BOB 00.00.10\nOK\n')

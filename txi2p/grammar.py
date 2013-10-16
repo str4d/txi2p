@@ -16,6 +16,7 @@ OK      = 'OK ' <(~'\n' anything)*>:info '\n' -> (True, info)
 OK_KEY  = 'OK ' KEY:pubkey '\n' -> (True, pubkey)
 OK_KEYS = 'OK ' KEYS:keys '\n' -> (True, keys)
 DATA    = 'DATA ' <(~'\n' anything)*>:data '\n' -> data
+OK_DATA = 'OK ' DATA:data -> data
 
 versionString = <digit+ '.' digit+ '.' digit+>
 BOB_init      = 'BOB ' versionString:version '\nOK\n' -> version
@@ -39,7 +40,8 @@ BOB_setnick   = (ERROR | OK)
 BOB_show      = (ERROR | OK)
 BOB_showprops = (ERROR | OK)
 BOB_start     = (ERROR | OK)
-BOB_status    = (ERROR | OK)
+BOB_status    = ((ERROR:(result, info)   -> (result, info, ()))
+                |(OK_DATA:(result, data) -> (result, '', data)))
 BOB_stop      = (ERROR | OK)
 BOB_verify    = (ERROR | OK)
 BOB_visit     = (OK)

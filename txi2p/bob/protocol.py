@@ -5,6 +5,9 @@ from parsley import makeProtocol
 
 from txi2p import grammar
 
+DEFAULT_INPORT  = 9000
+DEFAULT_OUTPORT = 9001
+
 
 class BOBSender(object):
     def __init__(self, transport):
@@ -82,6 +85,7 @@ class BOBReceiver(object):
 
     def __init__(self, sender):
         self.sender = sender
+        self.tunnelExists = False
 
     def prepareParsing(self, parser):
         # Store the factory for later use
@@ -93,6 +97,21 @@ class BOBReceiver(object):
     def initBOB(self, version):
         self.sender.sendList()
         self.currentRule = 'State_list'
+
+    def processTunnelList(self, tunnels):
+        # Default port offset is at the end of the tunnels list
+        offset = 2*(len(tunnels))
+        for i in range(0, len(tunnels)):
+            if tunnels[i]['nickname'] == self.factory.tunnelNick:
+                self.tunnelExists = True
+                self.tunnelRunning = tunnels[i]['running']
+                offset = 2*i
+                break
+        # If the in/outport were not user-configured, set them.
+        if not hasattr(self.factory, 'inport'):
+            self.factory.inport = DEFAULT_INPORT + offset
+        if not hasattr(self.factory, 'outport'):
+            self.factory.outport = DEFAULT_OUTPORT + offset
 
     def setnick(self, success, info):
         if success:
@@ -122,17 +141,43 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
     def list(self, success, info, data):
         if success:
             if hasattr(self.factory, 'tunnelNick'):
-                # Set tunnel nickname (and update keypair/localDest state)
-                self.sender.sendSetnick(self.factory.tunnelNick)
-                self.currentRule = 'State_setnick'
+                self.processTunnelList(data)
+                if self.tunnelExists:
+                    self.sender.sendGetnick(self.factory.tunnelNick)
+                    self.currentRule = 'State_getnick'
+                else:
+                    # Set tunnel nickname (and update keypair/localDest state)
+                    self.sender.sendSetnick(self.factory.tunnelNick)
+                    self.currentRule = 'State_setnick'
             else:
                 print 'Factory has no tunnelNick'
+
+    def getnick(self, success, info):
+        if success:
+            if self.tunnelRunning:
+                self.sender.sendStop()
+                self.currentRule = 'State_stop'
+            else:
+                # Update the local Destination
+                self.sender.sendGetdest()
+                self.currentRule = 'State_getdest'
+
+    def stop(self, success, info):
+        if success:
+            # Update the local Destination
+            self.sender.sendGetdest()
+            self.currentRule = 'State_getdest'
 
     def getdest(self, success, info):
         if success:
             # Save the local Destination
             self.factory.localDest = info
-            self._setInhost()
+            if self.tunnelExists:
+                # Get the keypair
+                self.sender.sendGetkeys()
+                self.currentRule = 'State_getkeys'
+            else:
+                self._setInhost()
 
     def getkeys(self, success, info):
         if success:
@@ -170,11 +215,32 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
     def list(self, success, info, data):
         if success:
             if hasattr(self.factory, 'tunnelNick'):
-                # Set tunnel nickname (and update keypair/localDest state)
-                self.sender.sendSetnick(self.factory.tunnelNick)
-                self.currentRule = 'State_setnick'
+                self.processTunnelList(data)
+                if self.tunnelExists:
+                    self.sender.sendGetnick(self.factory.tunnelNick)
+                    self.currentRule = 'State_getnick'
+                else:
+                    # Set tunnel nickname (and update keypair/localDest state)
+                    self.sender.sendSetnick(self.factory.tunnelNick)
+                    self.currentRule = 'State_setnick'
             else:
                 print 'Factory has no tunnelNick'
+
+    def getnick(self, success, info):
+        if success:
+            if self.tunnelRunning:
+                self.sender.sendStop()
+                self.currentRule = 'State_stop'
+            else:
+                # Update the local Destination
+                self.sender.sendGetdest()
+                self.currentRule = 'State_getdest'
+
+    def stop(self, success, info):
+        if success:
+            # Update the local Destination
+            self.sender.sendGetdest()
+            self.currentRule = 'State_getdest'
 
     def getdest(self, success, info):
         if success:
@@ -217,9 +283,14 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
     def list(self, success, info, data):
         if success:
             if hasattr(self.factory, 'tunnelNick'):
-                # Get tunnel for nickname
-                self.sender.sendGetnick(self.factory.tunnelNick)
-                self.currentRule = 'State_getnick'
+                self.processTunnelList(data)
+                if self.tunnelExists:
+                    # Get tunnel for nickname
+                    self.sender.sendGetnick(self.factory.tunnelNick)
+                    self.currentRule = 'State_getnick'
+                else:
+                    # Tunnel already removed
+                    pass
             else:
                 print 'Factory has no tunnelNick'
 

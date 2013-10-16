@@ -7,7 +7,8 @@ from twisted.trial import unittest
 
 from txi2p.bob.protocol import (I2PClientTunnelCreatorBOBClient,
                                 I2PServerTunnelCreatorBOBClient,
-                                I2PTunnelRemoverBOBClient)
+                                I2PTunnelRemoverBOBClient,
+                                DEFAULT_INPORT, DEFAULT_OUTPORT)
 
 
 class BOBProtoTestMixin(object):
@@ -145,6 +146,23 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
         self.assertEqual(proto.transport.value(), 'inhost camelot\n')
 
+    def test_defaultInportSet(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.inhost = 'camelot'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'inport %s\n' % DEFAULT_INPORT)
+
     def test_inportSet(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
@@ -217,6 +235,23 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
         self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+
+    def test_defaultOutportSet(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.outhost = 'camelot'
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK shrubbery\n') # The new Destination
+        proto.transport.clear()
+        proto.dataReceived('OK rubberyeggs\n') # The new keypair
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'outport %s\n' % DEFAULT_OUTPORT)
 
     def test_outportSet(self):
         fac, proto = self.makeProto()

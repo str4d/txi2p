@@ -5,8 +5,8 @@ from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.python import failure
 from twisted.trial import unittest
 
-from txi2p.test.util import FakeEndpoint
 from txi2p.bob import endpoints
+from txi2p.test.util import FakeEndpoint, FakeFactory
 
 
 connectionLostFailure = failure.Failure(ConnectionLost())

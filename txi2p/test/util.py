@@ -1,8 +1,22 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet import defer
+from twisted.internet import defer, protocol
 from twisted.test import proto_helpers
+
+
+class FakeFactory(protocol.ClientFactory):
+    protocol = proto_helpers.AccumulatingProtocol
+
+    def __init__(self, returnNoProtocol=False):
+        self.returnNoProtocol = returnNoProtocol
+        self.protocolConnectionMade = defer.Deferred()
+
+    def buildProtocol(self, addr):
+        if self.returnNoProtocol:
+            return None
+        self.proto = protocol.ClientFactory.buildProtocol(self, addr)
+        return self.proto
 
 
 class FakeEndpoint(object):

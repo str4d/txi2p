@@ -56,11 +56,17 @@ class BOBFactoryTestMixin(object):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         self.assertEqual(proto.transport.value(), 'list\n')
 
+
+class TestBOBI2PClientFactory(BOBFactoryTestMixin, unittest.TestCase):
+    factory = BOBI2PClientFactory
+
     def test_noProtocolFromWrappedFactory(self):
         wrappedFac = FakeFactory(returnNoProtocol=True)
-        fac, proto = self.makeProto(None, wrappedFac, None, '')
+        mreactor = proto_helpers.MemoryReactor()
+        fac, proto = self.makeProto(mreactor, wrappedFac, None, '')
         fac.inhost = 'localhost'
         fac.inport = 1234
+        # Shortcut to end of BOB protocol
         proto.receiver.currentRule = 'State_start'
         proto._parser._setupInterp()
         proto.dataReceived('OK HTTP 418\n')
@@ -68,9 +74,18 @@ class BOBFactoryTestMixin(object):
         return self.assertFailure(fac.deferred, defer.CancelledError)
 
 
-class TestBOBI2PClientFactory(BOBFactoryTestMixin, unittest.TestCase):
-    factory = BOBI2PClientFactory
-
-
 class TestBOBI2PServerFactory(BOBFactoryTestMixin, unittest.TestCase):
     factory = BOBI2PServerFactory
+
+    def test_noProtocolFromWrappedFactory(self):
+        wrappedFac = FakeFactory(returnNoProtocol=True)
+        mreactor = proto_helpers.MemoryReactor()
+        fac, proto = self.makeProto(mreactor, wrappedFac, None, '')
+        fac.outhost = 'localhost'
+        fac.outport = 1234
+        # Shortcut to end of BOB protocol
+        proto.receiver.currentRule = 'State_start'
+        proto._parser._setupInterp()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assert_(self.aborted)
+        return self.assertFailure(fac.deferred, defer.CancelledError)

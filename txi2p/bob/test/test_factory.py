@@ -8,6 +8,7 @@ from twisted.test import proto_helpers
 from twisted.trial import unittest
 
 from txi2p.bob.factory import BOBI2PClientFactory, BOBI2PServerFactory
+from txi2p.test.util import FakeFactory
 
 connectionLostFailure = failure.Failure(ConnectionLost())
 connectionRefusedFailure = failure.Failure(ConnectionRefusedError())
@@ -54,6 +55,17 @@ class BOBFactoryTestMixin(object):
         fac, proto = self.makeProto(None, None, None, '')
         proto.dataReceived('BOB 00.00.10\nOK\n')
         self.assertEqual(proto.transport.value(), 'list\n')
+
+    def test_noProtocolFromWrappedFactory(self):
+        wrappedFac = FakeFactory(returnNoProtocol=True)
+        fac, proto = self.makeProto(None, wrappedFac, None, '')
+        fac.inhost = 'localhost'
+        fac.inport = 1234
+        proto.receiver.currentRule = 'State_start'
+        proto._parser._setupInterp()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assert_(self.aborted)
+        return self.assertFailure(fac.deferred, defer.CancelledError)
 
 
 class TestBOBI2PClientFactory(BOBFactoryTestMixin, unittest.TestCase):

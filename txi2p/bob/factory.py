@@ -31,13 +31,13 @@ class BOBI2PClientFactory(ClientFactory):
         self.bobProto = proto
         return proto
 
-    def i2pConnectionFailed(self, reason):
+    def bobConnectionFailed(self, reason):
         if not self.canceled:
             self.deferred.errback(reason)
 
     # This method is not called if an endpoint deferred errbacks
     def clientConnectionFailed(self, connector, reason):
-        self.i2pConnectionFailed(reason)
+        self.bobConnectionFailed(reason)
 
     def i2pTunnelCreated(self):
         # BOB is now listening for a tunnel.
@@ -82,6 +82,14 @@ class BOBI2PServerFactory(Factory):
         proto.factory = self
         self.bobProto = proto
         return proto
+
+    def bobConnectionFailed(self, reason):
+        if not self.canceled:
+            self.deferred.errback(reason)
+
+    # This method is not called if an endpoint deferred errbacks
+    def clientConnectionFailed(self, connector, reason):
+        self.bobConnectionFailed(reason)
 
     def i2pTunnelCreated(self):
         # BOB will now forward data to a listener.

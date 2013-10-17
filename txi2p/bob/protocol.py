@@ -92,7 +92,7 @@ class BOBReceiver(object):
         self.factory = parser.factory
 
     def finishParsing(self, reason):
-        print reason
+        self.factory.bobConnectionFailed(reason)
 
     def initBOB(self, version):
         self.sender.sendList()

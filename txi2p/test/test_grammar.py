@@ -33,6 +33,31 @@ class TestBOBGrammar(unittest.TestCase):
         self._test('BOB_getkeys', 'OK spameggs\n', (True, 'spameggs'))
 
     def test_BOB_list(self):
+        spam = {
+            'nickname': 'spam',
+            'starting': False,
+            'running': True,
+            'stopping': False,
+            'keys': True,
+            'quiet': False,
+            'inport': '12345',
+            'inhost': 'localhost',
+            'outport': '23456',
+            'outhost': 'localhost'
+        }
+        eggs = {
+            'nickname': 'eggs',
+            'starting': False,
+            'running': False,
+            'stopping': False,
+            'keys': True,
+            'quiet': False,
+            'inport': 'not_set',
+            'inhost': 'localhost',
+            'outport': 'not_set',
+            'outhost': 'localhost'
+        }
+
         self._test('BOB_list', 'OK Listing done\n', (True, 'Listing done', []))
-        self._test('BOB_list', 'DATA spam\nDATA eggs\nOK Listing done\n', (True, 'Listing done', ['spam', 'eggs']))
+        self._test('BOB_list', 'DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nDATA NICKNAME: eggs STARTING: false RUNNING: false STOPPING: false KEYS: true QUIET: false INPORT: not_set INHOST: localhost OUTPORT: not_set OUTHOST: localhost\nOK Listing done\n', (True, 'Listing done', [spam, eggs]))
         self._test('BOB_list', 'ERROR ni!\n', (False, 'ni!', []))

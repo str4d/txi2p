@@ -46,11 +46,13 @@ class BOBI2PClientFactory(ClientFactory):
         # Wrap the client Factory.
         wrappedFactory = self._clientFactory # TODO: Write wrapper
         d = clientEndpoint.connect(wrappedFactory)
-        if d is None: # Shouldn't happen? Should the proto None check be a callback?
-            self.deferred.cancel()
-            return
-        # Return the Deferred, which will return an IProtocol.
-        self.deferred.callback(d)
+        def checkProto(proto):
+            if proto is None:
+                self.deferred.cancel()
+            return proto
+        d.addCallback(checkProto)
+        # When the Deferred returns an IProtocol, pass it on.
+        d.chainDeferred(self.deferred)
 
 
 class BOBI2PServerFactory(Factory):
@@ -97,9 +99,11 @@ class BOBI2PServerFactory(Factory):
         serverEndpoint = TCP4ServerEndpoint(self._reactor, self.outport)
         # Wrap the server Factory.
         wrappedFactory = self._serverFactory # TODO: Write wrapper
-        d = serverEndpoint.connect(wrappedFactory)
-        if d is None: # Shouldn't happen? Should the proto None check be a callback?
-            self.deferred.cancel()
-            return
-        # Return the Deferred, which will return an IListeningPort.
-        self.deferred.callback(d)
+        d = serverEndpoint.listen(wrappedFactory)
+        def checkProto(proto):
+            if proto is None:
+                self.deferred.cancel()
+            return proto
+        d.addCallback(checkProto)
+        # When the Deferred returns an IListeningPort, pass it on.
+        d.chainDeferred(self.deferred)

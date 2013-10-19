@@ -107,6 +107,9 @@ class BOBReceiver(object):
                 self.tunnelExists = True
                 self.tunnelRunning = tunnels[i]['running']
                 offset = 2*i
+                # The tunnel will be removed by the Factory
+                # that created it.
+                self.factory.removeTunnelWhenFinished = False
                 break
         # If the in/outport were not user-configured, set them.
         if not hasattr(self.factory, 'inport'):

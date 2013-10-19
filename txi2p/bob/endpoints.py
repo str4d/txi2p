@@ -18,12 +18,19 @@ class BOBI2PClientEndpoint(object):
     I2P client endpoint backed by the BOB API.
     """
 
-    def __init__(self, reactor, bobEndpoint, dest, tunnelNick=None):
+    def __init__(self, reactor, bobEndpoint, dest,
+                 tunnelNick=None,
+                 inhost='localhost',
+                 inport=None,
+                 options=None):
         validateDestination(dest)
         self._reactor = reactor
         self._bobEndpoint = bobEndpoint
         self._dest = dest
         self._tunnelNick = tunnelNick
+        self._inhost = inhost
+        self._inport = inport
+        self._options = options
 
     def connect(self, fac):
         """
@@ -36,7 +43,11 @@ class BOBI2PClientEndpoint(object):
         will immediately close.
         """
 
-        i2pFac = BOBI2PClientFactory(self._reactor, fac, self._bobEndpoint, self._dest, self._tunnelNick)
+        i2pFac = BOBI2PClientFactory(self._reactor, fac, self._bobEndpoint, self._dest,
+                                     self._tunnelNick,
+                                     self._inhost,
+                                     self._inport,
+                                     self._options)
         d = self._bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # real IProtocol to be returned after tunnel creation,
@@ -51,11 +62,18 @@ class BOBI2PServerEndpoint(object):
     I2P server endpoint backed by the BOB API.
     """
 
-    def __init__(self, reactor, bobEndpoint, keypairPath, tunnelNick=None):
+    def __init__(self, reactor, bobEndpoint, keypairPath,
+                 tunnelNick=None,
+                 outhost='localhost',
+                 outport=None,
+                 options=None):
         self._reactor = reactor
         self._bobEndpoint = bobEndpoint
         self._keypairPath = keypairPath
         self._tunnelNick = tunnelNick
+        self._outhost = outhost
+        self._outport = outport
+        self._options = options
 
     def listen(self, fac):
         """
@@ -68,7 +86,11 @@ class BOBI2PServerEndpoint(object):
         will immediately close.
         """
 
-        i2pFac = BOBI2PServerFactory(self._reactor, fac, self._bobEndpoint, self._keypairPath, self._tunnelNick)
+        i2pFac = BOBI2PServerFactory(self._reactor, fac, self._bobEndpoint, self._keypairPath,
+                                     self._tunnelNick,
+                                     self._outhost,
+                                     self._outport,
+                                     self._options)
         d = self._bobEndpoint.connect(i2pFac)
         # Once the BOB IProtocol is returned, wait for the
         # IListeningPort to be returned after tunnel creation,

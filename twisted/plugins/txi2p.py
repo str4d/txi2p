@@ -27,7 +27,7 @@ class _I2PClientParser(object):
                      inport=None,
                      options=None):
         return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    dest, tunnelNick)
+                                    dest, tunnelNick, inhost, inport, options)
 
     def parseStreamClient(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has
@@ -48,7 +48,7 @@ class _I2PServerParser(object):
                      outport=None,
                      options=None):
         return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    keypairPath, tunnelNick)
+                                    keypairPath, tunnelNick, outhost, outport, options)
 
     def parseStreamServer(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has

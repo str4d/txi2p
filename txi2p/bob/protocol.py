@@ -115,14 +115,14 @@ class BOBReceiver(object):
         else:
             self.factory.tunnelNick = 'txi2p-%d' % (len(tunnels) + 1)
         # If the in/outport were not user-configured, set them.
-        if not hasattr(self.factory, 'inport'):
+        if not (hasattr(self.factory, 'inport') and self.factory.inport):
             self.factory.inport = DEFAULT_INPORT + offset
-        if not hasattr(self.factory, 'outport'):
+        if not (hasattr(self.factory, 'outport') and self.factory.outport):
             self.factory.outport = DEFAULT_OUTPORT + offset
 
     def setnick(self, success, info):
         if success:
-            if hasattr(self.factory, 'keypair'): # If a keypair was provided, use it
+            if hasattr(self.factory, 'keypair') and self.factory.keypair: # If a keypair was provided, use it
                 self.sender.sendSetkeys(self.factory.keypair)
                 self.currentRule = 'State_setkeys'
             else: # Get a new keypair
@@ -190,19 +190,13 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
             self._setInhost()
 
     def _setInhost(self):
-        if hasattr(self.factory, 'inhost'):
-            self.sender.sendInhost(self.factory.inhost)
-            self.currentRule = 'State_inhost'
-        else:
-            print 'Factory has no inhost'
+        self.sender.sendInhost(self.factory.inhost)
+        self.currentRule = 'State_inhost'
 
     def inhost(self, success, info):
         if success:
-            if hasattr(self.factory, 'inport'):
-                self.sender.sendInport(self.factory.inport)
-                self.currentRule = 'State_inport'
-            else:
-                print 'Factory has no inport'
+            self.sender.sendInport(self.factory.inport)
+            self.currentRule = 'State_inport'
 
     def inport(self, success, info):
         if success:
@@ -256,19 +250,13 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             self._setOuthost()
 
     def _setOuthost(self):
-        if hasattr(self.factory, 'outhost'):
-            self.sender.sendOuthost(self.factory.outhost)
-            self.currentRule = 'State_outhost'
-        else:
-            print 'Factory has no outhost'
+        self.sender.sendOuthost(self.factory.outhost)
+        self.currentRule = 'State_outhost'
 
     def outhost(self, success, info):
         if success:
-            if hasattr(self.factory, 'outport'):
-                self.sender.sendOutport(self.factory.outport)
-                self.currentRule = 'State_outport'
-            else:
-                print 'Factory has no outport'
+            self.sender.sendOutport(self.factory.outport)
+            self.currentRule = 'State_outport'
 
     def outport(self, success, info):
         if success:

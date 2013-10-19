@@ -7,7 +7,10 @@ from twisted.python import failure
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
-from txi2p.bob.factory import BOBI2PClientFactory, BOBI2PServerFactory
+from txi2p.bob.factory import (BOBI2PClientFactory,
+                               BOBI2PServerFactory,
+                               BOBClientFactoryWrapper,
+                               BOBServerFactoryWrapper)
 from txi2p.test.util import FakeFactory
 
 connectionLostFailure = failure.Failure(ConnectionLost())
@@ -64,6 +67,7 @@ class TestBOBI2PClientFactory(BOBFactoryTestMixin, unittest.TestCase):
         wrappedFac = FakeFactory(returnNoProtocol=True)
         mreactor = proto_helpers.MemoryReactor()
         fac, proto = self.makeProto(mreactor, wrappedFac, None, '')
+        fac.tunnelNick = 'spam'
         fac.inhost = 'localhost'
         fac.inport = 1234
         # Shortcut to end of BOB protocol
@@ -81,6 +85,7 @@ class TestBOBI2PServerFactory(BOBFactoryTestMixin, unittest.TestCase):
         wrappedFac = FakeFactory(returnNoProtocol=True)
         mreactor = proto_helpers.MemoryReactor()
         fac, proto = self.makeProto(mreactor, wrappedFac, None, '')
+        fac.tunnelNick = 'spam'
         fac.outhost = 'localhost'
         fac.outport = 1234
         # Shortcut to end of BOB protocol
@@ -89,3 +94,20 @@ class TestBOBI2PServerFactory(BOBFactoryTestMixin, unittest.TestCase):
         proto.dataReceived('OK HTTP 418\n')
         self.assert_(self.aborted)
         return self.assertFailure(fac.deferred, defer.CancelledError)
+
+
+class TestBOBClientFactoryWrapper(unittest.TestCase):
+    def test_buildProtocol(self):
+        wrappedFac = FakeFactory()
+        fac = BOBClientFactoryWrapper(wrappedFac, None, '', True)
+        fac.setDest('spam.i2p')
+        proto = fac.buildProtocol(None)
+        self.assertEqual(proto.wrappedProto.factory, wrappedFac)
+
+
+class TestBOBServerFactoryWrapper(unittest.TestCase):
+    def test_buildProtocol(self):
+        wrappedFac = FakeFactory()
+        fac = BOBServerFactoryWrapper(wrappedFac, None, '', True)
+        proto = fac.buildProtocol(None)
+        self.assertEqual(proto.wrappedProto.factory, wrappedFac)

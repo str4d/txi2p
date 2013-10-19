@@ -1,11 +1,4 @@
-- Reorganize code
-  - Reorganize to group by API (for when SAM is added)
-- Work out how BOB will not choose conflicting in/outports
-  - No state can be stored between endpoint instances?
-  - List all existing tunnels, pick a port that is not one of them?
-  - Hard-coded start port, pick consecutive, use BOB list to 'count' offset?
-- Write wrapper factories for clientFactory and serverFactory
-  - clientFactory: Send dest before client can send data
-  - serverFactory: Strip and save remote client dest before server uses data
-  - Override getHost()/getPeer() somewhere to provide I2P Destinations
-  - In stopFactory() launch another bobEndpoint to take down tunnel
+- Reorganize code to group by API (for when SAM is added)
+  - Split grammar?
+- Work out how state can be stored between endpoint instances?
+- Override getHost()/getPeer() somewhere to provide I2P Destinations

@@ -8,6 +8,8 @@ from twisted.trial import unittest
 from txi2p.bob.protocol import (I2PClientTunnelCreatorBOBClient,
                                 I2PServerTunnelCreatorBOBClient,
                                 I2PTunnelRemoverBOBClient,
+                                I2PClientTunnelProtocol,
+                                I2PServerTunnelProtocol,
                                 DEFAULT_INPORT, DEFAULT_OUTPORT)
 
 
@@ -346,3 +348,43 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('ERROR tunnel shutting down\n')
         self.assertEqual(proto.transport.value(), 'clear\n')
+
+
+class TestI2PClientTunnelProtocol(unittest.TestCase):
+    def makeProto(self):
+        wrappedProto = proto_helpers.AccumulatingProtocol()
+        proto = I2PClientTunnelProtocol(wrappedProto, 'spam.i2p')
+        transport = proto_helpers.StringTransport()
+        transport.abortConnection = lambda: None
+        proto.makeConnection(transport)
+        return proto
+
+    def test_destRequested(self):
+        proto = self.makeProto()
+        self.assertEqual(proto.transport.value(), 'spam.i2p\n')
+
+    def test_dataPassed(self):
+        proto = self.makeProto()
+        proto.dataReceived('shrubbery')
+        self.assertEqual(proto.wrappedProto.data, 'shrubbery')
+
+
+class TestI2PServerTunnelProtocol(unittest.TestCase):
+    def makeProto(self):
+        wrappedProto = proto_helpers.AccumulatingProtocol()
+        proto = I2PServerTunnelProtocol(wrappedProto)
+        transport = proto_helpers.StringTransport()
+        transport.abortConnection = lambda: None
+        proto.makeConnection(transport)
+        return proto
+
+    def test_peerDestStored(self):
+        proto = self.makeProto()
+        proto.dataReceived('spam.i2p\n')
+        self.assertEqual(proto.peer, 'spam.i2p')
+
+    def test_dataAfterPeerDestPassed(self):
+        proto = self.makeProto()
+        proto.dataReceived('spam.i2p\n')
+        proto.dataReceived('shrubbery')
+        self.assertEqual(proto.wrappedProto.data, 'shrubbery')

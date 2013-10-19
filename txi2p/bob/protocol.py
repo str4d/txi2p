@@ -2,6 +2,7 @@
 # See COPYING for details.
 
 from parsley import makeProtocol
+from twisted.internet.protocol import Protocol
 
 from txi2p import grammar
 
@@ -328,3 +329,32 @@ I2PTunnelRemoverBOBClient = makeProtocol(
     grammar.bobGrammarSource,
     BOBSender,
     I2PTunnelRemoverBOBReceiver)
+
+
+class I2PClientTunnelProtocol(Protocol):
+    def __init__(self, wrappedProto, dest):
+        self.wrappedProto = wrappedProto
+        self.dest = dest
+
+    def connectionMade(self):
+        # First line sent must be the Destination to connect to.
+        self.transport.write(self.dest + '\n')
+
+    def dataReceived(self, data):
+        # Pass all received data to the wrapped Protocol.
+        self.wrappedProto.dataReceived(data)
+
+
+class I2PServerTunnelProtocol(Protocol):
+    def __init__(self, wrappedProto):
+        self.wrappedProto = wrappedProto
+        self.peer = None
+
+    def dataReceived(self, data):
+        if self.peer:
+            # Pass all other data to the wrapped Protocol.
+            self.wrappedProto.dataReceived(data)
+        else:
+            # First line is the peer's Destination.
+            # TODO: Return this to the user somehow.
+            self.peer = data.split('\n')[0]

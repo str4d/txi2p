@@ -26,11 +26,18 @@ class BOBProtoTestMixin(object):
 
     def test_initBOBListsTunnels(self):
         fac, proto = self.makeProto()
-        fac.tunnelNick = 'spam'
         proto.dataReceived('BOB 00.00.10\nOK\n')
         self.assertEqual(proto.transport.value(), 'list\n')
 
 class BOBTunnelCreationMixin(BOBProtoTestMixin):
+    def test_defaultNickSetsNick(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = None
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
+        self.assertEqual(proto.transport.value(), 'setnick txi2p-1\n')
+
     def test_newNickSetsNick(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'

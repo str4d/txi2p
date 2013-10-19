@@ -22,11 +22,12 @@ class BOBI2PClientFactory(ClientFactory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, reactor, clientFactory, bobEndpoint, dest):
+    def __init__(self, reactor, clientFactory, bobEndpoint, dest, tunnelNick=None):
         self._reactor = reactor
         self._clientFactory = clientFactory
         self._bobEndpoint = bobEndpoint
         self.dest = dest
+        self.tunnelNick = tunnelNick
         self.deferred = Deferred(self._cancel);
 
     def buildProtocol(self, addr):
@@ -73,11 +74,12 @@ class BOBI2PServerFactory(Factory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, reactor, serverFactory, bobEndpoint, keypairPath):
+    def __init__(self, reactor, serverFactory, bobEndpoint, keypairPath, tunnelNick=None):
         self._reactor = reactor
         self._serverFactory = serverFactory
         self._bobEndpoint = bobEndpoint
         self.keypairPath = keypairPath
+        self.tunnelNick = tunnelNick
         self.deferred = Deferred(self._cancel)
 
     def startFactory(self):

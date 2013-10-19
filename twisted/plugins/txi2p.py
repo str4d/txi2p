@@ -20,9 +20,9 @@ else:
 class _I2PClientParser(object):
     prefix = 'i2pbob'
 
-    def _parseClient(self, reactor, dest, bobEndpoint=DEFAULT_BOB_ENDPOINT):
+    def _parseClient(self, reactor, dest, bobEndpoint=DEFAULT_BOB_ENDPOINT, tunnelNick=None):
         return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    dest)
+                                    dest, tunnelNick)
 
     def parseStreamClient(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has
@@ -35,9 +35,9 @@ class _I2PClientParser(object):
 class _I2PServerParser(object):
     prefix = 'i2pbob'
 
-    def _parseServer(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT):
+    def _parseServer(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT, tunnelNick=None):
         return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    keypairPath)
+                                    keypairPath, tunnelNick)
 
     def parseStreamServer(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has

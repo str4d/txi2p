@@ -20,7 +20,12 @@ else:
 class _I2PClientParser(object):
     prefix = 'i2pbob'
 
-    def _parseClient(self, reactor, dest, bobEndpoint=DEFAULT_BOB_ENDPOINT, tunnelNick=None):
+    def _parseClient(self, reactor, dest,
+                     bobEndpoint=DEFAULT_BOB_ENDPOINT,
+                     tunnelNick=None,
+                     inhost='localhost',
+                     inport=None,
+                     options=None):
         return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
                                     dest, tunnelNick)
 
@@ -35,7 +40,13 @@ class _I2PClientParser(object):
 class _I2PServerParser(object):
     prefix = 'i2pbob'
 
-    def _parseServer(self, reactor, keypairPath, bobEndpoint=DEFAULT_BOB_ENDPOINT, tunnelNick=None):
+    def _parseServer(self, reactor,
+                     keypairPath,
+                     bobEndpoint=DEFAULT_BOB_ENDPOINT,
+                     tunnelNick=None,
+                     outhost='localhost',
+                     outport=None,
+                     options=None):
         return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
                                     keypairPath, tunnelNick)
 

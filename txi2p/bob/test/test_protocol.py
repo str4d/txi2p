@@ -29,6 +29,14 @@ class BOBProtoTestMixin(object):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         self.assertEqual(proto.transport.value(), 'list\n')
 
+    def test_quitDoesNotErrback(self):
+        fac, proto = self.makeProto()
+        # Shortcut to end of BOB protocol
+        proto.receiver.currentRule = 'State_quit'
+        proto._parser._setupInterp()
+        proto.dataReceived('OK Bye!\n')
+        self.assertTrue(False, 'TODO: Test something') # TODO: Test something
+
 class BOBTunnelCreationMixin(BOBProtoTestMixin):
     def test_defaultNickSetsNick(self):
         fac, proto = self.makeProto()

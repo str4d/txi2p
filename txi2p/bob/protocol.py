@@ -93,7 +93,8 @@ class BOBReceiver(object):
         self.factory = parser.factory
 
     def finishParsing(self, reason):
-        self.factory.bobConnectionFailed(reason)
+        if self.currentRule != 'State_quit':
+            self.factory.bobConnectionFailed(reason)
 
     def initBOB(self, version):
         self.sender.sendList()
@@ -142,6 +143,9 @@ class BOBReceiver(object):
             # Get the new keypair
             self.sender.sendGetkeys()
             self.currentRule = 'State_getkeys'
+
+    def quit(self, success, info):
+        pass
 
 
 class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
@@ -207,6 +211,8 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
         if success:
             print "Client tunnel started"
             self.factory.i2pTunnelCreated()
+            self.sender.sendQuit()
+            self.currentRule = 'State_quit'
 
 
 class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
@@ -267,6 +273,8 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
         if success:
             print "Server tunnel started"
             self.factory.i2pTunnelCreated()
+            self.sender.sendQuit()
+            self.currentRule = 'State_quit'
 
 class I2PTunnelRemoverBOBReceiver(BOBReceiver):
     def list(self, success, info, data):
@@ -293,6 +301,8 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
     def clear(self, success, info):
         if success:
             print 'Tunnel removed'
+            self.sender.sendQuit()
+            self.currentRule = 'State_quit'
         else: # Try again. TODO: Limit retries
             self.sender.sendClear()
 

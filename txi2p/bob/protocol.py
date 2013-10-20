@@ -330,6 +330,9 @@ class I2PClientTunnelProtocol(Protocol):
         # Pass all received data to the wrapped Protocol.
         self.wrappedProto.dataReceived(data)
 
+    def connectionLost(self, reason):
+        self.wrappedProto.connectionLost(reason)
+
 
 class I2PServerTunnelProtocol(Protocol):
     def __init__(self, wrappedProto):
@@ -347,3 +350,6 @@ class I2PServerTunnelProtocol(Protocol):
             # First line is the peer's Destination.
             # TODO: Return this to the user somehow.
             self.peer = data.split('\n')[0]
+
+    def connectionLost(self, reason):
+        self.wrappedProto.connectionLost(reason)

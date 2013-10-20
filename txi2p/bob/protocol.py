@@ -324,6 +324,7 @@ class I2PClientTunnelProtocol(Protocol):
     def connectionMade(self):
         # First line sent must be the Destination to connect to.
         self.transport.write(self.dest + '\n')
+        self.wrappedProto.makeConnection(self.transport)
 
     def dataReceived(self, data):
         # Pass all received data to the wrapped Protocol.
@@ -334,6 +335,9 @@ class I2PServerTunnelProtocol(Protocol):
     def __init__(self, wrappedProto):
         self.wrappedProto = wrappedProto
         self.peer = None
+
+    def connectionMade(self):
+        self.wrappedProto.makeConnection(self.transport)
 
     def dataReceived(self, data):
         if self.peer:

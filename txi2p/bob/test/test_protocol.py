@@ -370,6 +370,10 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
         proto = self.makeProto()
         self.assertEqual(proto.transport.value(), 'spam.i2p\n')
 
+    def test_wrappedProtoConnectionMade(self):
+        proto = self.makeProto()
+        self.assertEqual(proto.transport, proto.wrappedProto.transport)
+
     def test_dataPassed(self):
         proto = self.makeProto()
         proto.dataReceived('shrubbery')
@@ -384,6 +388,10 @@ class TestI2PServerTunnelProtocol(unittest.TestCase):
         transport.abortConnection = lambda: None
         proto.makeConnection(transport)
         return proto
+
+    def test_wrappedProtoConnectionMade(self):
+        proto = self.makeProto()
+        self.assertEqual(proto.transport, proto.wrappedProto.transport)
 
     def test_peerDestStored(self):
         proto = self.makeProto()

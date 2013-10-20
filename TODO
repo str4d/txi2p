@@ -3,3 +3,5 @@
 - Work out how state can be stored between endpoint instances
 - Override getHost()/getPeer() somewhere to provide I2P Destinations
 - Handle more errors properly
+- Only run BOB tunnel creation Protocol for first Protocol created
+  by the Factory, shortcut the process for subsequent Protocols.

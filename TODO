@@ -1,4 +1,5 @@
 - Reorganize code to group by API (for when SAM is added)
   - Split grammar?
-- Work out how state can be stored between endpoint instances?
+- Work out how state can be stored between endpoint instances
 - Override getHost()/getPeer() somewhere to provide I2P Destinations
+- Handle more errors properly

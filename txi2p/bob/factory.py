@@ -140,8 +140,15 @@ class BOBI2PServerFactory(Factory):
 class BOBI2PTunnelRemoverFactory(ClientFactory):
     protocol = I2PTunnelRemoverBOBClient
 
-    def __init__(self, tunnelNick):
+    def __init__(self, tunnelNick, protoToNotify, reason):
         self.tunnelNick = tunnelNick
+        self.protoToNotify = protoToNotify
+        self.reason = reason
+
+    def i2pTunnelRemoved(self):
+        # Now that the I2P tunnel has been removed,
+        # notify the underlying protocol.
+        self.protoToNotify.connectionLost(self.reason)
 
 
 class BOBFactoryWrapperCommon(object):
@@ -157,11 +164,17 @@ class BOBFactoryWrapperCommon(object):
     def __getattr__(self, attr):
         return getattr(self.w, attr)
 
-    def stopFactory():
-        self.w.stopFactory()
+    def i2pConnectionLost(self, wrappedProto, reason):
         if self.removeTunnelWhenFinished:
-            rmTunnelFac = BOBI2PTunnelRemoverFactory(self.tunnelNick)
+            # Notify the underlying protocol once the tunnel has
+            # been removed, in case they stop the reactor.
+            rmTunnelFac = BOBI2PTunnelRemoverFactory(self.tunnelNick,
+                                                     wrappedProto,
+                                                     reason)
             self.bobEndpoint.connect(rmTunnelFac)
+        else:
+            # Notify the underlying protocol now.
+            wrappedProto.connectionLost(reason)
 
 
 class BOBClientFactoryWrapper(BOBFactoryWrapperCommon):
@@ -174,7 +187,6 @@ class BOBClientFactoryWrapper(BOBFactoryWrapperCommon):
         wrappedProto = self.w.buildProtocol(addr)
         proto = self.protocol(wrappedProto, self.dest)
         proto.factory = self
-        self.bobProto = proto
         return proto
 
 
@@ -185,5 +197,4 @@ class BOBServerFactoryWrapper(BOBFactoryWrapperCommon):
         wrappedProto = self.w.buildProtocol(addr)
         proto = self.protocol(wrappedProto)
         proto.factory = self
-        self.bobProto = proto
         return proto

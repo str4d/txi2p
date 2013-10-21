@@ -301,6 +301,7 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
     def clear(self, success, info):
         if success:
             print 'Tunnel removed'
+            self.factory.i2pTunnelRemoved()
             self.sender.sendQuit()
             self.currentRule = 'State_quit'
         else: # Try again. TODO: Limit retries
@@ -341,7 +342,7 @@ class I2PClientTunnelProtocol(Protocol):
         self.wrappedProto.dataReceived(data)
 
     def connectionLost(self, reason):
-        self.wrappedProto.connectionLost(reason)
+        self.factory.i2pConnectionLost(self.wrappedProto, reason)
 
 
 class I2PServerTunnelProtocol(Protocol):

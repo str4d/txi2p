@@ -17,7 +17,7 @@ else:
 
 
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
-class _I2PClientParser(object):
+class _BOBI2PClientParser(object):
     prefix = 'i2pbob'
 
     def _parseClient(self, reactor, dest,
@@ -37,7 +37,7 @@ class _I2PClientParser(object):
 
 
 @implementer(IPlugin, IStreamServerEndpointStringParser)
-class _I2PServerParser(object):
+class _BOBI2PServerParser(object):
     prefix = 'i2pbob'
 
     def _parseServer(self, reactor,

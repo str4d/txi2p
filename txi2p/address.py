@@ -18,12 +18,15 @@ class I2PAddress(FancyEqMixin, object):
 
     def __init__(self, destination, port=None):
         self.destination = destination
-        self.port = port
+        self.port = int(port) if port else None
 
 
     def __repr__(self):
-        return '%s(%s, %d)' % (
-            self.__class__.__name__, self.destination, self.port)
+        if self.port:
+            return '%s(%s, %d)' % (
+                self.__class__.__name__, self.destination, self.port)
+        return '%s(%s)' % (
+            self.__class__.__name__, self.destination)
 
 
     def __hash__(self):

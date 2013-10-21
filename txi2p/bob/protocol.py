@@ -2,7 +2,9 @@
 # See COPYING for details.
 
 from parsley import makeProtocol
+from twisted.internet.interfaces import IListeningPort
 from twisted.internet.protocol import Protocol
+from zope.interface import implementer
 
 from txi2p import grammar
 
@@ -364,3 +366,20 @@ class I2PServerTunnelProtocol(Protocol):
 
     def connectionLost(self, reason):
         self.wrappedProto.connectionLost(reason)
+
+
+@implementer(IListeningPort)
+class I2PListeningPort(object):
+    def __init__(self, wrappedPort, factoryWrapper, serverAddr):
+        self._wrappedPort = wrappedPort
+        self._factoryWrapper = factoryWrapper
+        self._serverAddr = serverAddr
+
+    def startListening(self):
+        self._wrappedPort.startListening()
+
+    def stopListening(self):
+        self._factoryWrapper.stopListening(self._wrappedPort)
+
+    def getHost(self):
+        return self._serverAddr

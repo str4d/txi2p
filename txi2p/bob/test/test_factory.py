@@ -68,8 +68,6 @@ class TestBOBI2PClientFactory(BOBFactoryTestMixin, unittest.TestCase):
         mreactor = proto_helpers.MemoryReactor()
         fac, proto = self.makeProto(mreactor, wrappedFac, None, '')
         fac.tunnelNick = 'spam'
-        fac.inhost = 'localhost'
-        fac.inport = 1234
         # Shortcut to end of BOB protocol
         proto.receiver.currentRule = 'State_start'
         proto._parser._setupInterp()
@@ -86,8 +84,7 @@ class TestBOBI2PServerFactory(BOBFactoryTestMixin, unittest.TestCase):
         mreactor = proto_helpers.MemoryReactor()
         fac, proto = self.makeProto(mreactor, wrappedFac, None, '')
         fac.tunnelNick = 'spam'
-        fac.outhost = 'localhost'
-        fac.outport = 1234
+        fac.localDest = 'spam.i2p'
         # Shortcut to end of BOB protocol
         proto.receiver.currentRule = 'State_start'
         proto._parser._setupInterp()

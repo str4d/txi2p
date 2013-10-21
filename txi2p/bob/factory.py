@@ -5,11 +5,13 @@ from twisted.internet.defer import Deferred
 from twisted.internet.endpoints import TCP4ClientEndpoint, TCP4ServerEndpoint
 from twisted.internet.protocol import ClientFactory, Factory
 
+from txi2p.address import I2PAddress
 from txi2p.bob.protocol import (I2PClientTunnelCreatorBOBClient,
                                 I2PServerTunnelCreatorBOBClient,
                                 I2PTunnelRemoverBOBClient,
                                 I2PClientTunnelProtocol,
-                                I2PServerTunnelProtocol)
+                                I2PServerTunnelProtocol,
+                                I2PListeningPort)
 
 
 class BOBI2PClientFactory(ClientFactory):
@@ -128,27 +130,15 @@ class BOBI2PServerFactory(Factory):
                                                  self.tunnelNick,
                                                  self.removeTunnelWhenFinished)
         d = serverEndpoint.listen(wrappedFactory)
-        def checkProto(proto):
-            if proto is None:
+        def handlePort(port):
+            if port is None:
                 self.deferred.cancel()
-            return proto
-        d.addCallback(checkProto)
+            serverAddr = I2PAddress(self.localDest)
+            p = I2PListeningPort(port, wrappedFactory, serverAddr)
+            return p
+        d.addCallback(handlePort)
         # When the Deferred returns an IListeningPort, pass it on.
         d.chainDeferred(self.deferred)
-
-
-class BOBI2PTunnelRemoverFactory(ClientFactory):
-    protocol = I2PTunnelRemoverBOBClient
-
-    def __init__(self, tunnelNick, protoToNotify, reason):
-        self.tunnelNick = tunnelNick
-        self.protoToNotify = protoToNotify
-        self.reason = reason
-
-    def i2pTunnelRemoved(self):
-        # Now that the I2P tunnel has been removed,
-        # notify the underlying protocol.
-        self.protoToNotify.connectionLost(self.reason)
 
 
 class BOBFactoryWrapperCommon(object):
@@ -164,18 +154,6 @@ class BOBFactoryWrapperCommon(object):
     def __getattr__(self, attr):
         return getattr(self.w, attr)
 
-    def i2pConnectionLost(self, wrappedProto, reason):
-        if self.removeTunnelWhenFinished:
-            # Notify the underlying protocol once the tunnel has
-            # been removed, in case they stop the reactor.
-            rmTunnelFac = BOBI2PTunnelRemoverFactory(self.tunnelNick,
-                                                     wrappedProto,
-                                                     reason)
-            self.bobEndpoint.connect(rmTunnelFac)
-        else:
-            # Notify the underlying protocol now.
-            wrappedProto.connectionLost(reason)
-
 
 class BOBClientFactoryWrapper(BOBFactoryWrapperCommon):
     protocol = I2PClientTunnelProtocol
@@ -189,6 +167,18 @@ class BOBClientFactoryWrapper(BOBFactoryWrapperCommon):
         proto.factory = self
         return proto
 
+    def i2pConnectionLost(self, wrappedProto, reason):
+        if self.removeTunnelWhenFinished:
+            # Notify the underlying Protocol once the tunnel has
+            # been removed, in case they stop the reactor.
+            rmTunnelFac = BOBI2PClientTunnelRemoverFactory(self.tunnelNick,
+                                                           wrappedProto,
+                                                           reason)
+            self.bobEndpoint.connect(rmTunnelFac)
+        else:
+            # Notify the underlying Protocol now.
+            wrappedProto.connectionLost(reason)
+
 
 class BOBServerFactoryWrapper(BOBFactoryWrapperCommon):
     protocol = I2PServerTunnelProtocol
@@ -198,3 +188,41 @@ class BOBServerFactoryWrapper(BOBFactoryWrapperCommon):
         proto = self.protocol(wrappedProto)
         proto.factory = self
         return proto
+
+    def stopListening(self, wrappedPort):
+        if self.removeTunnelWhenFinished:
+            # Notify the underlying ListeningPort once the tunnel
+            # has been removed, in case they stop the reactor.
+            rmTunnelFac = BOBI2PServerTunnelRemoverFactory(self.tunnelNick,
+                                                           wrappedPort)
+            self.bobEndpoint.connect(rmTunnelFac)
+        else:
+            # Notify the underlying ListeningPort now.
+            wrappedPort.stopListening()
+
+
+class BOBI2PClientTunnelRemoverFactory(ClientFactory):
+    protocol = I2PTunnelRemoverBOBClient
+
+    def __init__(self, tunnelNick, protoToNotify, reason):
+        self.tunnelNick = tunnelNick
+        self._protoToNotify = protoToNotify
+        self._reason = reason
+
+    def i2pTunnelRemoved(self):
+        # Now that the I2P tunnel has been removed,
+        # notify the underlying Protocol.
+        self._protoToNotify.connectionLost(self._reason)
+
+
+class BOBI2PServerTunnelRemoverFactory(ClientFactory):
+    protocol = I2PTunnelRemoverBOBClient
+
+    def __init__(self, tunnelNick, portToNotify):
+        self.tunnelNick = tunnelNick
+        self._portToNotify = portToNotify
+
+    def i2pTunnelRemoved(self):
+        # Now that the I2P tunnel has been removed,
+        # notify the underlying ListeningPort.
+        self._portToNotify.stopListening()

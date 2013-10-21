@@ -1,7 +1,21 @@
 - Reorganize code to group by API (for when SAM is added)
   - Split grammar?
+
 - Work out how state can be stored between endpoint instances
+
 - Override getHost()/getPeer() somewhere to provide I2P Destinations
+
 - Handle more errors properly
-- Only run BOB tunnel creation Protocol for first Protocol created
-  by the Factory, shortcut the process for subsequent Protocols.
+
+- Only run BOB tunnel creation Protocol for first Protocol created by the
+  Factory, shortcut the process for subsequent Protocols.
+  - Does this matter? Will a Factory ever have multiple Protocols at once?
+  - For clients, the tunnel dies with the first Protocol
+
+- Examine design, decide where I2P tunnels should be created and removed
+  - Client and server tunnels are created by the endpoint
+    - Once the tunnel is created, the real Protocol/ListeningPort is created
+      and returned via a Deferred callback chain
+    - Should the tunnels be created by the Protocol/ListeningPort instead?
+  - Client tunnels are removed by I2PClientTunnelProtocol.connectionLost()
+  - Server tunnels are removed by I2PListeningPort.stopListening()

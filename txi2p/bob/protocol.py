@@ -131,12 +131,16 @@ class BOBReceiver(object):
             else: # Get a new keypair
                 self.sender.sendNewkeys()
                 self.currentRule = 'State_newkeys'
+        else:
+            print 'setnick ERROR: %s' % info
 
     def setkeys(self, success, info):
         if success:
             # Update the local Destination
             self.sender.sendGetdest()
             self.currentRule = 'State_getdest'
+        else:
+            print 'setkeys ERROR: %s' % info
 
     def newkeys(self, success, info):
         if success:
@@ -145,6 +149,8 @@ class BOBReceiver(object):
             # Get the new keypair
             self.sender.sendGetkeys()
             self.currentRule = 'State_getkeys'
+        else:
+            print 'newkeys ERROR: %s' % info
 
     def quit(self, success, info):
         pass
@@ -161,6 +167,8 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
                 # Set tunnel nickname (and update keypair/localDest state)
                 self.sender.sendSetnick(self.factory.tunnelNick)
                 self.currentRule = 'State_setnick'
+        else:
+            print 'list ERROR: %s' % info
 
     def getnick(self, success, info):
         if success:
@@ -171,12 +179,16 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
                 # Update the local Destination
                 self.sender.sendGetdest()
                 self.currentRule = 'State_getdest'
+        else:
+            print 'ERROR: %s' % info
 
     def stop(self, success, info):
         if success:
             # Update the local Destination
             self.sender.sendGetdest()
             self.currentRule = 'State_getdest'
+        else:
+            print 'stop ERROR: %s' % info
 
     def getdest(self, success, info):
         if success:
@@ -188,12 +200,16 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
                 self.currentRule = 'State_getkeys'
             else:
                 self._setInhost()
+        else:
+            print 'getdest ERROR: %s' % info
 
     def getkeys(self, success, info):
         if success:
             # Save the keypair
             self.factory.keypair = info
             self._setInhost()
+        else:
+            print 'getkeys ERROR: %s' % info
 
     def _setInhost(self):
         self.sender.sendInhost(self.factory.inhost)
@@ -203,11 +219,19 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
         if success:
             self.sender.sendInport(self.factory.inport)
             self.currentRule = 'State_inport'
+        else:
+            if info == 'tunnel is active':
+                # Try again. TODO: Limit retries
+                self.sender.sendInhost(self.factory.inhost)
+            else:
+                print 'inhost ERROR: %s' % info
 
     def inport(self, success, info):
         if success:
             self.sender.sendStart()
             self.currentRule = 'State_start'
+        else:
+            print 'inport ERROR: %s' % info
 
     def start(self, success, info):
         if success:
@@ -215,6 +239,8 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
             self.factory.i2pTunnelCreated()
             self.sender.sendQuit()
             self.currentRule = 'State_quit'
+        else:
+            print 'start ERROR: %s' % info
 
 
 class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
@@ -228,6 +254,8 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
                 # Set tunnel nickname (and update keypair/localDest state)
                 self.sender.sendSetnick(self.factory.tunnelNick)
                 self.currentRule = 'State_setnick'
+        else:
+            print 'list ERROR: %s' % info
 
     def getnick(self, success, info):
         if success:
@@ -238,24 +266,32 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
                 # Update the local Destination
                 self.sender.sendGetdest()
                 self.currentRule = 'State_getdest'
+        else:
+            print 'getnick ERROR: %s' % info
 
     def stop(self, success, info):
         if success:
             # Update the local Destination
             self.sender.sendGetdest()
             self.currentRule = 'State_getdest'
+        else:
+            print 'stop ERROR: %s' % info
 
     def getdest(self, success, info):
         if success:
             # Save the local Destination
             self.factory.localDest = info
             self._setOuthost()
+        else:
+            print 'getdest ERROR: %s' % info
 
     def getkeys(self, success, info):
         if success:
             # Save the keypair
             self.factory.keypair = info
             self._setOuthost()
+        else:
+            print 'getkeys ERROR: %s' % info
 
     def _setOuthost(self):
         self.sender.sendOuthost(self.factory.outhost)
@@ -265,11 +301,19 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
         if success:
             self.sender.sendOutport(self.factory.outport)
             self.currentRule = 'State_outport'
+        else:
+            if info == 'tunnel is active':
+                # Try again. TODO: Limit retries
+                self.sender.sendOuthost(self.factory.outhost)
+            else:
+                print 'outhost ERROR: %s' % info
 
     def outport(self, success, info):
         if success:
             self.sender.sendStart()
             self.currentRule = 'State_start'
+        else:
+            print 'outport ERROR: %s' % info
 
     def start(self, success, info):
         if success:
@@ -277,6 +321,8 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             self.factory.i2pTunnelCreated()
             self.sender.sendQuit()
             self.currentRule = 'State_quit'
+        else:
+            print 'start ERROR: %s' % info
 
 class I2PTunnelRemoverBOBReceiver(BOBReceiver):
     def list(self, success, info, data):
@@ -289,16 +335,22 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
             else:
                 # Tunnel already removed
                 pass
+        else:
+            print 'list ERROR: %s' % info
 
     def getnick(self, success, info):
         if success:
             self.sender.sendStop()
             self.currentRule = 'State_stop'
+        else:
+            print 'getnick ERROR: %s' % info
 
     def stop(self, success, info):
         if success:
             self.sender.sendClear()
             self.currentRule = 'State_clear'
+        else:
+            print 'stop ERROR: %s' % info
 
     def clear(self, success, info):
         if success:
@@ -306,8 +358,12 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
             self.factory.i2pTunnelRemoved()
             self.sender.sendQuit()
             self.currentRule = 'State_quit'
-        else: # Try again. TODO: Limit retries
-            self.sender.sendClear()
+        else:
+            if info == 'tunnel is active':
+                # Try again. TODO: Limit retries
+                self.sender.sendClear()
+            else:
+                print 'clear ERROR: %s ' % info
 
 
 # A Protocol for making an I2P client tunnel via BOB

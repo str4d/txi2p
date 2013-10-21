@@ -353,14 +353,9 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
     def test_clearRequestRepeated(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
-        proto.dataReceived('BOB 00.00.10\nOK\n')
-        proto.transport.clear()
-        proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
-        proto.transport.clear()
-        proto.dataReceived('OK HTTP 418\n')
-        proto.transport.clear()
-        proto.dataReceived('OK HTTP 418\n')
-        proto.transport.clear()
+        # Shortcut
+        proto.receiver.currentRule = 'State_clear'
+        proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel shutting down\n')
         self.assertEqual(proto.transport.value(), 'clear\n')
 

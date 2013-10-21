@@ -359,7 +359,7 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
             self.sender.sendQuit()
             self.currentRule = 'State_quit'
         else:
-            if info == 'tunnel is active':
+            if info == 'tunnel shutting down':
                 # Try again. TODO: Limit retries
                 self.sender.sendClear()
             else:

@@ -15,10 +15,10 @@ landed.
 * `tunnelNick` (optional) - The tunnel nickname to use. If a tunnel with this
   nickname already exists, it will be used. The default is an auto-generated
   nickname.
-* `inhost` - The host that the tunnel created by BOB will listen on. Defaults
-  to `localhost`.
-* `inport` - The port that the tunnel created by BOB will listen on. Defaults
-  to a port over 9000.
+* `inhost` (optional) - The host that the tunnel created by BOB will listen on.
+  Defaults to `localhost`.
+* `inport` (optional) - The port that the tunnel created by BOB will listen on.
+  Defaults to a port over 9000.
 
 `BOBI2PServerEndpoint` parameters:
 
@@ -28,7 +28,7 @@ landed.
 * `tunnelNick` (optional) - The tunnel nickname to use. If a tunnel with this
   nickname already exists, it will be used. The default is an auto-generated
   nickname.
-* `outhost` - The host that the tunnel created by BOB will forward data to.
-  Defaults to `localhost`.
-* `outport` - The port that the tunnel created by BOB will forward data to.
-  Defaults to a port over 9000.
+* `outhost` (optional) - The host that the tunnel created by BOB will forward
+  data to. Defaults to `localhost`.
+* `outport` (optional) - The port that the tunnel created by BOB will forward
+  data to. Defaults to a port over 9000.

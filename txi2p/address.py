@@ -1,3 +1,6 @@
+# Copyright (c) str4d <str4d@mail.i2p>
+# See COPYING for details.
+
 from twisted.internet.interfaces import IAddress
 from twisted.python.util import FancyEqMixin
 from zope.interface import implementer

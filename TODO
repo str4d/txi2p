@@ -1,9 +1,12 @@
 - Reorganize code to group by API (for when SAM is added)
+  - Mostly done
   - Split grammar?
 
-- Work out how state can be stored between endpoint instances
+- Work out how state can be shared between endpoint instances (for SAM)
 
 - Override getHost()/getPeer() somewhere to provide I2P Destinations
+
+- Use Twisted for logging/debug
 
 - Handle more errors properly
 
@@ -11,6 +14,13 @@
   Factory, shortcut the process for subsequent Protocols.
   - Does this matter? Will a Factory ever have multiple Protocols at once?
   - For clients, the tunnel dies with the first Protocol
+
+- If a tunnel exists and its settings match what the tunnel creator wants,
+  don't stop and start the tunnel
+  - Important for a server tunnel used multiple times by client endpoints,
+    first client will stop the tunnel and add inport, later clients should
+    not (unless the inport is explicitly specified by the client tunnel and
+    does not match)
 
 - Examine design, decide where I2P tunnels should be created and removed
   - Client and server tunnels are created by the endpoint

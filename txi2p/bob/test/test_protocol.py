@@ -132,6 +132,26 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
 class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestCase):
     protocol = I2PClientTunnelCreatorBOBClient
 
+    def test_inhostRequestRepeatedIfActive(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.inhost = 'camelot'
+        # Shortcut
+        proto.receiver.currentRule = 'State_inhost'
+        proto._parser._setupInterp()
+        proto.dataReceived('ERROR tunnel is active\n')
+        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+
+    def test_inhostRequestRepeatedIfShuttingDown(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.inhost = 'camelot'
+        # Shortcut
+        proto.receiver.currentRule = 'State_inhost'
+        proto._parser._setupInterp()
+        proto.dataReceived('ERROR tunnel shutting down\n')
+        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+
     def test_inhostSetAfterNickSetWithKeypair(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
@@ -221,6 +241,26 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
 
 class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestCase):
     protocol = I2PServerTunnelCreatorBOBClient
+
+    def test_outhostRequestRepeatedIfActive(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.outhost = 'camelot'
+        # Shortcut
+        proto.receiver.currentRule = 'State_outhost'
+        proto._parser._setupInterp()
+        proto.dataReceived('ERROR tunnel is active\n')
+        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+
+    def test_outhostRequestRepeatedIfShuttingDown(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.outhost = 'camelot'
+        # Shortcut
+        proto.receiver.currentRule = 'State_outhost'
+        proto._parser._setupInterp()
+        proto.dataReceived('ERROR tunnel shutting down\n')
+        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
 
     def test_outhostSetAfterNickSetWithKeypair(self):
         fac, proto = self.makeProto()
@@ -350,7 +390,16 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.dataReceived('OK HTTP 418\n')
         self.assertEqual(proto.transport.value(), 'clear\n')
 
-    def test_clearRequestRepeated(self):
+    def test_clearRequestRepeatedIfActive(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        # Shortcut
+        proto.receiver.currentRule = 'State_clear'
+        proto._parser._setupInterp()
+        proto.dataReceived('ERROR tunnel is active\n')
+        self.assertEqual(proto.transport.value(), 'clear\n')
+
+    def test_clearRequestRepeatedIfShuttingDown(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
         # Shortcut

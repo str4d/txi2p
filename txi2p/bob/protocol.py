@@ -220,7 +220,8 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
             self.sender.sendInport(self.factory.inport)
             self.currentRule = 'State_inport'
         else:
-            if info == 'tunnel is active':
+            if info in ['tunnel is active',
+                        'tunnel shutting down']:
                 # Try again. TODO: Limit retries
                 self.sender.sendInhost(self.factory.inhost)
             else:
@@ -302,7 +303,8 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
             self.sender.sendOutport(self.factory.outport)
             self.currentRule = 'State_outport'
         else:
-            if info == 'tunnel is active':
+            if info in ['tunnel is active',
+                        'tunnel shutting down']:
                 # Try again. TODO: Limit retries
                 self.sender.sendOuthost(self.factory.outhost)
             else:
@@ -359,7 +361,8 @@ class I2PTunnelRemoverBOBReceiver(BOBReceiver):
             self.sender.sendQuit()
             self.currentRule = 'State_quit'
         else:
-            if info == 'tunnel shutting down':
+            if info in ['tunnel is active',
+                        'tunnel shutting down']:
                 # Try again. TODO: Limit retries
                 self.sender.sendClear()
             else:

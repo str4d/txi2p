@@ -23,7 +23,7 @@ class EepsiteFactory(ClientFactory):
     protocol = Eepsite
 
 
-bobEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:2828')
+bobEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:2827')
 endpoint = BOBI2PClientEndpoint(reactor, bobEndpoint, 'stats.i2p')
 d = endpoint.connect(EepsiteFactory())
 

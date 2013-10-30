@@ -4,7 +4,7 @@
 
 - Work out how state can be shared between endpoint instances (for SAM)
 
-- Override getHost()/getPeer() somewhere to provide I2P Destinations
+- Override client-side getHost()/getPeer() to provide I2P Destinations
 
 - Use Twisted for logging/debug
 

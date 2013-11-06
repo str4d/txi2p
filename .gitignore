@@ -5,3 +5,10 @@
 
 dropin.cache
 _trial_temp/
+
+build/
+dist/
+txi2p.egg-info/
+vcversioner-*.egg/
+_version.py
+version.txt

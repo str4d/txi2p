@@ -16,7 +16,7 @@ setup(
     description='I2P bindings for Twisted',
     long_description=long_description,
     author='str4d',
-    author_email='str4d@mail.i2p',
+    author_email='str4d@i2pmail.org',
     url='https://github.com/str4d/txi2p',
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -31,7 +31,7 @@ setup(
     ],
     license='ISC',
     install_requires=install_requires,
-    packages=['txi2p', 'txi2p.bob', 'txi2p.test', 'txi2p.bob.test'] #+ ['twisted.plugins'],
+    packages=['txi2p', 'txi2p.bob', 'txi2p.test', 'txi2p.bob.test'], #+ ['twisted.plugins'],
 )
 
 # Make Twisted regenerate the dropin.cache, if possible.  This is necessary

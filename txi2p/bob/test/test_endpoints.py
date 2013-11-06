@@ -27,7 +27,7 @@ class BOBI2PClientEndpointTestCase(unittest.TestCase):
         return self.assertFailure(d, ConnectionRefusedError)
 
 
-    def test_destination(self):
+    def TODO_test_destination(self):
         reactor = object()
         bobEndpoint = FakeEndpoint()
         endpoint = endpoints.BOBI2PClientEndpoint(reactor, bobEndpoint, 'foo.i2p')
@@ -35,7 +35,7 @@ class BOBI2PClientEndpointTestCase(unittest.TestCase):
         self.assertEqual(bobEndpoint.transport.value(), 'foo.i2p') # TODO: Fix.
 
 
-    def test_clientDataSent(self):
+    def TODO_test_clientDataSent(self):
         reactor = object()
         wrappedFac = FakeFactory()
         bobEndpoint = FakeEndpoint()

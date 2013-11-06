@@ -12,7 +12,6 @@ with open('requirements.txt', 'rb') as infile:
 
 setup(
     name='txi2p',
-    version='0.1.0',
     description='I2P bindings for Twisted',
     long_description=long_description,
     author='str4d',
@@ -30,6 +29,11 @@ setup(
         'Topic :: Internet',
     ],
     license='ISC',
+
+    setup_requires=['vcversioner'],
+    vcversioner={
+        'version_module_paths': ['txi2p/_version.py'],
+    },
     install_requires=install_requires,
     packages=['txi2p', 'txi2p.bob', 'txi2p.test', 'txi2p.bob.test'], #+ ['twisted.plugins'],
 )

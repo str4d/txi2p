@@ -4,7 +4,7 @@
 from setuptools import setup
 
 
-with open('README.md', 'rb') as infile:
+with open('README.rst', 'rb') as infile:
     long_description = infile.read()
 
 with open('requirements.txt', 'rb') as infile:

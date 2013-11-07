@@ -123,6 +123,26 @@ class BOBReceiver(object):
         if not (hasattr(self.factory, 'outport') and self.factory.outport):
             self.factory.outport = DEFAULT_OUTPORT + offset
 
+    def getnick(self, success, info):
+        if success:
+            if self.tunnelRunning:
+                self.sender.sendStop()
+                self.currentRule = 'State_stop'
+            else:
+                # Update the local Destination
+                self.sender.sendGetdest()
+                self.currentRule = 'State_getdest'
+        else:
+            print 'ERROR: %s' % info
+
+    def stop(self, success, info):
+        if success:
+            # Update the local Destination
+            self.sender.sendGetdest()
+            self.currentRule = 'State_getdest'
+        else:
+            print 'stop ERROR: %s' % info
+
     def setnick(self, success, info):
         if success:
             if hasattr(self.factory, 'keypair') and self.factory.keypair: # If a keypair was provided, use it
@@ -169,26 +189,6 @@ class I2PClientTunnelCreatorBOBReceiver(BOBReceiver):
                 self.currentRule = 'State_setnick'
         else:
             print 'list ERROR: %s' % info
-
-    def getnick(self, success, info):
-        if success:
-            if self.tunnelRunning:
-                self.sender.sendStop()
-                self.currentRule = 'State_stop'
-            else:
-                # Update the local Destination
-                self.sender.sendGetdest()
-                self.currentRule = 'State_getdest'
-        else:
-            print 'ERROR: %s' % info
-
-    def stop(self, success, info):
-        if success:
-            # Update the local Destination
-            self.sender.sendGetdest()
-            self.currentRule = 'State_getdest'
-        else:
-            print 'stop ERROR: %s' % info
 
     def getdest(self, success, info):
         if success:
@@ -257,26 +257,6 @@ class I2PServerTunnelCreatorBOBReceiver(BOBReceiver):
                 self.currentRule = 'State_setnick'
         else:
             print 'list ERROR: %s' % info
-
-    def getnick(self, success, info):
-        if success:
-            if self.tunnelRunning:
-                self.sender.sendStop()
-                self.currentRule = 'State_stop'
-            else:
-                # Update the local Destination
-                self.sender.sendGetdest()
-                self.currentRule = 'State_getdest'
-        else:
-            print 'getnick ERROR: %s' % info
-
-    def stop(self, success, info):
-        if success:
-            # Update the local Destination
-            self.sender.sendGetdest()
-            self.currentRule = 'State_getdest'
-        else:
-            print 'stop ERROR: %s' % info
 
     def getdest(self, success, info):
         if success:

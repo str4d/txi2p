@@ -128,6 +128,15 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK HTTP 418\n')
         self.assertNotEqual(proto.transport.value(), 'stop\n') # TODO: Refactor to test against what is actually expected
 
+    def test_quitRequestedAfterStart(self):
+        fac, proto = self.makeProto()
+        called = []
+        fac.i2pTunnelCreated = lambda: called.append(True)
+        # Shortcut
+        proto.receiver.currentRule = 'State_start'
+        proto._parser._setupInterp()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual((called, proto.transport.value()), ([True], 'quit\n'))
 
 class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestCase):
     protocol = I2PClientTunnelCreatorBOBClient

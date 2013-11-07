@@ -9,7 +9,11 @@ from zope.interface import implementer
 
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
 
-DEFAULT_BOB_ENDPOINT = 'tcp:127.0.0.1:2827'
+DEFAULT_ENDPOINT = {
+    'BOB': 'tcp:127.0.0.1:2827',
+    }
+
+DEFAULT_API = 'BOB'
 
 if not _PY3:
     from twisted.plugin import IPlugin
@@ -20,11 +24,30 @@ else:
 
 
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
-class _BOBI2PClientParser(object):
-    prefix = 'i2pbob'
+class _I2PClientParser(object):
+    prefix = 'i2p'
+
+    _apiParsers = {
+        'BOB': self._parseBOBClient,
+        }
 
     def _parseClient(self, reactor, dest,
-                     bobEndpoint=DEFAULT_BOB_ENDPOINT,
+                     api=None, apiEndpoint=None, **kwargs):
+        if not api:
+            if apiEndpoint:
+                raise ValueError('api must be specified if apiEndpoint is given')
+            else:
+                api = DEFAULT_API
+
+        if not apiEndpoint:
+            apiEndpoint = DEFAULT_ENDPOINT[api]
+
+        if api not in self._apiParsers:
+            raise ValueError('Specified I2P API is invalid or unsupported')
+        else:
+            return self._apiParsers[api](reactor, dest, apiEndpoint, **kwargs)
+
+    def _parseBOBClient(self, reactor, dest, bobEndpoint,
                      tunnelNick=None,
                      inhost='localhost',
                      inport=None,
@@ -40,12 +63,30 @@ class _BOBI2PClientParser(object):
 
 
 @implementer(IPlugin, IStreamServerEndpointStringParser)
-class _BOBI2PServerParser(object):
-    prefix = 'i2pbob'
+class _I2PServerParser(object):
+    prefix = 'i2p'
 
-    def _parseServer(self, reactor,
-                     keypairPath,
-                     bobEndpoint=DEFAULT_BOB_ENDPOINT,
+    _apiParsers = {
+        'BOB': self._parseBOBServer,
+        }
+
+    def _parseServer(self, reactor, keypairPath,
+                     api=None, apiEndpoint=None, **kwargs):
+        if not api:
+            if apiEndpoint:
+                raise ValueError('api must be specified if apiEndpoint is given')
+            else:
+                api = DEFAULT_API
+
+        if not apiEndpoint:
+            apiEndpoint = DEFAULT_ENDPOINT[api]
+
+        if api not in self._apiParsers:
+            raise ValueError('Specified I2P API is invalid or unsupported')
+        else:
+            return self._apiParsers[api](reactor, keypairPath, apiEndpoint, **kwargs)
+
+    def _parseBOBServer(self, reactor, keypairPath, bobEndpoint,
                      tunnelNick=None,
                      outhost='localhost',
                      outport=None,

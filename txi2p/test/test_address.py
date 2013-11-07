@@ -30,3 +30,15 @@ class TestI2PAddress(unittest.TestCase):
     def test_reprWithPortString(self):
         addr = I2PAddress('spam.i2p', '81')
         self.assertEqual(repr(addr), 'I2PAddress(spam.i2p, 81)')
+
+    def test_hashWithNoPort(self):
+        addr = I2PAddress('spam.i2p')
+        self.assertEqual(hash(addr), hash(('spam.i2p',None)))
+
+    def test_hashWithPort(self):
+        addr = I2PAddress('spam.i2p', 81)
+        self.assertEqual(hash(addr), hash(('spam.i2p', 81)))
+
+    def test_hashWithPortString(self):
+        addr = I2PAddress('spam.i2p', '81')
+        self.assertEqual(hash(addr), hash(('spam.i2p', 81)))

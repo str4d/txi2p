@@ -417,6 +417,16 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.dataReceived('ERROR tunnel shutting down\n')
         self.assertEqual(proto.transport.value(), 'clear\n')
 
+    def test_quitRequestedAfterClearSuccess(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.i2pTunnelRemoved = lambda: None
+        # Shortcut
+        proto.receiver.currentRule = 'State_clear'
+        proto._parser._setupInterp()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'quit\n')
+
 
 class TestI2PClientTunnelProtocol(unittest.TestCase):
     def makeProto(self):

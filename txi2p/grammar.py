@@ -37,7 +37,7 @@ OK_DATA_TUNNEL_STATUS = 'OK ' DATA_TUNNEL_STATUS:status -> (True, status)
 versionString = <digit+ '.' digit+ '.' digit+>
 BOB_init      = 'BOB ' versionString:version '\nOK\n' -> version
 
-BOB_clear     = (ERROR | OK_KEY)
+BOB_clear     = (ERROR | OK)
 BOB_getdest   = (ERROR | OK_KEY)
 BOB_getkeys   = (ERROR | OK_KEYS)
 BOB_getnick   = (ERROR | OK)

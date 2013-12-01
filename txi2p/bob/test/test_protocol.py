@@ -431,7 +431,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
 class TestI2PClientTunnelProtocol(unittest.TestCase):
     def makeProto(self):
         wrappedProto = proto_helpers.AccumulatingProtocol()
-        proto = I2PClientTunnelProtocol(wrappedProto, 'spam.i2p')
+        proto = I2PClientTunnelProtocol(wrappedProto, None, 'spam.i2p')
         transport = proto_helpers.StringTransport()
         transport.abortConnection = lambda: None
         proto.makeConnection(transport)
@@ -454,7 +454,7 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
 class TestI2PServerTunnelProtocol(unittest.TestCase):
     def makeProto(self):
         wrappedProto = proto_helpers.AccumulatingProtocol()
-        proto = I2PServerTunnelProtocol(wrappedProto)
+        proto = I2PServerTunnelProtocol(wrappedProto, None)
         transport = proto_helpers.StringTransport()
         transport.abortConnection = lambda: None
         proto.makeConnection(transport)

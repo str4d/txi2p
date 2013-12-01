@@ -2,11 +2,12 @@
 # See COPYING for details.
 
 from parsley import makeProtocol
-from twisted.internet.interfaces import IListeningPort
+from twisted.internet.interfaces import IListeningPort, ITransport
 from twisted.internet.protocol import Protocol
 from zope.interface import implementer
 
 from txi2p import grammar
+from txi2p.address import I2PAddress
 
 DEFAULT_INPORT  = 9000
 DEFAULT_OUTPORT = 9001
@@ -368,12 +369,33 @@ I2PTunnelRemoverBOBClient = makeProtocol(
     I2PTunnelRemoverBOBReceiver)
 
 
+@implementer(ITransport)
+class I2PTunnelTransport(object):
+    def __init__(self, wrappedTransport, localAddr, peerAddr=None):
+        self.t = wrappedTransport
+        self._localAddr = localAddr
+        self.peerAddr = peerAddr
+
+    def __getattr__(self, attr):
+        return getattr(self.t, attr)
+
+    def getPeer(self):
+        return self.peerAddr
+
+    def getHost(self):
+        return self._localAddr
+
+
 class I2PClientTunnelProtocol(Protocol):
-    def __init__(self, wrappedProto, dest):
+    def __init__(self, wrappedProto, clientAddr, dest):
         self.wrappedProto = wrappedProto
+        self._clientAddr = clientAddr
         self.dest = dest
 
     def connectionMade(self):
+        # Substitute transport for an I2P wrapper
+        self.transport = I2PTunnelTransport(self.transport, self._clientAddr,
+                                            I2PAddress(self.dest))
         # First line sent must be the Destination to connect to.
         self.transport.write(self.dest + '\n')
         self.wrappedProto.makeConnection(self.transport)
@@ -387,11 +409,14 @@ class I2PClientTunnelProtocol(Protocol):
 
 
 class I2PServerTunnelProtocol(Protocol):
-    def __init__(self, wrappedProto):
+    def __init__(self, wrappedProto, serverAddr):
         self.wrappedProto = wrappedProto
+        self._serverAddr = serverAddr
         self.peer = None
 
     def connectionMade(self):
+        # Substitute transport for an I2P wrapper
+        self.transport = I2PTunnelTransport(self.transport, self._serverAddr)
         self.wrappedProto.makeConnection(self.transport)
 
     def dataReceived(self, data):
@@ -400,8 +425,8 @@ class I2PServerTunnelProtocol(Protocol):
             self.wrappedProto.dataReceived(data)
         else:
             # First line is the peer's Destination.
-            # TODO: Return this to the user somehow.
             self.peer = data.split('\n')[0]
+            self.transport.peerAddr = I2PAddress(self.peer)
 
     def connectionLost(self, reason):
         self.wrappedProto.connectionLost(reason)

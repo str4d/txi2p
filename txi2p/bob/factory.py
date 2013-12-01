@@ -60,6 +60,7 @@ class BOBI2PClientFactory(ClientFactory):
         # Wrap the client Factory.
         wrappedFactory = BOBClientFactoryWrapper(self._clientFactory,
                                                  self._bobEndpoint,
+                                                 I2PAddress(self.localDest),
                                                  self.tunnelNick,
                                                  self.removeTunnelWhenFinished)
         wrappedFactory.setDest(self.dest)
@@ -136,6 +137,7 @@ class BOBI2PServerFactory(Factory):
         # Wrap the server Factory.
         wrappedFactory = BOBServerFactoryWrapper(self._serverFactory,
                                                  self._bobEndpoint,
+                                                 I2PAddress(self.localDest),
                                                  self.tunnelNick,
                                                  self.removeTunnelWhenFinished)
         d = serverEndpoint.listen(wrappedFactory)
@@ -153,10 +155,12 @@ class BOBI2PServerFactory(Factory):
 class BOBFactoryWrapperCommon(object):
     def __init__(self, wrappedFactory,
                        bobEndpoint,
+                       localAddr,
                        tunnelNick,
                        removeTunnelWhenFinished):
         self.w = wrappedFactory
         self.bobEndpoint = bobEndpoint
+        self.localAddr = localAddr
         self.tunnelNick = tunnelNick
         self.removeTunnelWhenFinished = removeTunnelWhenFinished
 
@@ -172,7 +176,7 @@ class BOBClientFactoryWrapper(BOBFactoryWrapperCommon):
 
     def buildProtocol(self, addr):
         wrappedProto = self.w.buildProtocol(addr)
-        proto = self.protocol(wrappedProto, self.dest)
+        proto = self.protocol(wrappedProto, self.localAddr, self.dest)
         proto.factory = self
         return proto
 
@@ -194,7 +198,7 @@ class BOBServerFactoryWrapper(BOBFactoryWrapperCommon):
 
     def buildProtocol(self, addr):
         wrappedProto = self.w.buildProtocol(addr)
-        proto = self.protocol(wrappedProto)
+        proto = self.protocol(wrappedProto, self.localAddr)
         proto.factory = self
         return proto
 

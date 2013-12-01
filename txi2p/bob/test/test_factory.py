@@ -96,7 +96,7 @@ class TestBOBI2PServerFactory(BOBFactoryTestMixin, unittest.TestCase):
 class TestBOBClientFactoryWrapper(unittest.TestCase):
     def test_buildProtocol(self):
         wrappedFac = FakeFactory()
-        fac = BOBClientFactoryWrapper(wrappedFac, None, '', True)
+        fac = BOBClientFactoryWrapper(wrappedFac, None, None, '', True)
         fac.setDest('spam.i2p')
         proto = fac.buildProtocol(None)
         self.assertEqual(proto.wrappedProto.factory, wrappedFac)
@@ -105,6 +105,6 @@ class TestBOBClientFactoryWrapper(unittest.TestCase):
 class TestBOBServerFactoryWrapper(unittest.TestCase):
     def test_buildProtocol(self):
         wrappedFac = FakeFactory()
-        fac = BOBServerFactoryWrapper(wrappedFac, None, '', True)
+        fac = BOBServerFactoryWrapper(wrappedFac, None, None, '', True)
         proto = fac.buildProtocol(None)
         self.assertEqual(proto.wrappedProto.factory, wrappedFac)

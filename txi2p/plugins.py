@@ -24,11 +24,19 @@ else:
 
 
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
-class _I2PClientParser(object):
+class I2PClientParser(object):
     prefix = 'i2p'
 
+    def _parseBOBClient(self, reactor, dest, bobEndpoint,
+                     tunnelNick=None,
+                     inhost='localhost',
+                     inport=None,
+                     options=None):
+        return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
+                                    dest, tunnelNick, inhost, inport, options)
+
     _apiParsers = {
-        'BOB': self._parseBOBClient,
+        'BOB': _parseBOBClient,
         }
 
     def _parseClient(self, reactor, dest,
@@ -47,14 +55,6 @@ class _I2PClientParser(object):
         else:
             return self._apiParsers[api](reactor, dest, apiEndpoint, **kwargs)
 
-    def _parseBOBClient(self, reactor, dest, bobEndpoint,
-                     tunnelNick=None,
-                     inhost='localhost',
-                     inport=None,
-                     options=None):
-        return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    dest, tunnelNick, inhost, inport, options)
-
     def parseStreamClient(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has
         # an insane signature to trick zope.interface into believing the
@@ -63,11 +63,19 @@ class _I2PClientParser(object):
 
 
 @implementer(IPlugin, IStreamServerEndpointStringParser)
-class _I2PServerParser(object):
+class I2PServerParser(object):
     prefix = 'i2p'
 
+    def _parseBOBServer(self, reactor, keypairPath, bobEndpoint,
+                     tunnelNick=None,
+                     outhost='localhost',
+                     outport=None,
+                     options=None):
+        return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
+                                    keypairPath, tunnelNick, outhost, outport, options)
+
     _apiParsers = {
-        'BOB': self._parseBOBServer,
+        'BOB': _parseBOBServer,
         }
 
     def _parseServer(self, reactor, keypairPath,
@@ -85,14 +93,6 @@ class _I2PServerParser(object):
             raise ValueError('Specified I2P API is invalid or unsupported')
         else:
             return self._apiParsers[api](reactor, keypairPath, apiEndpoint, **kwargs)
-
-    def _parseBOBServer(self, reactor, keypairPath, bobEndpoint,
-                     tunnelNick=None,
-                     outhost='localhost',
-                     outport=None,
-                     options=None):
-        return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    keypairPath, tunnelNick, outhost, outport, options)
 
     def parseStreamServer(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has

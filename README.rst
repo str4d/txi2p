@@ -10,7 +10,7 @@ APIs
 I2P endpoints will be backed by several APIs. BOB is the only one implemented.
 
 The Twisted plugin for ``clientFromString()`` and ``serverFromString()`` will
-not work until `Twisted ticket #5069`_ has landed.
+only work for `Twisted`_ ` 14.0 or greater
 
 BOB
 ---

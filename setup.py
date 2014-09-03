@@ -35,7 +35,7 @@ setup(
         'version_module_paths': ['txi2p/_version.py'],
     },
     install_requires=install_requires,
-    packages=['txi2p', 'txi2p.bob', 'txi2p.test', 'txi2p.bob.test'], #+ ['twisted.plugins'],
+    packages=['txi2p', 'txi2p.bob', 'txi2p.test', 'txi2p.bob.test', 'twisted.plugins'],
 )
 
 # Make Twisted regenerate the dropin.cache, if possible.  This is necessary

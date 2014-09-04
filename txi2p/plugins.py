@@ -27,13 +27,13 @@ else:
 class I2PClientParser(object):
     prefix = 'i2p'
 
-    def _parseBOBClient(self, reactor, dest, bobEndpoint,
+    def _parseBOBClient(self, reactor, dest, port, bobEndpoint,
                      tunnelNick=None,
                      inhost='localhost',
                      inport=None,
                      options=None):
         return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    dest, tunnelNick, inhost, inport, options)
+                                    dest, port, tunnelNick, inhost, inport, options)
 
     _apiParsers = {
         'BOB': _parseBOBClient,
@@ -53,7 +53,7 @@ class I2PClientParser(object):
         if api not in self._apiParsers:
             raise ValueError('Specified I2P API is invalid or unsupported')
         else:
-            return self._apiParsers[api](self, reactor, dest, apiEndpoint, **kwargs)
+            return self._apiParsers[api](self, reactor, dest, port, apiEndpoint, **kwargs)
 
     def parseStreamClient(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has
@@ -66,13 +66,13 @@ class I2PClientParser(object):
 class I2PServerParser(object):
     prefix = 'i2p'
 
-    def _parseBOBServer(self, reactor, keypairPath, bobEndpoint,
+    def _parseBOBServer(self, reactor, keypairPath, port, bobEndpoint,
                      tunnelNick=None,
                      outhost='localhost',
                      outport=None,
                      options=None):
         return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    keypairPath, tunnelNick, outhost, outport, options)
+                                    keypairPath, port, tunnelNick, outhost, outport, options)
 
     _apiParsers = {
         'BOB': _parseBOBServer,
@@ -92,7 +92,7 @@ class I2PServerParser(object):
         if api not in self._apiParsers:
             raise ValueError('Specified I2P API is invalid or unsupported')
         else:
-            return self._apiParsers[api](self, reactor, keypairPath, apiEndpoint, **kwargs)
+            return self._apiParsers[api](self, reactor, keypairPath, port, apiEndpoint, **kwargs)
 
     def parseStreamServer(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has

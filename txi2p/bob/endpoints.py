@@ -19,6 +19,7 @@ class BOBI2PClientEndpoint(object):
     """
 
     def __init__(self, reactor, bobEndpoint, dest,
+                 port=None,
                  tunnelNick=None,
                  inhost='localhost',
                  inport=None,
@@ -27,6 +28,7 @@ class BOBI2PClientEndpoint(object):
         self._reactor = reactor
         self._bobEndpoint = bobEndpoint
         self._dest = dest
+        self._port = port
         self._tunnelNick = tunnelNick
         self._inhost = inhost
         self._inport = inport
@@ -63,6 +65,7 @@ class BOBI2PServerEndpoint(object):
     """
 
     def __init__(self, reactor, bobEndpoint, keypairPath,
+                 port=None,
                  tunnelNick=None,
                  outhost='localhost',
                  outport=None,
@@ -70,6 +73,7 @@ class BOBI2PServerEndpoint(object):
         self._reactor = reactor
         self._bobEndpoint = bobEndpoint
         self._keypairPath = keypairPath
+        self._port = port
         self._tunnelNick = tunnelNick
         self._outhost = outhost
         self._outport = outport

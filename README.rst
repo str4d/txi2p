@@ -19,6 +19,9 @@ BOB
 
 * ``bobEndpoint`` - An endpoint that will connect to the BOB API.
 * ``dest`` - The I2P Destination to connect to.
+* ``port`` (optional) - The port to connect to inside I2P. If unset or `None`,
+  the default (null) port is used. Ignored because BOB doesn't support ports
+  yet.
 * ``tunnelNick`` (optional) - The tunnel nickname to use. If a tunnel with this
   nickname already exists, it will be used. The default is an auto-generated
   nickname.
@@ -32,6 +35,9 @@ BOB
 * ``bobEndpoint`` - An endpoint that will connect to the BOB API.
 * ``keypairPath`` - Path to a local file containing the keypair to use for the
   server Destination. If non-existent, new keys will be generated and stored.
+* ``port`` (optional) - The port to listen on inside I2P. If unset or `None`,
+  the default (null) port is used. Ignored because BOB doesn't support ports
+  yet.
 * ``tunnelNick`` (optional) - The tunnel nickname to use. If a tunnel with this
   nickname already exists, it will be used. The default is an auto-generated
   nickname.

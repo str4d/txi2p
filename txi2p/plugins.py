@@ -39,7 +39,7 @@ class I2PClientParser(object):
         'BOB': _parseBOBClient,
         }
 
-    def _parseClient(self, reactor, dest,
+    def _parseClient(self, reactor, dest, port=None,
                      api=None, apiEndpoint=None, **kwargs):
         if not api:
             if apiEndpoint:
@@ -78,7 +78,7 @@ class I2PServerParser(object):
         'BOB': _parseBOBServer,
         }
 
-    def _parseServer(self, reactor, keypairPath,
+    def _parseServer(self, reactor, keypairPath, port=None,
                      api=None, apiEndpoint=None, **kwargs):
         if not api:
             if apiEndpoint:

@@ -3,6 +3,8 @@
 
 # General I2P grammar
 i2pGrammarSource = r"""
+digit = anything:x ?(x in '0123456789')
+number = <digit+>:ds -> int(ds)
 b64char = :x ?(x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-~') -> x
 b64 = <b64char+>
 """
@@ -17,16 +19,16 @@ OK_KEY  = 'OK ' KEY:pubkey '\n' -> (True, pubkey)
 OK_KEYS = 'OK ' KEYS:keys '\n' -> (True, keys)
 DATA    = 'DATA ' <(~'\n' anything)*>:data '\n' -> data
 
-TUNNEL_STATUS = 'NICKNAME: ' <(~' ' anything)*>:nickname ' STARTING: ' <'true'|'false'>:starting ' RUNNING: ' <'true'|'false'>:running ' STOPPING: ' <'true'|'false'>:stopping ' KEYS: ' <'true'|'false'>:keys  ' QUIET: ' <'true'|'false'>:quiet ' INPORT: ' <(~' ' anything)*>:inport ' INHOST: ' <(~' ' anything)*>:inhost ' OUTPORT: ' <(~' ' anything)*>:outport ' OUTHOST: ' <(~'\n' anything)*>:outhost '\n' -> {
+TUNNEL_STATUS = 'NICKNAME: ' <(~' ' anything)*>:nickname ' STARTING: ' <'true'|'false'>:starting ' RUNNING: ' <'true'|'false'>:running ' STOPPING: ' <'true'|'false'>:stopping ' KEYS: ' <'true'|'false'>:keys  ' QUIET: ' <'true'|'false'>:quiet ' INPORT: ' <'not_set'|number>:inport ' INHOST: ' <(~' ' anything)*>:inhost ' OUTPORT: ' <'not_set'|number>:outport ' OUTHOST: ' <(~'\n' anything)*>:outhost '\n' -> {
     'nickname': nickname,
     'starting': starting=='true',
     'running': running=='true',
     'stopping': stopping=='true',
     'keys': keys=='true',
     'quiet': quiet=='true',
-    'inport': inport,
+    'inport': None if inport=='not_set' else int(inport),
     'inhost': inhost,
-    'outport': outport,
+    'outport': None if outport=='not_set' else int(outport),
     'outhost': outhost
     }
 

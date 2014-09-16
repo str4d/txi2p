@@ -40,9 +40,9 @@ class TestBOBGrammar(unittest.TestCase):
             'stopping': False,
             'keys': True,
             'quiet': False,
-            'inport': '12345',
+            'inport': 12345,
             'inhost': 'localhost',
-            'outport': '23456',
+            'outport': 23456,
             'outhost': 'localhost'
         }
         eggs = {
@@ -52,9 +52,9 @@ class TestBOBGrammar(unittest.TestCase):
             'stopping': False,
             'keys': True,
             'quiet': False,
-            'inport': 'not_set',
+            'inport': None,
             'inhost': 'localhost',
-            'outport': 'not_set',
+            'outport': None,
             'outhost': 'localhost'
         }
 

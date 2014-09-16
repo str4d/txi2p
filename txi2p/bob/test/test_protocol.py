@@ -96,8 +96,8 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
     def test_existingOuthostAndOutportSelectedForExistingTunnel(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
-        fac.inhost = 'camelot'
-        fac.inport = 1234
+        fac.outhost = 'camelot'
+        fac.outport = 1234
         proto.dataReceived('BOB 00.00.10\nOK\n')
         proto.transport.clear()
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: false STOPPING: false KEYS: false QUIET: false INPORT: not_set INHOST: localhost OUTPORT: 2345 OUTHOST: localhost\nOK Listing done\n')

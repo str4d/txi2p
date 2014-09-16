@@ -18,6 +18,9 @@ class BOBProtoTestMixin(object):
         protoClass = kw.pop('_protoClass', self.protocol)
         fac = ClientFactory(*a, **kw)
         fac.protocol = protoClass
+        def raise_(ex):
+            raise ex
+        fac.bobConnectionFailed = lambda reason: raise_(reason)
         proto = fac.buildProtocol(None)
         transport = proto_helpers.StringTransport()
         transport.abortConnection = lambda: None

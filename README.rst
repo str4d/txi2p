@@ -35,8 +35,12 @@ BOB
   the default (null) port is used. Ignored because BOB doesn't support ports
   yet.
 * ``tunnelNick`` (optional) - The tunnel nickname to use. If a tunnel with this
-  nickname already exists, it will be used. The default is an auto-generated
-  nickname.
+  nickname already exists, it will be used. The default is ``txi2p-#`` where
+  ``#`` is the PID of the current process.
+
+  * The implication of this is that by default, all endpoints (both client and
+    server) created by the same process will use the same BOB tunnel.
+
 * ``inhost`` (optional) - The host that the tunnel created by BOB will listen
   on. Defaults to ``localhost``.
 * ``inport`` (optional) - The port that the tunnel created by BOB will listen
@@ -51,8 +55,12 @@ BOB
   the default (null) port is used. Ignored because BOB doesn't support ports
   yet.
 * ``tunnelNick`` (optional) - The tunnel nickname to use. If a tunnel with this
-  nickname already exists, it will be used. The default is an auto-generated
-  nickname.
+  nickname already exists, it will be used. The default is ``txi2p-#`` where
+  ``#`` is the PID of the current process.
+
+  * The implication of this is that by default, all endpoints (both client and
+    server) created by the same process will use the same BOB tunnel.
+
 * ``outhost`` (optional) - The host that the tunnel created by BOB will forward
   data to. Defaults to ``localhost``.
 * ``outport`` (optional) - The port that the tunnel created by BOB will forward

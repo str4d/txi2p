@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+import os
 from parsley import makeProtocol
 from twisted.internet.interfaces import IListeningPort, ITransport
 from twisted.internet.protocol import Protocol
@@ -104,25 +105,42 @@ class BOBReceiver(object):
         self.currentRule = 'State_list'
 
     def processTunnelList(self, tunnels):
-        # Default port offset is at the end of the tunnels list
-        offset = 2*(len(tunnels))
-        if self.factory.tunnelNick:
-            for i in range(0, len(tunnels)):
-                if tunnels[i]['nickname'] == self.factory.tunnelNick:
-                    self.tunnelExists = True
-                    self.tunnelRunning = tunnels[i]['running']
-                    offset = 2*i
-                    # The tunnel will be removed by the Factory
-                    # that created it.
-                    self.factory.removeTunnelWhenFinished = False
-                    break
+        if not (hasattr(self.factory, 'tunnelNick') and self.factory.tunnelNick):
+            # All tunnels in the same process use the same tunnelNick
+            # TODO is using the PID a security risk?
+            self.factory.tunnelNick = 'txi2p-%d' % os.getpid()
+
+        used_ports = []
+        for i in range(0, len(tunnels)):
+            if tunnels[i]['nickname'] == self.factory.tunnelNick:
+                # Tunnel already exists, use its settings.
+                self.tunnelExists = True
+                self.tunnelRunning = tunnels[i]['running']
+                self.factory.inhost = tunnels[i]['inhost']
+                self.factory.inport = tunnels[i]['inport']
+                self.factory.outhost = tunnels[i]['outhost']
+                self.factory.outport = tunnels[i]['outport']
+                # The tunnel will be removed by the Factory
+                # that created it.
+                self.factory.removeTunnelWhenFinished = False
+                break
+            else:
+                if tunnels[i]['inport']:
+                    used_ports.append(tunnels[i]['inport'])
+                if tunnels[i]['outport']:
+                    used_ports.append(tunnels[i]['outport'])
         else:
-            self.factory.tunnelNick = 'txi2p-%d' % (len(tunnels) + 1)
-        # If the in/outport were not user-configured, set them.
-        if not (hasattr(self.factory, 'inport') and self.factory.inport):
-            self.factory.inport = DEFAULT_INPORT + offset
-        if not (hasattr(self.factory, 'outport') and self.factory.outport):
-            self.factory.outport = DEFAULT_OUTPORT + offset
+            # This is a new tunnel.
+            # Default port offset is at the end of the tunnels list
+            offset = 2*(len(tunnels))
+            # Find an offset that does not clash
+            while (DEFAULT_INPORT + offset) in used_ports or (DEFAULT_OUTPORT + offset) in used_ports:
+                offset += 2
+            # If the in/outport were not user-configured, set them.
+            if not (hasattr(self.factory, 'inport') and self.factory.inport):
+                self.factory.inport = DEFAULT_INPORT + offset
+            if not (hasattr(self.factory, 'outport') and self.factory.outport):
+                self.factory.outport = DEFAULT_OUTPORT + offset
 
     def getnick(self, success, info):
         if success:

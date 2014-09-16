@@ -414,11 +414,22 @@ class I2PClientTunnelProtocol(Protocol):
         # Substitute transport for an I2P wrapper
         self.transport = I2PTunnelTransport(self.transport, self._clientAddr,
                                             I2PAddress(self.dest))
+        self.isConnected = False
         # First line sent must be the Destination to connect to.
         self.transport.write(self.dest + '\n')
         self.wrappedProto.makeConnection(self.transport)
 
     def dataReceived(self, data):
+        # Check for a successful connection
+        if not self.isConnected:
+            if data.startswith("ERROR"):
+                # I2P connection failed
+                # TODO: Why does this not work?
+                self.transport.loseConnection()
+                return
+            else:
+                self.isConnected = True
+
         # Pass all received data to the wrapped Protocol.
         self.wrappedProto.dataReceived(data)
 

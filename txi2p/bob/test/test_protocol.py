@@ -511,6 +511,11 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
         proto = self.makeProto()
         self.assertEqual(proto.transport, proto.wrappedProto.transport)
 
+    def test_connectionFailed(self):
+        proto = self.makeProto()
+        proto.dataReceived("ERROR Can't find destination: spam.i2p")
+        self.assertEqual(proto.wrappedProto.closed, 1)
+
     def test_dataPassed(self):
         proto = self.makeProto()
         proto.dataReceived('shrubbery')

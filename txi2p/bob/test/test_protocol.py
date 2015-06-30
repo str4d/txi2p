@@ -494,12 +494,18 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         self.assertEqual(proto.transport.value(), 'quit\n')
 
 
+class FakeDisconnectingFactory(object):
+    def i2pConnectionLost(self, wrappedProto, reason):
+        wrappedProto.connectionLost(reason)
+
 class TestI2PClientTunnelProtocol(unittest.TestCase):
     def makeProto(self):
         wrappedProto = proto_helpers.AccumulatingProtocol()
         proto = I2PClientTunnelProtocol(wrappedProto, None, 'spam.i2p')
-        transport = proto_helpers.StringTransport()
+        proto.factory = FakeDisconnectingFactory()
+        transport = proto_helpers.StringTransportWithDisconnection()
         transport.abortConnection = lambda: None
+        transport.protocol = proto
         proto.makeConnection(transport)
         return proto
 

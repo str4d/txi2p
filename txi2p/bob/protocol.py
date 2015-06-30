@@ -424,7 +424,6 @@ class I2PClientTunnelProtocol(Protocol):
         if not self.isConnected:
             if data.startswith("ERROR"):
                 # I2P connection failed
-                # TODO: Why does this not work?
                 self.transport.loseConnection()
                 return
             else:

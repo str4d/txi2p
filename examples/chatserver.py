@@ -1,5 +1,5 @@
 from twisted.internet import reactor, defer
-from twisted.internet.endpoints import clientFromString
+from twisted.internet.endpoints import serverFromString
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 
@@ -65,8 +65,7 @@ def printDest(port):
     reactor.addSystemEventTrigger('before', 'shutdown', shutdown)
 
 
-bobEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:2827')
-endpoint = BOBI2PServerEndpoint(reactor, bobEndpoint, 'keypair.chatserver')
+endpoint = serverFromString(reactor, 'i2p:keypair.chatserver')
 d = endpoint.listen(ChatFactory())
 d.addCallback(printDest)
 

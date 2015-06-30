@@ -1,5 +1,5 @@
 from twisted.internet import reactor, defer
-from twisted.internet.endpoints import clientFromString
+from twisted.internet.endpoints import serverFromString
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 
@@ -14,6 +14,7 @@ class Answer(LineReceiver):
         }
 
     def lineReceived(self, line):
+        print 'Line received from ' + self.transport.getPeer().destination
         if self.answers.has_key(line):
             self.sendLine(self.answers[line])
         else:
@@ -38,8 +39,7 @@ def printDest(port):
     reactor.addSystemEventTrigger('before', 'shutdown', shutdown)
 
 
-bobEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:2827')
-endpoint = BOBI2PServerEndpoint(reactor, bobEndpoint, 'keypair.answerserver')
+endpoint = serverFromString(reactor, 'i2p:keypair.answerserver')
 d = endpoint.listen(AnswerFactory())
 d.addCallback(printDest)
 

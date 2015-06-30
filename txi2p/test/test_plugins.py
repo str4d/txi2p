@@ -2,8 +2,10 @@
 # See COPYING for details.
 
 from twisted.internet import interfaces
+from twisted.internet.endpoints import clientFromString, getPlugins
 from twisted.test.proto_helpers import MemoryReactor
 from twisted.trial import unittest
+from zope.interface.verify import verifyObject
 
 from txi2p.bob.endpoints import (BOBI2PClientEndpoint,
                                  BOBI2PServerEndpoint)

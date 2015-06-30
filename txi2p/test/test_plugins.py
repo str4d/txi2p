@@ -2,7 +2,6 @@
 # See COPYING for details.
 
 from twisted.internet import interfaces
-from twisted.internet.endpoints import getPlugins
 from twisted.python.versions import Version
 from twisted.test.proto_helpers import MemoryReactor
 from twisted.trial import unittest
@@ -20,6 +19,7 @@ else:
 
 class I2PPluginTestMixin(object):
     def test_pluginDiscovery(self):
+        from twisted.internet.endpoints import getPlugins
         parsers = list(getPlugins(self._parserInterface))
         for p in parsers:
             if isinstance(p, self._parserClass):
@@ -39,7 +39,9 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     """
 
     skip = skip
-    _parserInterface = interfaces.IStreamClientEndpointStringParserWithReactor
+    @property
+    def _parserInterface(self):
+        return interfaces.IStreamClientEndpointStringParserWithReactor
     @property
     def _parserClass(self):
         from txi2p.plugins import I2PClientParser
@@ -62,7 +64,9 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     """
 
     skip = skip
-    _parserInterface = interfaces.IStreamServerEndpointStringParser
+    @property
+    def _parserInterface(self):
+        return interfaces.IStreamServerEndpointStringParser
     @property
     def _parserClass(self):
         from txi2p.plugins import I2PServerParser

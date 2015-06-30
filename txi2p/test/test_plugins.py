@@ -3,13 +3,20 @@
 
 from twisted.internet import interfaces
 from twisted.internet.endpoints import clientFromString, getPlugins
+from twisted.python.versions import Version
 from twisted.test.proto_helpers import MemoryReactor
 from twisted.trial import unittest
+import twisted
 from zope.interface.verify import verifyObject
 
 from txi2p.bob.endpoints import (BOBI2PClientEndpoint,
                                  BOBI2PServerEndpoint)
 from txi2p.plugins import I2PClientParser
+
+if twisted.version < Version('twisted', 14, 0, 0):
+    skip = 'txi2p.plugins requires twisted 14.0 or newer'
+else:
+    skip = None
 
 
 class I2PClientEndpointPluginTest(unittest.TestCase):
@@ -17,6 +24,7 @@ class I2PClientEndpointPluginTest(unittest.TestCase):
     Unit tests for the I2P client endpoint description parser.
     """
 
+    skip = skip
     _parserClass = I2PClientParser
 
     def test_pluginDiscovery(self):

@@ -2,7 +2,9 @@
 # See COPYING for details.
 
 import os
+from twisted.internet.error import UnknownHostError
 from twisted.internet.protocol import ClientFactory
+from twisted.python.failure import Failure
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
@@ -521,6 +523,11 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
         proto = self.makeProto()
         proto.dataReceived("ERROR Can't find destination: spam.i2p")
         self.assertEqual(proto.wrappedProto.closed, 1)
+
+        expected = UnknownHostError(string="Can't find destination: spam.i2p")
+        got = proto.wrappedProto.closedReason.value
+        self.assertEqual(type(expected), type(got))
+        self.assertEqual(expected.args, got.args)
 
     def test_dataPassed(self):
         proto = self.makeProto()

@@ -3,8 +3,10 @@
 
 import os
 from parsley import makeProtocol
+from twisted.internet.error import ConnectError, UnknownHostError
 from twisted.internet.interfaces import IListeningPort, ITransport
 from twisted.internet.protocol import Protocol
+from twisted.python.failure import Failure
 from zope.interface import implementer
 
 from txi2p import grammar
@@ -409,6 +411,7 @@ class I2PClientTunnelProtocol(Protocol):
         self.wrappedProto = wrappedProto
         self._clientAddr = clientAddr
         self.dest = dest
+        self._errmsg = None
 
     def connectionMade(self):
         # Substitute transport for an I2P wrapper
@@ -423,6 +426,7 @@ class I2PClientTunnelProtocol(Protocol):
         # Check for a successful connection
         if not self.isConnected:
             if data.startswith("ERROR"):
+                self._errmsg = data[6:]
                 # I2P connection failed
                 self.transport.loseConnection()
                 return
@@ -433,6 +437,11 @@ class I2PClientTunnelProtocol(Protocol):
         self.wrappedProto.dataReceived(data)
 
     def connectionLost(self, reason):
+        if self._errmsg:
+            if self._errmsg.startswith("Can't find destination"):
+                reason = Failure(UnknownHostError(string=self._errmsg))
+            else:
+                reason = Failure(ConnectError(string=self._errmsg))
         self.factory.i2pConnectionLost(self.wrappedProto, reason)
 
 

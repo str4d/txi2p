@@ -2,7 +2,7 @@
 # See COPYING for details.
 
 from twisted.internet import interfaces
-from twisted.internet.endpoints import clientFromString, getPlugins, serverFromString
+from twisted.internet.endpoints import getPlugins
 from twisted.python.versions import Version
 from twisted.test.proto_helpers import MemoryReactor
 from twisted.trial import unittest
@@ -11,8 +11,6 @@ from zope.interface.verify import verifyObject
 
 from txi2p.bob.endpoints import (BOBI2PClientEndpoint,
                                  BOBI2PServerEndpoint)
-from txi2p.plugins import (I2PClientParser,
-                           I2PServerParser)
 
 if twisted.version < Version('twisted', 14, 0, 0):
     skip = 'txi2p.plugins requires twisted 14.0 or newer'
@@ -41,10 +39,14 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     """
 
     skip = skip
-    _parserClass = I2PClientParser
     _parserInterface = interfaces.IStreamClientEndpointStringParserWithReactor
+    @property
+    def _parserClass(self):
+        from txi2p.plugins import I2PClientParser
+        return I2PClientParser
 
     def test_stringDescription(self):
+        from twisted.internet.endpoints import clientFromString
         ep = clientFromString(
             MemoryReactor(), "i2p:stats.i2p:api=BOB:tunnelNick=spam:inport=12345")
         self.assertIsInstance(ep, BOBI2PClientEndpoint)
@@ -60,10 +62,14 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     """
 
     skip = skip
-    _parserClass = I2PServerParser
     _parserInterface = interfaces.IStreamServerEndpointStringParser
+    @property
+    def _parserClass(self):
+        from txi2p.plugins import I2PServerParser
+        return I2PServerParser
 
     def test_stringDescription(self):
+        from twisted.internet.endpoints import serverFromString
         ep = serverFromString(
             MemoryReactor(), "i2p:/tmp/testkeys.foo:api=BOB:tunnelNick=spam:outport=23456")
         self.assertIsInstance(ep, BOBI2PServerEndpoint)

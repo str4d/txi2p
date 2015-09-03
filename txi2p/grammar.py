@@ -90,3 +90,27 @@ State_stop      = BOB_stop:response      -> receiver.stop(*response)
 State_verify    = BOB_verify:response    -> receiver.verify(*response)
 State_visit     = BOB_visit:response     -> receiver.visit(*response)
 """
+
+# SAM grammar
+samGrammarSource = i2pGrammarSource + r"""
+KEY = <(~'=' anything)*>
+VALUE = (('"' <(~'"' anything)*>:value '"' -> value)
+        |(<(~' ' anything)*>))
+OPTION = KEY:key '=' VALUE:value -> (key.lower(), value)
+OPTIONS = (OPTION:first (ws OPTION)*:rest -> dict([first] + rest))
+          | -> {}
+
+SAM_hello          = 'HELLO REPLY '    OPTIONS:options -> options
+SAM_session_status = 'SESSION STATUS ' OPTIONS:options -> options
+SAM_stream_status  = 'STREAM STATUS '  OPTIONS:options -> options
+SAM_naming_reply   = 'NAMING REPLY '   OPTIONS:options -> options
+SAM_dest_reply     = 'DEST REPLY '     OPTIONS:options -> options
+
+State_hello   = SAM_hello:options          -> receiver.hello(**options)
+State_create  = SAM_session_status:options -> receiver.create(**options)
+State_connect = SAM_stream_status:options  -> receiver.connect(**options)
+State_accept  = SAM_stream_status:options  -> receiver.accept(**options)
+State_forward = SAM_stream_status:options  -> receiver.forward(**options)
+State_naming  = SAM_naming_reply:options   -> receiver.lookup_reply(**options)
+State_dest    = SAM_dest_reply:options     -> receiver.dest_generated(**options)
+"""

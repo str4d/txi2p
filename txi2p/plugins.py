@@ -48,15 +48,15 @@ class I2PClientParser(object):
             else:
                 api = DEFAULT_API
 
+        if api not in self._apiParsers:
+            raise ValueError('Specified I2P API is invalid or unsupported')
+
         if not apiEndpoint:
             apiEndpoint = DEFAULT_ENDPOINT[api]
 
-        if api not in self._apiParsers:
-            raise ValueError('Specified I2P API is invalid or unsupported')
-        else:
-            return self._apiParsers[api](self, reactor, dest,
-                                         port and int(port) or None,
-                                         apiEndpoint, **kwargs)
+        return self._apiParsers[api](self, reactor, dest,
+                                     port and int(port) or None,
+                                     apiEndpoint, **kwargs)
 
     def parseStreamClient(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has
@@ -90,15 +90,15 @@ class I2PServerParser(object):
             else:
                 api = DEFAULT_API
 
+        if api not in self._apiParsers:
+            raise ValueError('Specified I2P API is invalid or unsupported')
+
         if not apiEndpoint:
             apiEndpoint = DEFAULT_ENDPOINT[api]
 
-        if api not in self._apiParsers:
-            raise ValueError('Specified I2P API is invalid or unsupported')
-        else:
-            return self._apiParsers[api](self, reactor, keypairPath,
-                                         port and int(port) or None,
-                                         apiEndpoint, **kwargs)
+        return self._apiParsers[api](self, reactor, keypairPath,
+                                     port and int(port) or None,
+                                     apiEndpoint, **kwargs)
 
     def parseStreamServer(self, reactor, *args, **kwargs):
         # Delegate to another function with a sane signature.  This function has

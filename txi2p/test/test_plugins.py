@@ -57,6 +57,16 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         self.assertEqual(ep._tunnelNick,"spam")
         self.assertEqual(ep._inport,12345)
 
+    def test_badAPI(self):
+        from twisted.internet.endpoints import clientFromString
+        self.failUnlessRaises(ValueError, clientFromString,
+            MemoryReactor(), "i2p:stats.i2p:api=FOO")
+
+    def test_apiEndpointWithNoAPI(self):
+        from twisted.internet.endpoints import clientFromString
+        self.failUnlessRaises(ValueError, clientFromString,
+            MemoryReactor(), "i2p:stats.i2p:apiEndpoint=tcp\:127.0.0.1\:2827")
+
 
 class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     """
@@ -81,3 +91,13 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         self.assertEqual(ep._keypairPath, "/tmp/testkeys.foo")
         self.assertEqual(ep._tunnelNick, "spam")
         self.assertEqual(ep._outport, 23456)
+
+    def test_badAPI(self):
+        from twisted.internet.endpoints import serverFromString
+        self.failUnlessRaises(ValueError, serverFromString,
+            MemoryReactor(), "i2p:/tmp/testkeys.foo:api=FOO")
+
+    def test_apiEndpointWithNoAPI(self):
+        from twisted.internet.endpoints import serverFromString
+        self.failUnlessRaises(ValueError, serverFromString,
+            MemoryReactor(), "i2p:/tmp/testkeys.foo:apiEndpoint=tcp\:127.0.0.1\:2827")

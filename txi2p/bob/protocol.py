@@ -4,13 +4,13 @@
 import os
 from parsley import makeProtocol
 from twisted.internet.error import ConnectError, UnknownHostError
-from twisted.internet.interfaces import IListeningPort, ITransport
+from twisted.internet.interfaces import IListeningPort
 from twisted.internet.protocol import Protocol
 from twisted.python.failure import Failure
 from zope.interface import implementer
 
 from txi2p import grammar
-from txi2p.address import I2PAddress
+from txi2p.address import I2PAddress, I2PTunnelTransport
 
 DEFAULT_INPORT  = 9000
 DEFAULT_OUTPORT = 9001
@@ -387,23 +387,6 @@ I2PTunnelRemoverBOBClient = makeProtocol(
     grammar.bobGrammarSource,
     BOBSender,
     I2PTunnelRemoverBOBReceiver)
-
-
-@implementer(ITransport)
-class I2PTunnelTransport(object):
-    def __init__(self, wrappedTransport, localAddr, peerAddr=None):
-        self.t = wrappedTransport
-        self._localAddr = localAddr
-        self.peerAddr = peerAddr
-
-    def __getattr__(self, attr):
-        return getattr(self.t, attr)
-
-    def getPeer(self):
-        return self.peerAddr
-
-    def getHost(self):
-        return self._localAddr
 
 
 class I2PClientTunnelProtocol(Protocol):

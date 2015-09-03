@@ -1,7 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet.interfaces import IAddress
+from twisted.internet.interfaces import IAddress, ITransport
 from twisted.python.util import FancyEqMixin
 from zope.interface import implementer
 
@@ -34,3 +34,20 @@ class I2PAddress(FancyEqMixin, object):
 
     def __hash__(self):
         return hash((self.destination, self.port))
+
+
+@implementer(ITransport)
+class I2PTunnelTransport(object):
+    def __init__(self, wrappedTransport, localAddr, peerAddr=None):
+        self.t = wrappedTransport
+        self._localAddr = localAddr
+        self.peerAddr = peerAddr
+
+    def __getattr__(self, attr):
+        return getattr(self.t, attr)
+
+    def getPeer(self):
+        return self.peerAddr
+
+    def getHost(self):
+        return self._localAddr

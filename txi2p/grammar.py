@@ -95,16 +95,16 @@ State_visit     = BOB_visit:response     -> receiver.visit(*response)
 samGrammarSource = i2pGrammarSource + r"""
 KEY = <(~'=' anything)*>
 VALUE = (('"' <(~'"' anything)*>:value '"' -> value)
-        |(<(~' ' anything)*>))
+        |(<(~(' '|'\n') anything)*>))
 OPTION = KEY:key '=' VALUE:value -> (key.lower(), value)
-OPTIONS = (OPTION:first (ws OPTION)*:rest -> dict([first] + rest))
+OPTIONS = (OPTION:first (' ' OPTION)*:rest -> dict([first] + rest))
           | -> {}
 
-SAM_hello          = 'HELLO REPLY '    OPTIONS:options -> options
-SAM_session_status = 'SESSION STATUS ' OPTIONS:options -> options
-SAM_stream_status  = 'STREAM STATUS '  OPTIONS:options -> options
-SAM_naming_reply   = 'NAMING REPLY '   OPTIONS:options -> options
-SAM_dest_reply     = 'DEST REPLY '     OPTIONS:options -> options
+SAM_hello          = 'HELLO REPLY '    OPTIONS:options '\n' -> options
+SAM_session_status = 'SESSION STATUS ' OPTIONS:options '\n' -> options
+SAM_stream_status  = 'STREAM STATUS '  OPTIONS:options '\n' -> options
+SAM_naming_reply   = 'NAMING REPLY '   OPTIONS:options '\n' -> options
+SAM_dest_reply     = 'DEST REPLY '     OPTIONS:options '\n' -> options
 
 State_hello   = SAM_hello:options          -> receiver.hello(**options)
 State_create  = SAM_session_status:options -> receiver.create(**options)

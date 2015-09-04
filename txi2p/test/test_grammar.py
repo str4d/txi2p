@@ -71,36 +71,36 @@ class TestSAMGrammar(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_SAM_hello(self):
-        self._test('SAM_hello', 'HELLO REPLY RESULT=OK VERSION=3.1',
+        self._test('SAM_hello', 'HELLO REPLY RESULT=OK VERSION=3.1\n',
                    {'result': 'OK', 'version': '3.1'})
-        self._test('SAM_hello', 'HELLO REPLY RESULT=NOVERSION', {'result': 'NOVERSION'})
+        self._test('SAM_hello', 'HELLO REPLY RESULT=NOVERSION\n', {'result': 'NOVERSION'})
         self._test('SAM_hello',
-                   'HELLO REPLY RESULT=I2P_ERROR MESSAGE="Something failed"',
+                   'HELLO REPLY RESULT=I2P_ERROR MESSAGE="Something failed"\n',
                    {'result': 'I2P_ERROR', 'message': 'Something failed'})
 
     def test_SAM_session_status(self):
         self._test('SAM_session_status',
-                   'SESSION STATUS RESULT=OK DESTINATION=privkey',
+                   'SESSION STATUS RESULT=OK DESTINATION=privkey\n',
                    {'result': 'OK', 'destination': 'privkey'})
         self._test('SAM_session_status',
-                   'SESSION STATUS RESULT=DUPLICATED_ID',
+                   'SESSION STATUS RESULT=DUPLICATED_ID\n',
                    {'result': 'DUPLICATED_ID'})
 
     def test_SAM_stream_status(self):
-        self._test('SAM_stream_status', 'STREAM STATUS RESULT=OK', {'result': 'OK'})
+        self._test('SAM_stream_status', 'STREAM STATUS RESULT=OK\n', {'result': 'OK'})
         self._test('SAM_stream_status',
-                   'STREAM STATUS RESULT=CANT_REACH_PEER MESSAGE="Can\'t reach peer"',
+                   'STREAM STATUS RESULT=CANT_REACH_PEER MESSAGE="Can\'t reach peer"\n',
                    {'result': 'CANT_REACH_PEER', 'message': 'Can\'t reach peer'})
 
     def test_SAM_naming_reply(self):
         self._test('SAM_naming_reply',
-                   'NAMING REPLY RESULT=OK NAME=name VALUE=dest',
+                   'NAMING REPLY RESULT=OK NAME=name VALUE=dest\n',
                    {'result': 'OK', 'name': 'name', 'value': 'dest'})
         self._test('SAM_naming_reply',
-                   'NAMING REPLY RESULT=KEY_NOT_FOUND',
+                   'NAMING REPLY RESULT=KEY_NOT_FOUND\n',
                    {'result': 'KEY_NOT_FOUND'})
 
     def test_SAM_dest_reply(self):
         self._test('SAM_dest_reply',
-                   'DEST REPLY PUB=foo PRIV=foobar',
+                   'DEST REPLY PUB=foo PRIV=foobar\n',
                    {'pub': 'foo', 'priv': 'foobar'})

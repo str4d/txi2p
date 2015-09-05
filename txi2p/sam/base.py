@@ -1,6 +1,13 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from twisted.internet.error import (
+    ConnectBindError,
+    ConnectError,
+    NoRouteError,
+    TCPTimedOutError,
+    UnknownHostError,
+)
 from twisted.internet.interfaces import IListeningPort, IProtocolFactory
 from twisted.internet.protocol import ClientFactory
 from twisted.python.failure import Failure
@@ -87,7 +94,21 @@ class SAMFactory(ClientFactory):
             self.deferred.errback(reason)
 
     def resultNotOK(self, result, message):
-        self.connectionFailed(Failure(Exception('%s: %s' % (result, message))))
+        if result == 'CANT_REACH_PEER':
+            ecls = NoRouteError
+        elif result == 'DUPLICATED_DEST':
+            ecls = ConnectBindError
+        elif result == 'KEY_NOT_FOUND':
+            ecls = UnknownHostError
+        elif result == 'PEER_NOT_FOUND':
+            ecls = NoRouteError
+        elif result == 'TIMEOUT':
+            ecls = TCPTimedOutError
+        else:
+            ecls = ConnectError
+
+        e = ecls(string=(message if message else result))
+        self.connectionFailed(Failure(e))
 
     # This method is not called if an endpoint deferred errbacks
     def clientConnectionFailed(self, connector, reason):

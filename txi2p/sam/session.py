@@ -109,7 +109,9 @@ class SAMSession(object):
         self.streams.append(stream)
 
     def removeStream(self, stream):
-        self.streams.remove(stream)
+        # Streams are only added once they have been established
+        if stream in self.streams:
+            self.streams.remove(stream)
         if not self.streams:
             # No more streams, close the session
             self.proto.sender.transport.loseConnection()

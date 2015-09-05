@@ -63,6 +63,7 @@ class StreamConnectFactory(SAMFactory):
         self.deferred = Deferred(self._cancel);
 
     def streamConnectionEstablished(self, streamProto):
+        self.session.addStream(streamProto)
         proto = self._clientFactory.buildProtocol(I2PAddress(self.dest, self.host))
         if proto is None:
             self.deferred.cancel()
@@ -112,4 +113,5 @@ class StreamForwardFactory(SAMFactory):
         self.deferred = Deferred(self._cancel);
 
     def streamForwardEstablished(self, forwardingProto):
+        self.session.addStream(forwardingProto)
         self.deferred.callback(forwardingProto)

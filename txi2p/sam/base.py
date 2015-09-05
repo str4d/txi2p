@@ -52,6 +52,8 @@ class SAMReceiver(object):
             self.wrappedProto.connectionLost(reason)
         else:
             self.factory.connectionFailed(reason)
+        if hasattr(self.factory, 'session'):
+            self.factory.session.removeStream(self)
 
     def hello(self, result, version=None, message=None):
         if result != 'OK':

@@ -1,10 +1,16 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from twisted.internet.interfaces import IListeningPort, IProtocolFactory
 from twisted.internet.protocol import ClientFactory
 from twisted.python.failure import Failure
+from zope.interface import implementer
 
-from txi2p.address import I2PAddress, I2PTunnelTransport
+from txi2p.address import (
+    I2PAddress,
+    I2PServerTunnelProtocol,
+    I2PTunnelTransport,
+)
 
 
 class SAMSender(object):
@@ -34,7 +40,7 @@ class SAMReceiver(object):
         self.wrappedProto = proto
         self.transportWrapper = I2PTunnelTransport(
             self.sender.transport,
-            I2PAddress(self.factory.session.pubKey),
+            self.factory.session.address,
             I2PAddress(self.factory.dest, self.factory.host))
         proto.makeConnection(self.transportWrapper)
 
@@ -84,3 +90,39 @@ class SAMFactory(ClientFactory):
     # This method is not called if an endpoint deferred errbacks
     def clientConnectionFailed(self, connector, reason):
         self.connectionFailed(reason)
+
+
+@implementer(IProtocolFactory)
+class I2PFactoryWrapper(object):
+    protocol = I2PServerTunnelProtocol
+
+    def __init__(self, wrappedFactory, serverAddr):
+        self.w = wrappedFactory
+        self.serverAddr = serverAddr
+
+    def buildProtocol(self, addr):
+        wrappedProto = self.w.buildProtocol(addr)
+        proto = self.protocol(wrappedProto, self.serverAddr)
+        proto.factory = self
+        return proto
+
+    def __getattr__(self, attr):
+        return getattr(self.w, attr)
+
+
+@implementer(IListeningPort)
+class I2PListeningPort(object):
+    def __init__(self, listeningPort, forwardingProto, serverAddr):
+        self._listeningPort = listeningPort
+        self._forwardingProto = forwardingProto
+        self._serverAddr = serverAddr
+
+    def startListening(self):
+        self._listeningPort.startListening()
+
+    def stopListening(self):
+        self._listeningPort.stopListening()
+        self._forwardingProto.sender.transport.loseConnection()
+
+    def getHost(self):
+        return self._serverAddr

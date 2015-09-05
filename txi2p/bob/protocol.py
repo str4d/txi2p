@@ -10,7 +10,11 @@ from twisted.python.failure import Failure
 from zope.interface import implementer
 
 from txi2p import grammar
-from txi2p.address import I2PAddress, I2PTunnelTransport
+from txi2p.address import (
+    I2PAddress,
+    I2PTunnelTransport,
+    I2PServerTunnelProtocol,
+)
 
 DEFAULT_INPORT  = 9000
 DEFAULT_OUTPORT = 9001
@@ -426,30 +430,6 @@ class I2PClientTunnelProtocol(Protocol):
             else:
                 reason = Failure(ConnectError(string=self._errmsg))
         self.factory.i2pConnectionLost(self.wrappedProto, reason)
-
-
-class I2PServerTunnelProtocol(Protocol):
-    def __init__(self, wrappedProto, serverAddr):
-        self.wrappedProto = wrappedProto
-        self._serverAddr = serverAddr
-        self.peer = None
-
-    def connectionMade(self):
-        # Substitute transport for an I2P wrapper
-        self.transport = I2PTunnelTransport(self.transport, self._serverAddr)
-        self.wrappedProto.makeConnection(self.transport)
-
-    def dataReceived(self, data):
-        if self.peer:
-            # Pass all other data to the wrapped Protocol.
-            self.wrappedProto.dataReceived(data)
-        else:
-            # First line is the peer's Destination.
-            self.peer = data.split('\n')[0]
-            self.transport.peerAddr = I2PAddress(self.peer)
-
-    def connectionLost(self, reason):
-        self.wrappedProto.connectionLost(reason)
 
 
 @implementer(IListeningPort)

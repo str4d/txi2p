@@ -7,6 +7,7 @@ from twisted.internet import defer
 from twisted.python import log
 
 from txi2p import grammar
+from txi2p.address import I2PAddress
 from txi2p.sam.base import SAMSender, SAMReceiver, SAMFactory
 
 
@@ -41,6 +42,7 @@ class SessionCreateReceiver(SAMReceiver):
             self.factory.resultNotOK(result, message)
             return
 
+        self.factory.privKey = destination
         self.sender.sendNamingLookup('ME')
         self.currentRule = 'State_naming'
 
@@ -76,7 +78,7 @@ class SessionCreateFactory(SAMFactory):
                 self.privKey = f.read()
                 f.close()
             except IOError:
-                log.msg('Could not load private key from %s' % sef._keyfile)
+                log.msg('Could not load private key from %s' % self._keyfile)
                 self._writeKeypair = True
 
     def sessionCreated(self, proto, pubKey):
@@ -121,7 +123,7 @@ def getSession(samEndpoint, nickname, **kwargs):
         s.samEndpoint = samEndpoint
         s.id = id
         s.proto = proto
-        s.pubKey = pubKey
+        s.address = I2PAddress(pubKey)
         _sessions[samEndpoint][nickname] = s
         return s
 

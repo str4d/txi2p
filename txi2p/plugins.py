@@ -10,6 +10,7 @@ from zope.interface import implementer
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
 from txi2p.sam.endpoints import (
     SAMI2PStreamClientEndpoint,
+    SAMI2PStreamServerEndpoint,
 )
 
 DEFAULT_ENDPOINT = {
@@ -90,8 +91,16 @@ class I2PServerParser(object):
                                     keypairPath, port, tunnelNick, outhost,
                                     outport and int(outport) or None, options)
 
+    def _parseSAMServer(self, reactor, keypairPath, port, samEndpoint,
+                     nickname=None,
+                     options=None):
+        return SAMI2PStreamServerEndpoint(reactor,
+            clientFromString(reactor, samEndpoint),
+            keypairPath, port, nickname, options)
+
     _apiParsers = {
         'BOB': _parseBOBServer,
+        'SAM': _parseSAMServer,
         }
 
     def _parseServer(self, reactor, keypairPath, port=None,

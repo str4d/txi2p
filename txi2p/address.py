@@ -2,6 +2,7 @@
 # See COPYING for details.
 
 from twisted.internet.interfaces import IAddress, ITransport
+from twisted.internet.protocol import Protocol
 from twisted.python.util import FancyEqMixin
 from zope.interface import implementer
 
@@ -57,3 +58,27 @@ class I2PTunnelTransport(object):
 
     def getHost(self):
         return self._localAddr
+
+
+class I2PServerTunnelProtocol(Protocol):
+    def __init__(self, wrappedProto, serverAddr):
+        self.wrappedProto = wrappedProto
+        self._serverAddr = serverAddr
+        self.peer = None
+
+    def connectionMade(self):
+        # Substitute transport for an I2P wrapper
+        self.transport = I2PTunnelTransport(self.transport, self._serverAddr)
+        self.wrappedProto.makeConnection(self.transport)
+
+    def dataReceived(self, data):
+        if self.peer:
+            # Pass all other data to the wrapped Protocol.
+            self.wrappedProto.dataReceived(data)
+        else:
+            # First line is the peer's Destination.
+            self.peer = data.split('\n')[0]
+            self.transport.peerAddr = I2PAddress(self.peer)
+
+    def connectionLost(self, reason):
+        self.wrappedProto.connectionLost(reason)

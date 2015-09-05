@@ -1,6 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+import base64
+import hashlib
 from twisted.internet.interfaces import IAddress, ITransport
 from twisted.internet.protocol import Protocol
 from twisted.python.util import FancyEqMixin
@@ -27,20 +29,27 @@ class I2PAddress(FancyEqMixin, object):
 
     def __init__(self, destination, host=None, port=None):
         self.destination = destination
-        self.host = host
         self.port = int(port) if port else None
+
+        if host:
+            self.host = host
+        else:
+            raw_key = base64.b64decode(destination, '-~')
+            hash = hashlib.sha256(raw_key)
+            base32_hash = base64.b32encode(hash.digest())
+            self.host = base32_hash.lower().replace('=', '')+'.b32.i2p'
 
 
     def __repr__(self):
         if self.port:
             return '%s(%s, %d)' % (
-                self.__class__.__name__, self.host if self.host else self.destination, self.port)
+                self.__class__.__name__, self.host, self.port)
         return '%s(%s)' % (
-            self.__class__.__name__, self.host if self.host else self.destination)
+            self.__class__.__name__, self.host)
 
 
     def __hash__(self):
-        return hash((self.destination, self.port))
+        return hash((self.host, self.port))
 
 
 @implementer(ITransport)

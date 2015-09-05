@@ -15,6 +15,8 @@ from txi2p.bob.protocol import (I2PClientTunnelCreatorBOBClient,
                                 I2PServerTunnelProtocol,
                                 DEFAULT_INPORT, DEFAULT_OUTPORT)
 
+TEST_B64 = "2wDRF5nDfeTNgM4X-TI5xEk3R-WiaTABvkMQ2eYpvEzayUZQJgr9E2T6Y2m9HHn3xHYGEOg-RLisjW9AubTaUTx-v66AsEEtv745qPcuWuV1SP~w1bdzYEn8MSoK7Zh4mwHBg1uHq8z17TUNvWz19q76vHNth-2PDuBToD7ySBn3cGBFDUU83wJJXPD6OueLY8yosWWtksk7WZk60~6z~nVePPSEY8JDry3myLDe11szAVER4A8eX1sFpw247cXGGJK9wQhV-TXFj~m76GPVcFKh7u79zwTwZnZ1GXXKqqyRoj1c4-U69CvvJsQRLmdLFwFEpRkxwV8z6LIFclYJk443YpTnPXC7vNdFOzqqS4FLR1ra~DNfN5foMtR2~2VxuR5m2dYiOS6GzHDxA4acJJSGqnasJjcEIFNVSQKxMnFu9PvGLNJHZ83EraHCErENcOGkPlnVgcJCtPGNGiirwCbBz38jE0lfjkrNrWabc6uWeU559CobG8F8KUDx1irpAAAA"
+
 
 class BOBProtoTestMixin(object):
     def makeProto(self, *a, **kw):
@@ -503,7 +505,7 @@ class FakeDisconnectingFactory(object):
 class TestI2PClientTunnelProtocol(unittest.TestCase):
     def makeProto(self):
         wrappedProto = proto_helpers.AccumulatingProtocol()
-        proto = I2PClientTunnelProtocol(wrappedProto, None, 'spam.i2p')
+        proto = I2PClientTunnelProtocol(wrappedProto, None, TEST_B64)
         proto.factory = FakeDisconnectingFactory()
         transport = proto_helpers.StringTransportWithDisconnection()
         transport.abortConnection = lambda: None
@@ -513,7 +515,7 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
 
     def test_destRequested(self):
         proto = self.makeProto()
-        self.assertEqual(proto.transport.value(), 'spam.i2p\n')
+        self.assertEqual(proto.transport.value(), '%s\n' % TEST_B64)
 
     def test_wrappedProtoConnectionMade(self):
         proto = self.makeProto()
@@ -550,11 +552,11 @@ class TestI2PServerTunnelProtocol(unittest.TestCase):
 
     def test_peerDestStored(self):
         proto = self.makeProto()
-        proto.dataReceived('spam.i2p\n')
-        self.assertEqual(proto.peer, 'spam.i2p')
+        proto.dataReceived('%s\n' % TEST_B64)
+        self.assertEqual(proto.peer, TEST_B64)
 
     def test_dataAfterPeerDestPassed(self):
         proto = self.makeProto()
-        proto.dataReceived('spam.i2p\n')
+        proto.dataReceived('%s\n' % TEST_B64)
         proto.dataReceived('shrubbery')
         self.assertEqual(proto.wrappedProto.data, 'shrubbery')

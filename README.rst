@@ -10,7 +10,7 @@ Endpoint strings
 The Twisted plugin for ``clientFromString()`` and ``serverFromString()`` will
 only work for `Twisted`_ 14.0 or greater.
 
-Client string format: ``i2p:<dest>[:port]``.
+Client string format: ``i2p:<host>[:port]``.
 Server string format: ``i2p:<keypairPath>[:port]``.
 
 Both client and server strings support the following keyword arguments:
@@ -30,7 +30,7 @@ BOB
 ``BOBI2PClientEndpoint`` parameters:
 
 * ``bobEndpoint`` - An endpoint that will connect to the BOB API.
-* ``dest`` - The I2P Destination to connect to.
+* ``host`` - The I2P hostname or Destination to connect to.
 * ``port`` (optional) - The port to connect to inside I2P. If unset or `None`,
   the default (null) port is used. Ignored because BOB doesn't support ports
   yet.

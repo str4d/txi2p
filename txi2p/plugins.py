@@ -8,9 +8,13 @@ from twisted.python.compat import _PY3
 from zope.interface import implementer
 
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
+from txi2p.sam.endpoints import (
+    SAMI2PStreamClientEndpoint,
+)
 
 DEFAULT_ENDPOINT = {
     'BOB': 'tcp:127.0.0.1:2827',
+    'SAM': 'tcp:127.0.0.1:7656',
     }
 
 DEFAULT_API = 'BOB'
@@ -27,20 +31,28 @@ else:
 class I2PClientParser(object):
     prefix = 'i2p'
 
-    def _parseBOBClient(self, reactor, dest, port, bobEndpoint,
+    def _parseBOBClient(self, reactor, host, port, bobEndpoint,
                      tunnelNick=None,
                      inhost='localhost',
                      inport=None,
                      options=None):
         return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    dest, port, tunnelNick, inhost,
+                                    host, port, tunnelNick, inhost,
                                     inport and int(inport) or None, options)
+
+    def _parseSAMClient(self, reactor, host, port, samEndpoint,
+                     nickname=None,
+                     options=None):
+        return SAMI2PStreamClientEndpoint(
+            clientFromString(reactor, samEndpoint),
+            host, port, nickname, options)
 
     _apiParsers = {
         'BOB': _parseBOBClient,
+        'SAM': _parseSAMClient,
         }
 
-    def _parseClient(self, reactor, dest, port=None,
+    def _parseClient(self, reactor, host, port=None,
                      api=None, apiEndpoint=None, **kwargs):
         if not api:
             if apiEndpoint:
@@ -54,7 +66,7 @@ class I2PClientParser(object):
         if not apiEndpoint:
             apiEndpoint = DEFAULT_ENDPOINT[api]
 
-        return self._apiParsers[api](self, reactor, dest,
+        return self._apiParsers[api](self, reactor, host,
                                      port and int(port) or None,
                                      apiEndpoint, **kwargs)
 

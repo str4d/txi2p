@@ -17,12 +17,6 @@ def parseHost(host):
 def parseOptions(options):
     return dict([option.split(':') for option in options.split(',')]) if options else {}
 
-def killReactor(reason):
-    print 'Something failed!'
-    print reason
-    from twisted.internet import reactor
-    reactor.stop()
-
 
 @implementer(interfaces.IStreamClientEndpoint)
 class SAMI2PStreamClientEndpoint(object):
@@ -60,7 +54,6 @@ class SAMI2PStreamClientEndpoint(object):
             # real IProtocol to be returned after tunnel creation,
             # and pass it to any further registered callbacks.
             d2.addCallback(lambda proto: i2pFac.deferred)
-            d2.addErrback(killReactor)
             return d2
         d.addCallback(createStream)
         return d
@@ -119,5 +112,4 @@ class SAMI2PStreamServerEndpoint(object):
             return d2
 
         d.addCallback(createStream)
-        d.addErrback(killReactor)
         return d

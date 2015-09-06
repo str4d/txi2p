@@ -7,6 +7,7 @@ from twisted.internet.error import ConnectError, UnknownHostError
 
 from txi2p import grammar
 from txi2p.address import I2PAddress
+from txi2p.sam import constants as c
 from txi2p.sam.base import SAMSender, SAMReceiver, SAMFactory
 
 
@@ -38,7 +39,7 @@ class StreamConnectReceiver(SAMReceiver):
         self.currentRule = 'State_connect'
 
     def connect(self, result, message=None):
-        if result != 'OK':
+        if result != c.RESULT_OK:
             self.factory.resultNotOK(result, message)
             return
 
@@ -92,7 +93,7 @@ class StreamForwardReceiver(SAMReceiver):
         self.currentRule = 'State_forward'
 
     def forward(self, result, message=None):
-        if result != 'OK':
+        if result != c.RESULT_OK:
             self.factory.resultNotOK(result, message)
             return
         self.factory.streamForwardEstablished(self)

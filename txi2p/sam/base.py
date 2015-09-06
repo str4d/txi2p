@@ -1,13 +1,6 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet.error import (
-    ConnectBindError,
-    ConnectError,
-    NoRouteError,
-    TCPTimedOutError,
-    UnknownHostError,
-)
 from twisted.internet.interfaces import IListeningPort, IProtocolFactory
 from twisted.internet.protocol import ClientFactory
 from twisted.python.failure import Failure
@@ -18,6 +11,7 @@ from txi2p.address import (
     I2PServerTunnelProtocol,
     I2PTunnelTransport,
 )
+from txi2p.sam import constants as c
 
 
 class SAMSender(object):
@@ -63,13 +57,13 @@ class SAMReceiver(object):
             self.factory.session.removeStream(self)
 
     def hello(self, result, version=None, message=None):
-        if result != 'OK':
+        if result != c.RESULT_OK:
             self.factory.resultNotOK(result, message)
             return
         self.command()
 
     def lookupReply(self, result, name, value=None, message=None):
-        if result != 'OK':
+        if result != c.RESULT_OK:
             self.factory.resultNotOK(result, message)
             return
         self.postLookup(value)
@@ -93,26 +87,12 @@ class SAMFactory(ClientFactory):
         if not self.canceled and not self.deferred.called:
             self.deferred.errback(reason)
 
-    def resultNotOK(self, result, message):
-        if result == 'CANT_REACH_PEER':
-            ecls = NoRouteError
-        elif result == 'DUPLICATED_DEST':
-            ecls = ConnectBindError
-        elif result == 'KEY_NOT_FOUND':
-            ecls = UnknownHostError
-        elif result == 'PEER_NOT_FOUND':
-            ecls = NoRouteError
-        elif result == 'TIMEOUT':
-            ecls = TCPTimedOutError
-        else:
-            ecls = ConnectError
-
-        e = ecls(string=(message if message else result))
-        self.connectionFailed(Failure(e))
-
     # This method is not called if an endpoint deferred errbacks
     def clientConnectionFailed(self, connector, reason):
         self.connectionFailed(reason)
+
+    def resultNotOK(self, result, message):
+        raise c.samErrorMap.get(result)(string=(message if message else result))
 
 
 @implementer(IProtocolFactory)

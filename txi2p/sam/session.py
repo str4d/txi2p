@@ -8,6 +8,7 @@ from twisted.python import log
 
 from txi2p import grammar
 from txi2p.address import I2PAddress
+from txi2p.sam import constants as c
 from txi2p.sam.base import SAMSender, SAMReceiver, SAMFactory
 
 
@@ -38,7 +39,7 @@ class SessionCreateReceiver(SAMReceiver):
         self.currentRule = 'State_create'
 
     def create(self, result, destination=None, message=None):
-        if result != 'OK':
+        if result != c.RESULT_OK:
             self.factory.resultNotOK(result, message)
             return
 

@@ -50,9 +50,6 @@ class SessionCreateReceiver(SAMReceiver):
     def postLookup(self, dest):
         self.factory.sessionCreated(self, dest)
 
-    def destGenerated(self, pub, priv):
-        pass
-
 
 # A Protocol for making a SAM session
 SessionCreateProtocol = makeProtocol(

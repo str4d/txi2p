@@ -77,8 +77,8 @@ class SAMFactory(ClientFactory):
         self.currentCandidate.sender.transport.abortConnection()
         self.canceled = True
 
-    def buildProto(self, addr):
-        proto = self.protocol
+    def buildProtocol(self, addr):
+        proto = self.protocol()
         proto.factory = self
         self.currentCandidate = proto
         return proto

@@ -1,13 +1,21 @@
 # Copyriht (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from mock import Mock
+import twisted
 from twisted.internet import defer
+from twisted.python.versions import Version
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
 from txi2p.sam import session
 from txi2p.test.util import TEST_B64
 from .util import SAMFactoryTestMixin
+
+if twisted.version < Version('twisted', 12, 3, 0):
+    skipSRO = 'TestCase.successResultOf() requires twisted 12.3 or newer'
+else:
+    skipSRO = None
 
 
 class FakeEndpoint(object):
@@ -36,14 +44,18 @@ class TestSessionCreateFactory(SAMFactoryTestMixin, unittest.TestCase):
         proto._parser._setupInterp()
         proto.dataReceived('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64)
         s = self.successResultOf(fac.deferred)
-        self.assertEqual(('foo', proto, TEST_B64), s)
+        self.assertEqual(('foo', proto.receiver, TEST_B64), s)
+    test_sessionCreated.skip = skipSRO
 
 
 class TestSAMSession(unittest.TestCase):
     def setUp(self):
         self.tr = proto_helpers.StringTransportWithDisconnection()
-        self.s = session.SAMSession()
-        self.s.nickname = 'foo'
+        proto = Mock()
+        proto.sender = Mock()
+        proto.sender.transport = self.tr
+        self.tr.protocol = proto
+        self.s = session.SAMSession('foo', 'foo', proto)
 
     def test_addStream(self):
         self.assertEqual([], self.s.streams)
@@ -56,7 +68,7 @@ class TestSAMSession(unittest.TestCase):
         self.s.addStream('baz')
         self.s.removeStream('bar')
         self.assertEqual(['baz'], self.s.streams)
-        self.assertEqual(True, session._sessions.haskey('foo'))
+        self.assertEqual(True, session._sessions.has_key('foo'))
         self.assertEqual(self.s, session._sessions['foo'])
         self.s.removeStream('baz')
         self.assertEqual([], self.s.streams)
@@ -79,6 +91,7 @@ class TestGetSession(unittest.TestCase):
         self.assertEqual('nick', s.id)
         self.assertEqual(proto, s.proto)
         self.assertEqual(TEST_B64, s.address.destination)
+    test_getSession_newNickname.skip = skipSRO
 
     def test_getSession_existingNickname(self):
         proto = proto_helpers.AccumulatingProtocol()
@@ -91,3 +104,4 @@ class TestGetSession(unittest.TestCase):
         s2 = self.successResultOf(d2)
         self.assertEqual(1, samEndpoint.called)
         self.assertEqual(s, s2)
+    test_getSession_existingNickname.skip = skipSRO

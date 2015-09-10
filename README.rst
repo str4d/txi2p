@@ -4,6 +4,17 @@ txi2p
 
 ``txi2p`` is a set of I2P bindings for `Twisted`_ 10.1 or greater.
 
+Installation
+==========
+
+You can install ``txi2p`` from PyPI::
+
+    $ pip install txi2p
+
+or by downloading the source and running::
+
+    $ python setup.py install
+
 Endpoint strings
 ================
 
@@ -11,18 +22,18 @@ The Twisted plugin for ``clientFromString()`` and ``serverFromString()`` will
 only work for `Twisted`_ 14.0 or greater.
 
 Client string format: ``i2p:<host>[:port]``.
-Server string format: ``i2p:<keypairPath>[:port]``.
+Server string format: ``i2p:<keyfile>[:port]``.
 
 Both client and server strings support the following keyword arguments:
 
-* ``api=<apiName>`` - Currently only ``BOB``.
+* ``api=<apiName>`` - Either ``SAM`` or ``BOB``.
 * ``apiEndpoint=<endpointString>`` - An escaped client endpoint string pointing
   to the API, e.g. ``tcp\:127.0.0.1\:2827``.
 
 APIs
 ====
 
-I2P endpoints will be backed by several APIs. BOB is the only one implemented.
+I2P endpoints can be used with several APIs.
 
 BOB
 ---

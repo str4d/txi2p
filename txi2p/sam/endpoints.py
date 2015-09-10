@@ -1,7 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from twisted.internet import defer, interfaces
+from twisted.internet import defer, error, interfaces
 from twisted.internet.endpoints import serverFromString
 from zope.interface import implementer
 
@@ -53,6 +53,9 @@ class SAMI2PStreamClientEndpoint(object):
         """
 
         def createStream(val):
+            if self._session.style != 'STREAM':
+                raise error.UnsupportedSocketType()
+
             i2pFac = StreamConnectFactory(fac, self._session, self._host, self._dest)
             d = self._session.samEndpoint.connect(i2pFac)
             # Once the SAM IProtocol is returned, wait for the
@@ -108,6 +111,9 @@ class SAMI2PStreamServerEndpoint(object):
         """
 
         def createStream(val):
+            if self._session.style != 'STREAM':
+                raise error.UnsupportedSocketType()
+
             serverEndpoint = serverFromString(self._reactor,
                                               'tcp:0:interface=127.0.0.1')
             wrappedFactory = I2PFactoryWrapper(fac, self._session.address)

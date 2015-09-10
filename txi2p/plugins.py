@@ -44,7 +44,7 @@ class I2PClientParser(object):
     def _parseSAMClient(self, reactor, host, port, samEndpoint,
                      nickname=None,
                      options=None):
-        return SAMI2PStreamClientEndpoint(
+        return SAMI2PStreamClientEndpoint.new(
             clientFromString(reactor, samEndpoint),
             host, port, nickname, options)
 
@@ -94,7 +94,7 @@ class I2PServerParser(object):
     def _parseSAMServer(self, reactor, keypairPath, port, samEndpoint,
                      nickname=None,
                      options=None):
-        return SAMI2PStreamServerEndpoint(reactor,
+        return SAMI2PStreamServerEndpoint.new(reactor,
             clientFromString(reactor, samEndpoint),
             keypairPath, port, nickname, options)
 

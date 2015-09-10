@@ -6,6 +6,7 @@ from twisted.python import failure
 from twisted.trial import unittest
 
 from txi2p.sam import endpoints
+from txi2p.sam.session import SAMSession
 from txi2p.test.util import FakeEndpoint, FakeFactory
 
 
@@ -22,6 +23,15 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
     def test_samConnectionFailed(self):
         reactor = object()
         samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
-        endpoint = endpoints.SAMI2PStreamClientEndpoint(samEndpoint, '')
+        endpoint = endpoints.SAMI2PStreamClientEndpoint.new(samEndpoint, '')
         d = endpoint.connect(None)
         return self.assertFailure(d, ConnectionRefusedError)
+
+
+    def test_streamConnect(self):
+        reactor = object()
+        samEndpoint = FakeEndpoint()
+        session = SAMSession(samEndpoint, 'foo', 'foo', None)
+        endpoint = endpoints.SAMI2PStreamClientEndpoint(session, 'foo.i2p')
+        endpoint.connect(None)
+        self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())

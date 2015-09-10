@@ -55,7 +55,7 @@ class TestSAMSession(unittest.TestCase):
         proto.sender = Mock()
         proto.sender.transport = self.tr
         self.tr.protocol = proto
-        self.s = session.SAMSession('foo', 'foo', proto)
+        self.s = session.SAMSession(None, 'foo', 'foo', proto)
 
     def test_addStream(self):
         self.assertEqual([], self.s.streams)

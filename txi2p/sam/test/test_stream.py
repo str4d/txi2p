@@ -50,7 +50,7 @@ class TestStreamConnectProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         proto.transport.clear()
-        proto.dataReceived('NAMING REPLY RESULT=KEY_NOT_FOUND MESSAGE="foo bar baz"\n')
+        proto.dataReceived('NAMING REPLY RESULT=KEY_NOT_FOUND NAME=spam.i2p MESSAGE="foo bar baz"\n')
         fac.resultNotOK.assert_called_with('KEY_NOT_FOUND', 'foo bar baz')
 
     def test_streamConnectAfterNamingLookup(self):

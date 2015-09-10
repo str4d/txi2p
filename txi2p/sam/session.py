@@ -18,8 +18,8 @@ class SessionCreateSender(SAMSender):
         msg += ' STYLE=%s' % style
         msg += ' ID=%s' % id
         msg += ' DESTINATION=%s' % (privKey if privKey else 'TRANSIENT')
-        for option in options:
-            msg += ' %s=%s' % option
+        for key in options:
+            msg += ' %s=%s' % (key, options[key])
         msg += '\n'
         self.transport.write(msg)
 

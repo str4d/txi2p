@@ -3,6 +3,7 @@
 
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.python import failure
+from twisted.test import proto_helpers
 from twisted.trial import unittest
 
 from txi2p.sam import endpoints
@@ -34,4 +35,27 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
         session = SAMSession(samEndpoint, 'foo', 'foo', None)
         endpoint = endpoints.SAMI2PStreamClientEndpoint(session, 'foo.i2p')
         endpoint.connect(None)
+        self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())
+
+
+
+class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
+    """
+    Tests for I2P server Endpoint backed by the SAM API.
+    """
+
+    def test_samConnectionFailed(self):
+        reactor = object()
+        samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
+        endpoint = endpoints.SAMI2PStreamServerEndpoint.new(reactor, samEndpoint, '')
+        d = endpoint.listen(None)
+        return self.assertFailure(d, ConnectionRefusedError)
+
+
+    def test_streamConnect(self):
+        reactor = proto_helpers.MemoryReactor()
+        samEndpoint = FakeEndpoint()
+        session = SAMSession(samEndpoint, 'foo', 'foo', None)
+        endpoint = endpoints.SAMI2PStreamServerEndpoint(reactor, session, '')
+        endpoint.listen(None)
         self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())

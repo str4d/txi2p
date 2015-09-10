@@ -153,7 +153,7 @@ class TestSAMSession(unittest.TestCase):
         proto.sender = Mock()
         proto.sender.transport = self.tr
         self.tr.protocol = proto
-        self.s = session.SAMSession(None, 'foo', 'STREAM', 'foo', proto, False)
+        self.s = session.SAMSession('foo', None, '3.1', 'STREAM', 'foo', proto, False)
         session._sessions['foo'] = self.s
 
     def tearDown(self):
@@ -196,7 +196,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
         d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         self.assertEqual(1, samEndpoint.called)
@@ -210,7 +210,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
         self.assertRaises(ValueError, session.getSession, 'nick')
     test_getSession_newNickname_withoutEndpoint.skip = skipSRO
 
@@ -218,7 +218,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
         d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         d2 = session.getSession('nick', samEndpoint)
@@ -231,7 +231,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
         d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         d2 = session.getSession('nick')

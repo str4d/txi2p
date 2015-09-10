@@ -32,7 +32,7 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
     def test_streamConnect(self):
         reactor = object()
         samEndpoint = FakeEndpoint()
-        session = SAMSession(samEndpoint, 'foo', 'STREAM', 'foo', None, True)
+        session = SAMSession('foo', samEndpoint, '3.1', 'STREAM', 'foo', None, True)
         endpoint = endpoints.SAMI2PStreamClientEndpoint(session, 'foo.i2p')
         endpoint.connect(None)
         self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())
@@ -55,7 +55,7 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
     def test_streamConnect(self):
         reactor = proto_helpers.MemoryReactor()
         samEndpoint = FakeEndpoint()
-        session = SAMSession(samEndpoint, 'foo', 'STREAM', 'foo', None, True)
+        session = SAMSession('foo', samEndpoint, '3.1', 'STREAM', 'foo', None, True)
         endpoint = endpoints.SAMI2PStreamServerEndpoint(reactor, session, '')
         endpoint.listen(None)
         self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())

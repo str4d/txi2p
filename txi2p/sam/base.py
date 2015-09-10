@@ -60,6 +60,7 @@ class SAMReceiver(object):
         if result != c.RESULT_OK:
             self.factory.resultNotOK(result, message)
             return
+        self.factory.samVersion = version
         self.command()
 
     def lookupReply(self, result, name, value=None, message=None):

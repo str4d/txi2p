@@ -55,24 +55,39 @@ class TestSAMSession(unittest.TestCase):
         proto.sender = Mock()
         proto.sender.transport = self.tr
         self.tr.protocol = proto
-        self.s = session.SAMSession(None, 'foo', 'foo', proto)
+        self.s = session.SAMSession(None, 'foo', 'foo', proto, True)
+        session._sessions['foo'] = self.s
+
+    def tearDown(self):
+        session._sessions = {}
 
     def test_addStream(self):
-        self.assertEqual([], self.s.streams)
+        self.assertEqual([], self.s._streams)
         self.s.addStream('foo')
-        self.assertEqual(['foo'], self.s.streams)
+        self.assertEqual(['foo'], self.s._streams)
 
-    def test_removeStream(self):
-        session._sessions['foo'] = self.s
+    def test_removeStream_autoClose(self):
         self.s.addStream('bar')
         self.s.addStream('baz')
         self.s.removeStream('bar')
-        self.assertEqual(['baz'], self.s.streams)
+        self.assertEqual(['baz'], self.s._streams)
         self.assertEqual(True, session._sessions.has_key('foo'))
         self.assertEqual(self.s, session._sessions['foo'])
         self.s.removeStream('baz')
-        self.assertEqual([], self.s.streams)
+        self.assertEqual([], self.s._streams)
         self.assertEqual({}, session._sessions)
+
+    def test_removeStream_noAutoClose(self):
+        self.s._autoClose = False
+        self.s.addStream('bar')
+        self.s.addStream('baz')
+        self.s.removeStream('bar')
+        self.assertEqual(['baz'], self.s._streams)
+        self.assertEqual(True, session._sessions.has_key('foo'))
+        self.assertEqual(self.s, session._sessions['foo'])
+        self.s.removeStream('baz')
+        self.assertEqual([], self.s._streams)
+        self.assertEqual({'foo': self.s}, session._sessions)
 
 
 class TestGetSession(unittest.TestCase):

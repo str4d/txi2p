@@ -3,7 +3,7 @@
 
 import os
 from parsley import makeProtocol
-from twisted.internet import defer
+from twisted.internet import defer, error
 from twisted.python import log
 
 from txi2p import grammar
@@ -96,7 +96,7 @@ _sessions = {}
 
 
 class SAMSession(object):
-    def __init__(self, samEndpoint, nickname, id, proto):
+    def __init__(self, samEndpoint, nickname, id, proto, autoClose):
         self.samEndpoint = samEndpoint
         # User-assigned nickname, can be None
         self.nickname = nickname
@@ -104,27 +104,38 @@ class SAMSession(object):
         self.id = id
         self.address = None
         self.proto = proto
-        self.streams = []
+        self._autoClose = autoClose
+        self._closed = False
+        self._streams = []
 
     def addStream(self, stream):
-        self.streams.append(stream)
+        if self._closed:
+            raise error.ConnectionDone
+        self._streams.append(stream)
 
     def removeStream(self, stream):
+        if self._closed:
+            raise error.ConnectionDone
         # Streams are only added once they have been established
-        if stream in self.streams:
-            self.streams.remove(stream)
-        if not self.streams:
+        if stream in self._streams:
+            self._streams.remove(stream)
+        if not self._streams and self._autoClose:
             # No more streams, close the session
-            self.proto.sender.transport.loseConnection()
-            del _sessions[self.nickname]
+            self.close()
+
+    def close(self):
+        self._closed = True
+        self._streams = []
+        self.proto.sender.transport.loseConnection()
+        del _sessions[self.nickname]
 
 
-def getSession(samEndpoint, nickname, **kwargs):
+def getSession(samEndpoint, nickname, autoClose=True, **kwargs):
     if _sessions.has_key(nickname):
         return defer.succeed(_sessions[nickname])
 
     def createSession((id, proto, pubKey)):
-        s = SAMSession(samEndpoint, nickname, id, proto)
+        s = SAMSession(samEndpoint, nickname, id, proto, autoClose)
         s.address = I2PAddress(pubKey)
         _sessions[nickname] = s
         return s

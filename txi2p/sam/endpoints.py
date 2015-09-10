@@ -26,7 +26,8 @@ class SAMI2PStreamClientEndpoint(object):
 
     @classmethod
     def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, options=None):
-        d = getSession(samEndpoint, nickname,
+        d = getSession(nickname,
+                       samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        options=parseOptions(options))
         return cls(d, host, port)
@@ -79,7 +80,8 @@ class SAMI2PStreamServerEndpoint(object):
 
     @classmethod
     def new(cls, reactor, samEndpoint, keyfile, port=None, nickname=None, autoClose=False, options=None):
-        d = getSession(samEndpoint, nickname,
+        d = getSession(nickname,
+                       samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        keyfile=keyfile,
                        options=parseOptions(options))

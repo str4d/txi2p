@@ -130,9 +130,12 @@ class SAMSession(object):
         del _sessions[self.nickname]
 
 
-def getSession(samEndpoint, nickname, autoClose=False, **kwargs):
+def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
     if _sessions.has_key(nickname):
         return defer.succeed(_sessions[nickname])
+
+    if not samEndpoint:
+        raise ValueError('A new session cannot be created without an API Endpoint')
 
     def createSession((id, proto, pubKey)):
         s = SAMSession(samEndpoint, nickname, id, proto, autoClose)

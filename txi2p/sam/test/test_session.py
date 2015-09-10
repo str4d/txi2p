@@ -191,7 +191,7 @@ class TestGetSession(unittest.TestCase):
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
         samEndpoint.facDeferred = defer.succeed(('nick', proto, TEST_B64))
-        d = session.getSession(samEndpoint, 'nick')
+        d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         self.assertEqual(1, samEndpoint.called)
         self.assertEqual('nick', s.nickname)
@@ -200,15 +200,36 @@ class TestGetSession(unittest.TestCase):
         self.assertEqual(TEST_B64, s.address.destination)
     test_getSession_newNickname.skip = skipSRO
 
+    def test_getSession_newNickname_withoutEndpoint(self):
+        proto = proto_helpers.AccumulatingProtocol()
+        samEndpoint = FakeEndpoint()
+        samEndpoint.deferred = defer.succeed(None)
+        samEndpoint.facDeferred = defer.succeed(('nick', proto, TEST_B64))
+        self.assertRaises(ValueError, session.getSession, 'nick')
+    test_getSession_newNickname_withoutEndpoint.skip = skipSRO
+
     def test_getSession_existingNickname(self):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
         samEndpoint.facDeferred = defer.succeed(('nick', proto, TEST_B64))
-        d = session.getSession(samEndpoint, 'nick')
+        d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
-        d2 = session.getSession(samEndpoint, 'nick')
+        d2 = session.getSession('nick', samEndpoint)
         s2 = self.successResultOf(d2)
         self.assertEqual(1, samEndpoint.called)
         self.assertEqual(s, s2)
     test_getSession_existingNickname.skip = skipSRO
+
+    def test_getSession_existingNickname_withoutEndpoint(self):
+        proto = proto_helpers.AccumulatingProtocol()
+        samEndpoint = FakeEndpoint()
+        samEndpoint.deferred = defer.succeed(None)
+        samEndpoint.facDeferred = defer.succeed(('nick', proto, TEST_B64))
+        d = session.getSession('nick', samEndpoint)
+        s = self.successResultOf(d)
+        d2 = session.getSession('nick')
+        s2 = self.successResultOf(d2)
+        self.assertEqual(1, samEndpoint.called)
+        self.assertEqual(s, s2)
+    test_getSession_existingNickname_withoutEndpoint.skip = skipSRO

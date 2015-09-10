@@ -1,4 +1,4 @@
-# Copyriht (c) str4d <str4d@mail.i2p>
+# Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
 from mock import Mock
@@ -68,6 +68,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
 
     def test_sessionCreatedAfterNamingLookup(self):
         fac, proto = self.makeProto()
+        fac.sessionCreated = Mock()
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         proto.transport.clear()

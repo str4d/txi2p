@@ -21,7 +21,6 @@ class SAMProtocolTestMixin(object):
         fac.options = {}
         fac.protocol = protoClass
         fac.resultNotOK = Mock()
-        fac.sessionCreated = Mock()
         def raise_(ex):
             raise ex
         fac.connectionFailed = lambda reason: raise_(reason)

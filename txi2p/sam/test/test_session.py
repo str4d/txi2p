@@ -121,12 +121,13 @@ class TestSessionCreateFactory(SAMFactoryTestMixin, unittest.TestCase):
     def test_sessionCreated(self):
         mreactor = proto_helpers.MemoryReactor()
         fac, proto = self.makeProto('foo')
+        fac.samVersion = '3.1'
         # Shortcut to end of SAM session create protocol
         proto.receiver.currentRule = 'State_naming'
         proto._parser._setupInterp()
         proto.dataReceived('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64)
         s = self.successResultOf(fac.deferred)
-        self.assertEqual(('foo', proto.receiver, TEST_B64), s)
+        self.assertEqual(('3.1', 'STREAM', 'foo', proto.receiver, TEST_B64), s)
     test_sessionCreated.skip = skipSRO
 
     def test_sessionCreatedWithKeyfile(self):

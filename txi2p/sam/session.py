@@ -92,7 +92,7 @@ class SessionCreateFactory(SAMFactory):
             except IOError:
                 log.msg('Could not save private key to %s' % self._keyfile)
         # Now continue on with creation of SAMSession
-        self.deferred.callback((self.nickname, proto, pubKey))
+        self.deferred.callback((self.samVersion, self.style, self.nickname, proto, pubKey))
 
 
 # Dictionary containing all active SAM sessions

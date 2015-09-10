@@ -147,7 +147,7 @@ class TestSAMSession(unittest.TestCase):
         proto.sender = Mock()
         proto.sender.transport = self.tr
         self.tr.protocol = proto
-        self.s = session.SAMSession(None, 'foo', 'foo', proto, True)
+        self.s = session.SAMSession(None, 'foo', 'foo', proto, False)
         session._sessions['foo'] = self.s
 
     def tearDown(self):
@@ -159,6 +159,7 @@ class TestSAMSession(unittest.TestCase):
         self.assertEqual(['foo'], self.s._streams)
 
     def test_removeStream_autoClose(self):
+        self.s._autoClose = True
         self.s.addStream('bar')
         self.s.addStream('baz')
         self.s.removeStream('bar')
@@ -170,7 +171,6 @@ class TestSAMSession(unittest.TestCase):
         self.assertEqual({}, session._sessions)
 
     def test_removeStream_noAutoClose(self):
-        self.s._autoClose = False
         self.s.addStream('bar')
         self.s.addStream('baz')
         self.s.removeStream('bar')

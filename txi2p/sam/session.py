@@ -130,7 +130,7 @@ class SAMSession(object):
         del _sessions[self.nickname]
 
 
-def getSession(samEndpoint, nickname, autoClose=True, **kwargs):
+def getSession(samEndpoint, nickname, autoClose=False, **kwargs):
     if _sessions.has_key(nickname):
         return defer.succeed(_sessions[nickname])
 

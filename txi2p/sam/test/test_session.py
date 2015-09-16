@@ -9,6 +9,7 @@ from twisted.python.versions import Version
 from twisted.test import proto_helpers
 from twisted.trial import unittest
 
+from txi2p.address import I2PAddress
 from txi2p.sam import session
 from txi2p.test.util import TEST_B64
 from .util import SAMProtocolTestMixin, SAMFactoryTestMixin
@@ -240,3 +241,54 @@ class TestGetSession(unittest.TestCase):
         self.assertEqual(1, samEndpoint.called)
         self.assertEqual(s, s2)
     test_getSession_existingNickname_withoutEndpoint.skip = skipSRO
+
+
+class TestDestGenerateProtocol(SAMProtocolTestMixin, unittest.TestCase):
+    protocol = session.DestGenerateProtocol
+
+    def test_destGenerateAfterHello(self):
+        fac, proto = self.makeProto()
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        self.assertEquals('DEST GENERATE\n', proto.transport.value())
+
+    def test_destGenerated(self):
+        fac, proto = self.makeProto()
+        fac.destGenerated = Mock()
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        proto.transport.clear()
+        proto.dataReceived('DEST REPLY PUB=%s PRIV=%s\n' % (TEST_B64, 'TEST_PRIV'))
+        fac.destGenerated.assert_called_with(TEST_B64, 'TEST_PRIV')
+
+
+class TestDestGenerateFactory(SAMFactoryTestMixin, unittest.TestCase):
+    factory = session.DestGenerateFactory
+    blankFactoryArgs = ('',)
+
+    def test_destGenerated(self):
+        tmp = '/tmp/TestDestGenerateFactory.privKey'
+        mreactor = proto_helpers.MemoryReactor()
+        fac, proto = self.makeProto(tmp)
+        # Shortcut to end of SAM dest generate protocol
+        proto.receiver.currentRule = 'State_dest'
+        proto._parser._setupInterp()
+        proto.dataReceived('DEST REPLY PUB=%s PRIV=%s\n' % (TEST_B64, 'TEST_PRIV'))
+        s = self.successResultOf(fac.deferred)
+        self.assertEqual(I2PAddress(TEST_B64), s)
+        os.remove(tmp)
+    test_destGenerated.skip = skipSRO
+
+    def test_destGenerated_privKeySaved(self):
+        tmp = '/tmp/TestDestGenerateFactory.privKey'
+        mreactor = proto_helpers.MemoryReactor()
+        fac, proto = self.makeProto(tmp)
+        # Shortcut to end of SAM dest generate protocol
+        proto.receiver.currentRule = 'State_dest'
+        proto._parser._setupInterp()
+        proto.dataReceived('DEST REPLY PUB=%s PRIV=%s\n' % (TEST_B64, 'TEST_PRIV'))
+        f = open(tmp, 'r')
+        privKey = f.read()
+        f.close()
+        self.assertEqual('TEST_PRIV', privKey)
+        os.remove(tmp)

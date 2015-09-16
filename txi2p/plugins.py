@@ -8,17 +8,11 @@ from twisted.python.compat import _PY3
 from zope.interface import implementer
 
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
+from txi2p.helpers import getApi
 from txi2p.sam.endpoints import (
     SAMI2PStreamClientEndpoint,
     SAMI2PStreamServerEndpoint,
 )
-
-DEFAULT_ENDPOINT = {
-    'BOB': 'tcp:127.0.0.1:2827',
-    'SAM': 'tcp:127.0.0.1:7656',
-    }
-
-DEFAULT_API = 'BOB'
 
 if not _PY3:
     from twisted.plugin import IPlugin
@@ -56,18 +50,7 @@ class I2PClientParser(object):
 
     def _parseClient(self, reactor, host, port=None,
                      api=None, apiEndpoint=None, **kwargs):
-        if not api:
-            if apiEndpoint:
-                raise ValueError('api must be specified if apiEndpoint is given')
-            else:
-                api = DEFAULT_API
-
-        if api not in self._apiParsers:
-            raise ValueError('Specified I2P API is invalid or unsupported')
-
-        if not apiEndpoint:
-            apiEndpoint = DEFAULT_ENDPOINT[api]
-
+        api, apiEndpoint = getApi(api, apiEndpoint, self._apiParsers)
         return self._apiParsers[api](self, reactor, host,
                                      port and int(port) or None,
                                      apiEndpoint, **kwargs)
@@ -107,18 +90,7 @@ class I2PServerParser(object):
 
     def _parseServer(self, reactor, keypairPath, port=None,
                      api=None, apiEndpoint=None, **kwargs):
-        if not api:
-            if apiEndpoint:
-                raise ValueError('api must be specified if apiEndpoint is given')
-            else:
-                api = DEFAULT_API
-
-        if api not in self._apiParsers:
-            raise ValueError('Specified I2P API is invalid or unsupported')
-
-        if not apiEndpoint:
-            apiEndpoint = DEFAULT_ENDPOINT[api]
-
+        api, apiEndpoint = getApi(api, apiEndpoint, self._apiParsers)
         return self._apiParsers[api](self, reactor, keypairPath,
                                      port and int(port) or None,
                                      apiEndpoint, **kwargs)

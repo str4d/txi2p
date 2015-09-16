@@ -4,7 +4,7 @@
 import os
 from parsley import makeProtocol
 from twisted.internet import defer, error
-from twisted.python import log
+from twisted.python import failure, log
 
 from txi2p import grammar
 from txi2p.address import I2PAddress
@@ -155,3 +155,42 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
     d.addCallback(lambda proto: sessionFac.deferred)
     d.addCallback(createSession)
     return d
+
+
+class DestGenerateSender(SAMSender):
+    def sendDestGenerate(self):
+        self.transport.write('DEST GENERATE\n')
+
+
+class DestGenerateReceiver(SAMReceiver):
+    def command(self):
+        self.sender.sendDestGenerate()
+        self.currentRule = 'State_dest'
+
+    def destGenerated(self, pub, priv):
+        self.factory.destGenerated(pub, priv)
+        self.sender.transport.loseConnection()
+
+
+# A Protocol for generating an I2P Destination via SAM
+DestGenerateProtocol = makeProtocol(
+    grammar.samGrammarSource,
+    DestGenerateSender,
+    DestGenerateReceiver)
+
+
+class DestGenerateFactory(SAMFactory):
+    protocol = DestGenerateProtocol
+
+    def __init__(self, keyfile):
+        self._keyfile = keyfile
+        self.deferred = defer.Deferred(self._cancel)
+
+    def destGenerated(self, pubKey, privKey):
+        try:
+            f = open(self._keyfile, 'w')
+            f.write(privKey)
+            f.close()
+            self.deferred.callback(I2PAddress(pubKey))
+        except IOError as e:
+            self.deferred.errback(failure.Failure(e))

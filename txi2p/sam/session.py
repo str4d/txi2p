@@ -194,3 +194,10 @@ class DestGenerateFactory(SAMFactory):
             self.deferred.callback(I2PAddress(pubKey))
         except IOError as e:
             self.deferred.errback(failure.Failure(e))
+
+
+def generateDestination(keyfile, samEndpoint):
+    destFac = DestGenerateFactory(keyfile)
+    d = samEndpoint.connect(destFac)
+    d.addCallback(lambda proto: destFac.deferred)
+    return d

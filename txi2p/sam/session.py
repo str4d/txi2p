@@ -187,6 +187,10 @@ class DestGenerateFactory(SAMFactory):
         self.deferred = defer.Deferred(self._cancel)
 
     def destGenerated(self, pubKey, privKey):
+        if os.path.exists(self._keyfile):
+            self.deferred.errback(failure.Failure(ValueError('The keyfile already exists')))
+            return
+
         try:
             f = open(self._keyfile, 'w')
             f.write(privKey)

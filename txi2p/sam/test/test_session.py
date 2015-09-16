@@ -292,3 +292,18 @@ class TestDestGenerateFactory(SAMFactoryTestMixin, unittest.TestCase):
         f.close()
         self.assertEqual('TEST_PRIV', privKey)
         os.remove(tmp)
+
+    def test_destGenerated_keyfileExists(self):
+        tmp = '/tmp/TestDestGenerateFactory.privKey'
+        f = open(tmp, 'w')
+        f.write('foo')
+        f.close()
+        mreactor = proto_helpers.MemoryReactor()
+        fac, proto = self.makeProto(tmp)
+        # Shortcut to end of SAM dest generate protocol
+        proto.receiver.currentRule = 'State_dest'
+        proto._parser._setupInterp()
+        proto.dataReceived('DEST REPLY PUB=%s PRIV=%s\n' % (TEST_B64, 'TEST_PRIV'))
+        self.assertIsInstance(self.failureResultOf(fac.deferred).value, ValueError)
+        os.remove(tmp)
+    test_destGenerated_keyfileExists.skip = skipSRO

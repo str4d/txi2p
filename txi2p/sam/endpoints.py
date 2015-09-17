@@ -10,11 +10,11 @@ from txi2p.sam.session import SAMSession, getSession
 from txi2p.sam.stream import StreamConnectFactory, StreamForwardFactory
 
 
-def parseHost(host):
+def _parseHost(host):
     # TODO: Validate I2P domain, B32 etc.
     return (host, None) if host[-4:] == '.i2p' else (None, host)
 
-def parseOptions(options):
+def _parseOptions(options):
     return dict([option.split(':') for option in options.split(',')]) if options else {}
 
 
@@ -29,11 +29,11 @@ class SAMI2PStreamClientEndpoint(object):
         d = getSession(nickname,
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
-                       options=parseOptions(options))
+                       options=_parseOptions(options))
         return cls(d, host, port)
 
     def __init__(self, session, host, port=None):
-        self._host, self._dest = parseHost(host)
+        self._host, self._dest = _parseHost(host)
         self._port = port
         if isinstance(session, SAMSession):
             self._session = session
@@ -87,7 +87,7 @@ class SAMI2PStreamServerEndpoint(object):
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        keyfile=keyfile,
-                       options=parseOptions(options))
+                       options=_parseOptions(options))
         return cls(reactor, d, port)
 
     def __init__(self, reactor, session, port=None):

@@ -8,6 +8,7 @@ _trial_temp/
 
 build/
 dist/
+docs/_build
 txi2p.egg-info/
 vcversioner-*.egg/
 _version.py

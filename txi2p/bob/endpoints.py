@@ -7,7 +7,7 @@ from zope.interface import implementer
 from txi2p.bob.factory import BOBI2PClientFactory, BOBI2PServerFactory
 
 
-def validateDestination(dest):
+def _validateDestination(dest):
     # TODO: Validate I2P domain, B32 etc.
     pass
 
@@ -24,7 +24,7 @@ class BOBI2PClientEndpoint(object):
                  inhost='localhost',
                  inport=None,
                  options=None):
-        validateDestination(dest)
+        _validateDestination(dest)
         self._reactor = reactor
         self._bobEndpoint = bobEndpoint
         self._dest = dest

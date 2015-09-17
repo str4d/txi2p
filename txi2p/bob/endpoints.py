@@ -14,8 +14,7 @@ def _validateDestination(dest):
 
 @implementer(interfaces.IStreamClientEndpoint)
 class BOBI2PClientEndpoint(object):
-    """
-    I2P client endpoint backed by the BOB API.
+    """I2P client endpoint backed by the BOB API.
     """
 
     def __init__(self, reactor, bobEndpoint, dest,
@@ -35,8 +34,7 @@ class BOBI2PClientEndpoint(object):
         self._options = options
 
     def connect(self, fac):
-        """
-        Connect over I2P.
+        """Connect over I2P.
 
         The provided factory will have its ``buildProtocol`` method called once
         an I2P client tunnel has been successfully created.
@@ -60,8 +58,7 @@ class BOBI2PClientEndpoint(object):
 
 @implementer(interfaces.IStreamServerEndpoint)
 class BOBI2PServerEndpoint(object):
-    """
-    I2P server endpoint backed by the BOB API.
+    """I2P server endpoint backed by the BOB API.
     """
 
     def __init__(self, reactor, bobEndpoint, keypairPath,
@@ -80,8 +77,7 @@ class BOBI2PServerEndpoint(object):
         self._options = options
 
     def listen(self, fac):
-        """
-        Listen over I2P.
+        """Listen over I2P.
 
         The provided factory will have its ``buildProtocol`` method called once
         an I2P server tunnel has been successfully created.

@@ -20,8 +20,7 @@ def _parseOptions(options):
 
 @implementer(interfaces.IStreamClientEndpoint)
 class SAMI2PStreamClientEndpoint(object):
-    """
-    I2P stream client endpoint backed by the SAM API.
+    """I2P stream client endpoint backed by the SAM API.
     """
 
     @classmethod
@@ -42,8 +41,7 @@ class SAMI2PStreamClientEndpoint(object):
             self._sessionDeferred = session
 
     def connect(self, fac):
-        """
-        Connect over I2P.
+        """Connect over I2P.
 
         The provided factory will have its ``buildProtocol`` method called once
         an I2P client tunnel has been successfully created.
@@ -77,8 +75,7 @@ class SAMI2PStreamClientEndpoint(object):
 
 @implementer(interfaces.IStreamServerEndpoint)
 class SAMI2PStreamServerEndpoint(object):
-    """
-    I2P server endpoint backed by the SAM API.
+    """I2P server endpoint backed by the SAM API.
     """
 
     @classmethod
@@ -100,8 +97,7 @@ class SAMI2PStreamServerEndpoint(object):
             self._sessionDeferred = session
 
     def listen(self, fac):
-        """
-        Listen over I2P.
+        """Listen over I2P.
 
         The provided factory will have its ``buildProtocol`` method called once
         an I2P server tunnel has been successfully created.

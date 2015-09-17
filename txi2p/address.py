@@ -11,19 +11,15 @@ from zope.interface import implementer
 
 @implementer(IAddress)
 class I2PAddress(FancyEqMixin, object):
-    """
-    An L{I2PAddress} represents the address of an L{I2PEndpoint}.
+    """An :class:`IAddress` that represents the address of an I2P Destination.
 
-    @ivar destination: An I2P Destination byte string.
-    @type destination: L{bytes}
-
-    @ivar host: An I2P host byte string; for example, b'example.i2p' or
-    b'fiftytwocharacters.b32.i2p'. If looked up, it is guaranteed to resolve to
-    destination.
-    @type host: L{bytes}
-
-    @ivar port: (Optional) An integer representing the port number.
-    @type port: L{int}
+    Attributes:
+        destination (str): An I2P Destination string in I2P-style B64 format.
+        host (str): An I2P host string; for example, ``'example.i2p'`` or
+            ``'fiftytwocharacters.b32.i2p'``. If looked up, it is guaranteed to
+            resolve to ``destination``.
+        port (int): An integer representing the port number. Will be ``None`` if
+            no port is configured.
     """
     compareAttributes = ('destination', 'port')
 

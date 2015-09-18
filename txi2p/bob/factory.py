@@ -84,7 +84,7 @@ class BOBI2PServerFactory(Factory):
         self.bobProto.sender.transport.abortConnection()
         self.canceled = True
 
-    def __init__(self, reactor, serverFactory, bobEndpoint, keypairPath,
+    def __init__(self, reactor, serverFactory, bobEndpoint, keyfile,
                  tunnelNick=None,
                  outhost='localhost',
                  outport=None,
@@ -92,7 +92,7 @@ class BOBI2PServerFactory(Factory):
         self._reactor = reactor
         self._serverFactory = serverFactory
         self._bobEndpoint = bobEndpoint
-        self._keypairPath = keypairPath
+        self._keyfile = keyfile
         self._writeKeypair = False
         self.tunnelNick = tunnelNick
         self.outhost = outhost
@@ -102,9 +102,9 @@ class BOBI2PServerFactory(Factory):
 
     def startFactory(self):
         try:
-            keypairFile = open(self._keypairPath, 'r')
-            self.keypair = keypairFile.read()
-            keypairFile.close()
+            f = open(self._keyfile, 'r')
+            self.keypair = f.read()
+            f.close()
         except IOError:
             self.keypair = None
             self._writeKeypair = True
@@ -126,9 +126,9 @@ class BOBI2PServerFactory(Factory):
     def i2pTunnelCreated(self):
         if self._writeKeypair:
             try:
-                keypairFile = open(self._keypairPath, 'w')
-                keypairFile.write(self.keypair)
-                keypairFile.close()
+                f = open(self._keyfile, 'w')
+                f.write(self.keypair)
+                f.close()
             except IOError:
                 print 'Could not save keypair'
         # BOB will now forward data to a listener.

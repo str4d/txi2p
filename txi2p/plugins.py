@@ -66,32 +66,32 @@ class I2PClientParser(object):
 class I2PServerParser(object):
     prefix = 'i2p'
 
-    def _parseBOBServer(self, reactor, keypairPath, port, bobEndpoint,
+    def _parseBOBServer(self, reactor, keyfile, port, bobEndpoint,
                      tunnelNick=None,
                      outhost='localhost',
                      outport=None,
                      options=None):
         return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
-                                    keypairPath, port, tunnelNick, outhost,
+                                    keyfile, port, tunnelNick, outhost,
                                     outport and int(outport) or None, options)
 
-    def _parseSAMServer(self, reactor, keypairPath, port, samEndpoint,
+    def _parseSAMServer(self, reactor, keyfile, port, samEndpoint,
                      nickname=None,
                      autoClose=False,
                      options=None):
         return SAMI2PStreamServerEndpoint.new(reactor,
             clientFromString(reactor, samEndpoint),
-            keypairPath, port, nickname, autoClose, options)
+            keyfile, port, nickname, autoClose, options)
 
     _apiParsers = {
         'BOB': _parseBOBServer,
         'SAM': _parseSAMServer,
         }
 
-    def _parseServer(self, reactor, keypairPath, port=None,
+    def _parseServer(self, reactor, keyfile, port=None,
                      api=None, apiEndpoint=None, **kwargs):
         api, apiEndpoint = getApi(api, apiEndpoint, self._apiParsers)
-        return self._apiParsers[api](self, reactor, keypairPath,
+        return self._apiParsers[api](self, reactor, keyfile,
                                      port and int(port) or None,
                                      apiEndpoint, **kwargs)
 

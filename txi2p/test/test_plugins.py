@@ -120,7 +120,7 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
             MemoryReactor(), "i2p:/tmp/testkeys.foo:api=BOB:tunnelNick=spam:outport=23456")
         self.assertIsInstance(ep, BOBI2PServerEndpoint)
         self.assertIsInstance(ep._reactor, MemoryReactor)
-        self.assertEqual(ep._keypairPath, "/tmp/testkeys.foo")
+        self.assertEqual(ep._keyfile, "/tmp/testkeys.foo")
         self.assertEqual(ep._tunnelNick, "spam")
         self.assertEqual(ep._outport, 23456)
 

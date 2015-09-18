@@ -103,7 +103,7 @@ class BOBI2PServerEndpoint(object):
         options (dict) (optional): I2CP options to configure the tunnel with.
     """
 
-    def __init__(self, reactor, bobEndpoint, keypairPath,
+    def __init__(self, reactor, bobEndpoint, keyfile,
                  port=None,
                  tunnelNick=None,
                  outhost='localhost',
@@ -111,7 +111,7 @@ class BOBI2PServerEndpoint(object):
                  options=None):
         self._reactor = reactor
         self._bobEndpoint = bobEndpoint
-        self._keypairPath = keypairPath
+        self._keyfile = keyfile
         self._port = port
         self._tunnelNick = tunnelNick
         self._outhost = outhost
@@ -128,7 +128,7 @@ class BOBI2PServerEndpoint(object):
         will immediately close.
         """
 
-        i2pFac = BOBI2PServerFactory(self._reactor, fac, self._bobEndpoint, self._keypairPath,
+        i2pFac = BOBI2PServerFactory(self._reactor, fac, self._bobEndpoint, self._keyfile,
                                      self._tunnelNick,
                                      self._outhost,
                                      self._outport,

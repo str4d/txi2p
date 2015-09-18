@@ -15,6 +15,26 @@ def _validateDestination(dest):
 @implementer(interfaces.IStreamClientEndpoint)
 class BOBI2PClientEndpoint(object):
     """I2P client endpoint backed by the BOB API.
+
+    Args:
+        bobEndpoint: An endpoint that will connect to the BOB API.
+        host (str): The I2P hostname or Destination to connect to.
+        port (int) (optional): The port to connect to inside I2P. If unset or
+            `None`, the default (null) port is used. Ignored because BOB doesn't
+            support ports yet.
+        tunnelNick (str) (optional): The tunnel nickname to use. If a tunnel
+            with this nickname already exists, it will be used. The default is
+            ``txi2p-#`` where ``#`` is the PID of the current process.
+
+            * The implication of this is that by default, all endpoints (both
+              client and server) created by the same process will use the same
+              BOB tunnel.
+
+        inhost (str) (optional): The host that the tunnel created by BOB will
+            listen on. Defaults to ``localhost``.
+        inport (int) (optional): The port that the tunnel created by BOB will
+            listen on. Defaults to a port over 9000.
+        options (dict) (optional): I2CP options to configure the tunnel with.
     """
 
     def __init__(self, reactor, bobEndpoint, dest,
@@ -59,6 +79,28 @@ class BOBI2PClientEndpoint(object):
 @implementer(interfaces.IStreamServerEndpoint)
 class BOBI2PServerEndpoint(object):
     """I2P server endpoint backed by the BOB API.
+
+    Args:
+        bobEndpoint: An endpoint that will connect to the BOB API.
+        keyfile (str): Path to a local file containing the keypair to use for
+            the server Destination. If non-existent, new keys will be generated
+            and stored.
+        port (int) (optional): The port to listen on inside I2P. If unset or
+            `None`, the default (null) port is used. Ignored because BOB doesn't
+            support ports yet.
+        tunnelNick (str) (optional): The tunnel nickname to use. If a tunnel
+            with this nickname already exists, it will be used. The default is
+            ``txi2p-#`` where ``#`` is the PID of the current process.
+
+            * The implication of this is that by default, all endpoints (both
+              client and server) created by the same process will use the same
+              BOB tunnel.
+
+        outhost (str) (optional): The host that the tunnel created by BOB will
+            forward data to. Defaults to ``localhost``.
+        outport (int) (optional): The port that the tunnel created by BOB will
+            forward data to. Defaults to a port over 9000.
+        options (dict) (optional): I2CP options to configure the tunnel with.
     """
 
     def __init__(self, reactor, bobEndpoint, keypairPath,

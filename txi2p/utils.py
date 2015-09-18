@@ -8,7 +8,7 @@ DEFAULT_ENDPOINT = {
     'SAM': 'tcp:127.0.0.1:7656',
     }
 
-DEFAULT_API = 'BOB'
+DEFAULT_API = 'SAM'
 
 def getApi(api, apiEndpoint, apiDict):
     if not api:

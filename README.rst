@@ -2,7 +2,8 @@
 txi2p
 =====
 
-``txi2p`` is a set of I2P bindings for `Twisted`_ 10.1 or greater.
+``txi2p`` is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
+10.1 or greater.
 
 Installation
 ==========

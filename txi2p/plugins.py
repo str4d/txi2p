@@ -8,11 +8,11 @@ from twisted.python.compat import _PY3
 from zope.interface import implementer
 
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
-from txi2p.helpers import getApi
 from txi2p.sam.endpoints import (
     SAMI2PStreamClientEndpoint,
     SAMI2PStreamServerEndpoint,
 )
+from txi2p.utils import getApi
 
 if not _PY3:
     from twisted.plugin import IPlugin

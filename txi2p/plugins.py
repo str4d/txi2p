@@ -38,10 +38,11 @@ class I2PClientParser(object):
     def _parseSAMClient(self, reactor, host, port, samEndpoint,
                      nickname=None,
                      autoClose=False,
+                     keyfile=None,
                      options=None):
         return SAMI2PStreamClientEndpoint.new(
             clientFromString(reactor, samEndpoint),
-            host, port, nickname, autoClose, options)
+            host, port, nickname, autoClose, keyfile, options)
 
     _apiParsers = {
         'BOB': _parseBOBClient,

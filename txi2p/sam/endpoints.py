@@ -24,10 +24,11 @@ class SAMI2PStreamClientEndpoint(object):
     """
 
     @classmethod
-    def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, options=None):
+    def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, keyfile=None, options=None):
         d = getSession(nickname,
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
+                       keyfile=keyfile,
                        options=_parseOptions(options))
         return cls(d, host, port)
 

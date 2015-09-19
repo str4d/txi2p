@@ -1,8 +1,8 @@
 .. include:: ../README.rst
    :end-line: -4
 
-API Docs:
-=========
+API Docs
+========
 
 .. toctree::
    :maxdepth: 2

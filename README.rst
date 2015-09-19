@@ -5,8 +5,10 @@ txi2p
 ``txi2p`` is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
 10.1 or greater.
 
+``txi2p`` supports both the SAM and BOB APIs for I2P. The default API is SAM.
+
 Installation
-==========
+============
 
 You can install ``txi2p`` from PyPI::
 

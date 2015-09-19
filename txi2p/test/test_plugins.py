@@ -63,7 +63,7 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         from twisted.internet.endpoints import clientFromString
         ep = clientFromString(
             MemoryReactor(), "i2p:stats.i2p")
-        self.assertIsInstance(ep, BOBI2PClientEndpoint)
+        self.assertIsInstance(ep, SAMI2PStreamClientEndpoint)
 
     def test_stringDescription_BOB(self):
         from twisted.internet.endpoints import clientFromString
@@ -112,7 +112,7 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         from twisted.internet.endpoints import serverFromString
         ep = serverFromString(
             MemoryReactor(), "i2p:/tmp/testkeys.foo")
-        self.assertIsInstance(ep, BOBI2PServerEndpoint)
+        self.assertIsInstance(ep, SAMI2PStreamServerEndpoint)
 
     def test_stringDescription_BOB(self):
         from twisted.internet.endpoints import serverFromString

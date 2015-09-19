@@ -31,6 +31,27 @@ _apiGenerators = {
 }
 
 def generateDestination(reactor, keyfile, api=None, apiEndpoint=None):
+    """Generate a new I2P Destination.
+
+    The function returns a :class:`twisted.internet.defer.Deferred`; register
+    callbacks to receive the return value or errors.
+
+    Args:
+        keyfile (str): Path to a local file where the keypair for the new
+            Destination should be stored.
+        api (str): The API to use.
+        apiEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
+            endpoint that will connect to the API.
+
+    Returns:
+        txi2p.I2PAddress: The new Destination. Once this is received via the
+        Deferred callback, the ``keyfile`` will have been written.
+
+    Raises:
+        ValueError: if the API doesn't support this method.
+        ValueError: if the ``keyfile`` already exists.
+        IOError: if the ``keyfile`` write fails.
+    """
     api, apiEndpoint = getApi(api, apiEndpoint, _apiGenerators)
     if isinstance(apiEndpoint, str):
         apiEndpoint = clientFromString(reactor, apiEndpoint)

@@ -21,10 +21,40 @@ def _parseOptions(options):
 @implementer(interfaces.IStreamClientEndpoint)
 class SAMI2PStreamClientEndpoint(object):
     """I2P stream client endpoint backed by the SAM API.
+
+    Args:
+        session (txi2p.sam.SAMSession): The SAM session to connect with.
+        host (str): The I2P hostname or Destination to connect to.
+        port (int): The port to connect to inside I2P. If unset or `None`, the
+            default (null) port is used. Ignored because SAM doesn't support
+            ports yet.
     """
 
     @classmethod
     def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, keyfile=None, options=None):
+        """Create an I2P client endpoint backed by the SAM API.
+
+        If a SAM session for ``nickname`` already exists, it will be used, and
+        all options other than ``host`` and ``port`` will be ignored. Otherwise,
+        a new SAM session will be created. The implication of this is that by
+        default, all endpoints (both client and server) created by the same
+        process will use the same SAM session.
+
+        Args:
+            samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
+                endpoint that will connect to the SAM API.
+            host (str): The I2P hostname or Destination to connect to.
+            port (int): The port to connect to inside I2P. If unset or `None`,
+                the default (null) port is used. Ignored because SAM doesn't
+                support ports yet.
+            nickname (str): The SAM session nickname.
+            autoClose (bool): `true` if the session should close automatically
+                once no more connections are using it.
+            keyfile (str): Path to a local file containing the keypair to use
+                for the session Destination. If non-existent, new keys will be
+                generated and stored.
+            options (dict): I2CP options to configure the session with.
+        """
         d = getSession(nickname,
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
@@ -77,10 +107,38 @@ class SAMI2PStreamClientEndpoint(object):
 @implementer(interfaces.IStreamServerEndpoint)
 class SAMI2PStreamServerEndpoint(object):
     """I2P server endpoint backed by the SAM API.
+
+    Args:
+        session (txi2p.sam.SAMSession): The SAM session to listen on.
+        port (int): The port to listen on inside I2P. If unset or `None`, the
+            default (null) port is used. Ignored because SAM doesn't support
+            ports yet.
     """
 
     @classmethod
     def new(cls, reactor, samEndpoint, keyfile, port=None, nickname=None, autoClose=False, options=None):
+        """Create an I2P server endpoint backed by the SAM API.
+
+        If a SAM session for ``nickname`` already exists, it will be used, and
+        all options other than ``port`` will be ignored. Otherwise, a new SAM
+        session will be created. The implication of this is that by default, all
+        endpoints (both client and server) created by the same process will use
+        the same SAM session.
+
+        Args:
+            samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
+                endpoint that will connect to the SAM API.
+            keyfile (str): Path to a local file containing the keypair to use
+                for the session Destination. If non-existent, new keys will be
+                generated and stored.
+            port (int): The port to listen on inside I2P. If unset or `None`,
+                the default (null) port is used. Ignored because SAM doesn't
+                support ports yet.
+            nickname (str): The SAM session nickname.
+            autoClose (bool): `true` if the session should close automatically
+                once no more connections are using it.
+            options (dict): I2CP options to configure the session with.
+        """
         d = getSession(nickname,
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,

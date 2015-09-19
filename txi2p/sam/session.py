@@ -137,6 +137,15 @@ class SAMSession(object):
 
 
 def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
+    """Get or create a SAM session.
+
+    Args:
+        nickname (str): The session nickname.
+        samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
+            endpoint that will connect to the SAM API.
+        autoClose (bool): `true` if the session should close automatically once
+            no more connections are using it.
+    """
     if _sessions.has_key(nickname):
         return defer.succeed(_sessions[nickname])
 
@@ -201,6 +210,25 @@ class DestGenerateFactory(SAMFactory):
 
 
 def generateDestination(keyfile, samEndpoint):
+    """Generate a new I2P Destination.
+
+    The function returns a :class:`twisted.internet.defer.Deferred`; register
+    callbacks to receive the return value or errors.
+
+    Args:
+        keyfile (str): Path to a local file where the keypair for the new
+            Destination should be stored.
+        samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
+            endpoint that will connect to the SAM API.
+
+    Returns:
+        txi2p.I2PAddress: The new Destination. Once this is received via the
+        Deferred callback, the ``keyfile`` will have been written.
+
+    Raises:
+        ValueError: if the ``keyfile`` already exists.
+        IOError: if the ``keyfile`` write fails.
+    """
     destFac = DestGenerateFactory(keyfile)
     d = samEndpoint.connect(destFac)
     d.addCallback(lambda proto: destFac.deferred)

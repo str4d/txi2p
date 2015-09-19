@@ -13,6 +13,11 @@ from zope.interface import implementer
 class I2PAddress(FancyEqMixin, object):
     """An :class:`IAddress` that represents the address of an I2P Destination.
 
+    Args:
+        destination (str): An I2P Destination string in I2P-style B64 format.
+        host (str): An I2P host string; for example, ``'example.i2p'``.
+        port (int): An integer representing the port number.
+
     Attributes:
         destination (str): An I2P Destination string in I2P-style B64 format.
         host (str): An I2P host string; for example, ``'example.i2p'`` or

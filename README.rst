@@ -24,8 +24,13 @@ Endpoint strings
 The Twisted plugin for ``clientFromString()`` and ``serverFromString()`` will
 only work for `Twisted`_ 14.0 or greater.
 
-Client string format: ``i2p:<host>[:port]``.
-Server string format: ``i2p:<keyfile>[:port]``.
+Client string format::
+
+    i2p:<host>[:port][:key=value]*
+
+Server string format::
+
+    i2p:<keyfile>[:port][:key=value]*
 
 Both client and server strings support the following keyword arguments:
 

@@ -3,6 +3,7 @@ from .endpoints import (
     SAMI2PStreamServerEndpoint,
 )
 from .session import (
+    SAMSession,
     generateDestination,
     getSession,
 )

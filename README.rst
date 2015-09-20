@@ -93,19 +93,56 @@ Endpoint strings
 The Twisted plugin for |clientFromString| and |serverFromString| will
 only work for `Twisted`_ 14.0 or greater.
 
-Client string format::
-
-    i2p:<host>[:port][:key=value]*
-
-Server string format::
-
-    i2p:<keyfile>[:port][:key=value]*
-
 Both client and server strings support the following keyword arguments:
 
 * ``api=<apiName>`` - Either ``SAM`` or ``BOB``.
 * ``apiEndpoint=<endpointString>`` - An escaped client endpoint string pointing
   to the API, e.g. ``tcp\:127.0.0.1\:2827``.
+
+Clients
+-------
+
+Client string format::
+
+    i2p:<host>[:port][:key=value]*
+
+Supported arguments:
+
+**SAM**
+
+* ``nickname``
+* ``autoClose``
+* ``keyfile``
+* ``options``
+
+**BOB**
+
+* ``tunnelNick``
+* ``inhost``
+* ``inport``
+* ``options``
+
+Servers
+-------
+
+Server string format::
+
+    i2p:<keyfile>[:port][:key=value]*
+
+Supported arguments:
+
+**SAM**
+
+* ``nickname``
+* ``autoClose``
+* ``options``
+
+**BOB**
+
+* ``tunnelNick``
+* ``outhost``
+* ``outport``
+* ``options``
 
 Documentation
 =============

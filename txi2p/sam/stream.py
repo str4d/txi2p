@@ -1,6 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import range
+from builtins import object
 from twisted.internet.defer import Deferred
 from twisted.internet.error import ConnectError, UnknownHostError
 from twisted.internet.interfaces import IListeningPort

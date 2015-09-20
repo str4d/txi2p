@@ -1,6 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import str
+from builtins import object
 import functools
 from ometa.grammar import OMeta
 from ometa.protocol import ParserProtocol
@@ -26,12 +28,14 @@ KEEPALIVE_TIMEOUT = 2 * 60
 def cmpSAM(a, b):
     def normalize(v):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
-    return cmp(normalize(a), normalize(b))
+    a_n = normalize(a)
+    b_n = normalize(b)
+    return (a_n > b_n) - (a_n < b_n)
 
 def peerSAM(data):
     peerInfo = data.split('\n')[0].split(' ')
     peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
-    fromPort = peerOptions['FROM_PORT'] if peerOptions.has_key('FROM_PORT') else None
+    fromPort = peerOptions['FROM_PORT'] if 'FROM_PORT' in peerOptions else None
     return I2PAddress(peerInfo[0], port=fromPort)
 
 

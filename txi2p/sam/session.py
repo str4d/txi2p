@@ -2,6 +2,7 @@
 # See COPYING for details.
 from __future__ import print_function
 
+from builtins import object
 import os
 from parsley import makeProtocol
 import sys
@@ -211,11 +212,11 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
         autoClose (bool): `true` if the session should close automatically once
             no more connections are using it.
     """
-    if _sessions.has_key(nickname):
+    if nickname in _sessions:
         return defer.succeed(_sessions[nickname])
-    elif _pending_sessions.has_key(nickname):
+    elif nickname in _pending_sessions:
         def cancel(d):
-            if _pending_sessions.has_key(nickname) and d in _pending_sessions[nickname]:
+            if nickname in _pending_sessions and d in _pending_sessions[nickname]:
                 _pending_sessions[nickname].remove(d)
         d = defer.Deferred(cancel)
         _pending_sessions[nickname].append(d)
@@ -224,7 +225,8 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
     if not samEndpoint:
         raise ValueError('A new session cannot be created without an API Endpoint')
 
-    def createSession((samVersion, style, id, proto, pubKey, localPort)):
+    def createSession(xxx_todo_changeme):
+        (samVersion, style, id, proto, pubKey, localPort) = xxx_todo_changeme
         s = SAMSession()
         s.nickname = nickname
         s.samEndpoint = samEndpoint

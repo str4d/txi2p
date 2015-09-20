@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 import mock
 from twisted.internet import interfaces
 from twisted.python.versions import Version

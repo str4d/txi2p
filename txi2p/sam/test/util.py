@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 from mock import Mock
 from twisted.internet import defer
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
@@ -160,5 +161,5 @@ class SAMFactoryTestMixin(object):
 
     def test_resultNotOK(self):
         fac, proto = self.makeProto(*self.blankFactoryArgs)
-        for result, error in c.samErrorMap.items():
+        for result, error in list(c.samErrorMap.items()):
             self.assertRaises(error, fac.resultNotOK, result, '')

@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 import mock
 from twisted.internet import defer, protocol
 from twisted.test import proto_helpers

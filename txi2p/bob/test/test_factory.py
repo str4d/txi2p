@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 from twisted.internet import defer
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.python import failure

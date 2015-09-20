@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 import base64
 import hashlib
 from twisted.internet.interfaces import IAddress, ITransport

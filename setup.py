@@ -3,6 +3,7 @@
 
 from setuptools import setup
 from os import path
+import sys
 
 
 here = path.abspath(path.dirname(__file__))
@@ -10,6 +11,18 @@ here = path.abspath(path.dirname(__file__))
 def readme():
     with open(path.join(here, 'README.rst')) as f:
         return f.read()
+
+install_requires = [
+    'Twisted>=10.1',
+    'Parsley>=1.2',
+]
+
+# future is only a requirement for Py2
+# This will not work on Py3 if any of the 14 standard library modules listed
+# here get used later on:
+# http://python-future.org/standard_library_imports.html#list-standard-library-refactored
+if sys.version_info[0] < 3:
+    install_requires.append('future>=0.14.0')
 
 setup(
     name='txi2p',
@@ -39,10 +52,7 @@ setup(
     vcversioner={
         'version_module_paths': ['txi2p/_version.py'],
     },
-    install_requires=[
-        'Twisted>=10.1',
-        'Parsley>=1.2',
-    ],
+    install_requires=install_requires,
     packages=[
         'txi2p',
         'txi2p.bob',

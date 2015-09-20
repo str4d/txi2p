@@ -113,15 +113,15 @@ class SAMSession(object):
         address (txi2p.I2PAddress): The Destination of this session.
     """
 
-    def __init__(self, nickname, samEndpoint, samVersion, style, id, proto, autoClose):
-        self.nickname = nickname
-        self.samEndpoint = samEndpoint
-        self.samVersion = samVersion
-        self.style = style
-        self.id = id
+    def __init__(self):
+        self.nickname = None
+        self.samEndpoint = None
+        self.samVersion = ''
+        self.style = 'STREAM'
+        self.id = None
         self.address = None
-        self.proto = proto
-        self._autoClose = autoClose
+        self._proto = None
+        self._autoClose = False
         self._closed = False
         self._streams = []
 
@@ -157,7 +157,7 @@ class SAMSession(object):
         """Close the session."""
         self._closed = True
         self._streams = []
-        self.proto.sender.transport.loseConnection()
+        self._proto.sender.transport.loseConnection()
         del _sessions[self.nickname]
 
 
@@ -178,8 +178,15 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
         raise ValueError('A new session cannot be created without an API Endpoint')
 
     def createSession((samVersion, style, id, proto, pubKey)):
-        s = SAMSession(nickname, samEndpoint, samVersion, style, id, proto, autoClose)
+        s = SAMSession()
+        s.nickname = nickname
+        s.samEndpoint = samEndpoint
+        s.samVersion = samVersion
+        s.style = style
+        s.id = id
         s.address = I2PAddress(pubKey)
+        s._proto = proto
+        s._autoClose = autoClose
         _sessions[nickname] = s
         return s
 

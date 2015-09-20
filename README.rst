@@ -2,15 +2,15 @@
 txi2p
 =====
 
-``txi2p`` is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
+|txi2p| is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
 10.1 or greater.
 
-``txi2p`` supports both the SAM and BOB APIs for I2P. The default API is SAM.
+|txi2p| supports both the SAM and BOB APIs for I2P. The default API is SAM.
 
 Installation
 ============
 
-You can install ``txi2p`` from PyPI::
+You can install |txi2p| from PyPI::
 
     $ pip install txi2p
 
@@ -21,7 +21,7 @@ or by downloading the source and running::
 Endpoint strings
 ================
 
-The Twisted plugin for ``clientFromString()`` and ``serverFromString()`` will
+The Twisted plugin for |clientFromString| and |serverFromString| will
 only work for `Twisted`_ 14.0 or greater.
 
 Client string format::
@@ -42,3 +42,7 @@ Documentation
 =============
 
 Will be available soon at https://txi2p.readthedocs.org
+
+.. |txi2p| replace:: ``txi2p``
+.. |clientFromString| replace:: ``clientFromString()``
+.. |serverFromString| replace:: ``serverFromString()``

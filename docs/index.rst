@@ -1,5 +1,5 @@
 .. include:: ../README.rst
-   :end-line: -4
+   :end-line: -8
 
 API Docs
 ========
@@ -20,3 +20,6 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. |txi2p| replace:: :mod:`txi2p`
+.. |clientFromString| replace:: :func:`twisted.internet.endpoints.clientFromString`
+.. |serverFromString| replace:: :func:`twisted.internet.endpoints.serverFromString`

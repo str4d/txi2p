@@ -43,7 +43,7 @@ class I2PAddress(FancyEqMixin, object):
         elif hasattr(destination, 'host'):
             self.host = destination.host
         else:
-            raw_key = base64.b64decode(destination, '-~')
+            raw_key = base64.b64decode(destination.encode('utf-8'), b'-~')
             hash = hashlib.sha256(raw_key)
             base32_hash = base64.b32encode(hash.digest())
             self.host = base32_hash.lower().replace('=', '')+'.b32.i2p'

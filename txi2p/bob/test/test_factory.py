@@ -58,7 +58,7 @@ class BOBFactoryTestMixin(object):
     def test_defaultFactoryListsTunnels(self):
         fac, proto = self.makeProto(None, None, None, '')
         proto.dataReceived('BOB 00.00.10\nOK\n')
-        self.assertEqual(proto.transport.value(), 'list\n')
+        self.assertEqual(proto.transport.value(), b'list\n')
 
 
 class TestBOBI2PClientFactory(BOBFactoryTestMixin, unittest.TestCase):

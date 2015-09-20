@@ -27,8 +27,8 @@ class SAMProtocolTestMixin(object):
         fac.sigType = None
         fac.protocol = protoClass
         fac.resultNotOK = Mock()
-        def raise_(ex):
-            raise ex
+        def raise_(reason):
+            raise reason.value
         fac.connectionFailed = lambda reason: raise_(reason)
         proto = fac.buildProtocol(None)
         transport = proto_helpers.StringTransport()
@@ -38,7 +38,7 @@ class SAMProtocolTestMixin(object):
 
     def test_initSendsHello(self):
         fac, proto = self.makeProto()
-        self.assertSubstring('HELLO VERSION', proto.transport.value())
+        self.assertSubstring('HELLO VERSION', str(proto.transport.value()))
 
     def test_helloReturnsError(self):
         fac, proto = self.makeProto()
@@ -55,7 +55,7 @@ class SAMProtocolTestMixin(object):
         proto._parser._setupInterp()
         proto.dataReceived('PING\n')
         self.assertEquals(
-            'PONG\n',
+            b'PONG\n',
             proto.transport.value())
 
     def test_pingReceivedWithData(self):
@@ -67,7 +67,7 @@ class SAMProtocolTestMixin(object):
         proto._parser._setupInterp()
         proto.dataReceived('PING some random data\n')
         self.assertEquals(
-            'PONG some random data\n',
+            b'PONG some random data\n',
             proto.transport.value())
 
     def test_pingReceivedResetsTimeout(self):
@@ -80,12 +80,12 @@ class SAMProtocolTestMixin(object):
         proto.receiver._sendPing()
         self.assertEquals(
             'PING %s\n' % proto.receiver.lastPing,
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
         self.assertTrue(proto.receiver.pingTimeout.active())
         proto.transport.clear()
         proto.dataReceived('PING\n')
         self.assertEquals(
-            'PONG\n',
+            b'PONG\n',
             proto.transport.value())
         self.assertFalse(proto.receiver.pingTimeout.active())
 
@@ -99,7 +99,7 @@ class SAMProtocolTestMixin(object):
         proto.receiver._sendPing()
         self.assertEquals(
             'PING %s\n' % proto.receiver.lastPing,
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
         self.assertTrue(proto.receiver.pingTimeout.active())
         proto.transport.clear()
         proto.dataReceived('PONG %s\n' % proto.receiver.lastPing)
@@ -115,7 +115,7 @@ class SAMProtocolTestMixin(object):
         proto.receiver._sendPing()
         self.assertEquals(
             'PING %s\n' % proto.receiver.lastPing,
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
         self.assertTrue(proto.receiver.pingTimeout.active())
         proto.transport.clear()
         proto.dataReceived('PONG not what was expected\n')

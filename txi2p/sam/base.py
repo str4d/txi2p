@@ -33,7 +33,7 @@ def cmpSAM(a, b):
     return (a_n > b_n) - (a_n < b_n)
 
 def peerSAM(data):
-    peerInfo = data.split('\n')[0].split(' ')
+    peerInfo = data.decode('utf-8').split('\n')[0].split(' ')
     peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
     fromPort = peerOptions['FROM_PORT'] if 'FROM_PORT' in peerOptions else None
     return I2PAddress(peerInfo[0], port=fromPort)
@@ -62,22 +62,23 @@ class SAMSender(object):
         self.transport = transport
 
     def sendHello(self):
-        self.transport.write('HELLO VERSION MIN=3.0 MAX=3.2\n')
+        self.transport.write(b'HELLO VERSION MIN=3.0 MAX=3.2\n')
 
     def sendNamingLookup(self, name):
-        self.transport.write('NAMING LOOKUP NAME=%s\n' % name)
+        msg = 'NAMING LOOKUP NAME=%s\n' % name
+        self.transport.write(msg.encode('utf-8'))
 
     def sendPing(self, data):
         if data:
-            self.transport.write('PING %s\n' % data)
+            self.transport.write(('PING %s\n' % data).encode('utf-8'))
         else:
-            self.transport.write('PING\n')
+            self.transport.write(b'PING\n')
 
     def sendPong(self, data):
         if data:
-            self.transport.write('PONG %s\n' % data)
+            self.transport.write(('PONG %s\n' % data).encode('utf-8'))
         else:
-            self.transport.write('PONG\n')
+            self.transport.write(b'PONG\n')
 
 
 class SAMReceiver(object):

@@ -32,7 +32,7 @@ class SessionCreateSender(SAMSender):
         for key in options:
             msg += ' %s=%s' % (key, options[key])
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class SessionCreateReceiver(SAMReceiver):
@@ -266,7 +266,7 @@ class DestGenerateSender(SAMSender):
         if cmpSAM(samVersion, '3.1') >= 0:
             msg += ' SIGNATURE_TYPE=%s' % (sigType and sigType or 'EdDSA_SHA512_Ed25519')
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class DestGenerateReceiver(SAMReceiver):

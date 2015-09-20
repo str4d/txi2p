@@ -28,74 +28,83 @@ class BOBSender(object):
         self.transport = transport
 
     def sendClear(self):
-        self.transport.write('clear\n')
+        self.transport.write(b'clear\n')
 
     def sendGetdest(self):
-        self.transport.write('getdest\n')
+        self.transport.write(b'getdest\n')
 
     def sendGetkeys(self):
-        self.transport.write('getkeys\n')
+        self.transport.write(b'getkeys\n')
 
     def sendGetnick(self, tunnelNick):
-        self.transport.write('getnick %s\n' % tunnelNick)
+        msg = 'getnick %s\n' % tunnelNick
+        self.transport.write(msg.encode('utf-8'))
 
     def sendInhost(self, inhost):
-        self.transport.write('inhost %s\n' % inhost)
+        msg = 'inhost %s\n' % inhost
+        self.transport.write(msg.encode('utf-8'))
 
     def sendInport(self, inport):
-        self.transport.write('inport %s\n' % inport)
+        msg = 'inport %s\n' % inport
+        self.transport.write(msg.encode('utf-8'))
 
     def sendList(self):
-        self.transport.write('list\n')
+        self.transport.write(b'list\n')
 
     def sendNewkeys(self):
-        self.transport.write('newkeys\n')
+        self.transport.write(b'newkeys\n')
 
     def sendOption(self, options={}):
         msg = 'option'
         for key in sorted(options):
             msg += ' %s=%s' % (key, options[key])
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
     def sendOuthost(self, outhost):
-        self.transport.write('outhost %s\n' % outhost)
+        msg = 'outhost %s\n' % outhost
+        self.transport.write(msg.encode('utf-8'))
 
     def sendOutport(self, outport):
-        self.transport.write('outport %s\n' % outport)
+        msg = 'outport %s\n' % outport
+        self.transport.write(msg.encode('utf-8'))
 
     def sendQuiet(self):
-        self.transport.write('quiet\n')
+        self.transport.write(b'quiet\n')
 
     def sendQuit(self):
-        self.transport.write('quit\n')
+        self.transport.write(b'quit\n')
 
     def sendSetkeys(self, keys):
-        self.transport.write('setkeys %s\n' % keys)
+        msg = 'setkeys %s\n' % keys
+        self.transport.write(msg.encode('utf-8'))
 
     def sendSetnick(self, tunnelNick):
-        self.transport.write('setnick %s\n' % tunnelNick)
+        msg = 'setnick %s\n' % tunnelNick
+        self.transport.write(msg.encode('utf-8'))
 
     def sendShow(self):
-        self.transport.write('show\n')
+        self.transport.write(b'show\n')
 
     def sendShowprops(self):
-        self.transport.write('showprops\n')
+        self.transport.write(b'showprops\n')
 
     def sendStart(self):
-        self.transport.write('start\n')
+        self.transport.write(b'start\n')
 
     def sendStatus(self, tunnelNick):
-        self.transport.write('status %s\n' % tunnelNick)
+        msg = 'status %s\n' % tunnelNick
+        self.transport.write(msg.encode('utf-8'))
 
     def sendStop(self):
-        self.transport.write('stop\n')
+        self.transport.write(b'stop\n')
 
     def sendVerify(self, key):
-        self.transport.write('verify %s\n' % key)
+        msg = 'verify %s\n' % key
+        self.transport.write(msg.encode('utf-8'))
 
     def sendVisit(self):
-        self.transport.write('visit\n')
+        self.transport.write(b'visit\n')
 
 
 class BOBReceiver(object):
@@ -421,13 +430,13 @@ class I2PClientTunnelProtocol(Protocol):
                                             I2PAddress(self.dest))
         self.isConnected = False
         # First line sent must be the Destination to connect to.
-        self.transport.write(self.dest + '\n')
+        self.transport.write((self.dest + '\n').encode('utf-8'))
         self.wrappedProto.makeConnection(self.transport)
 
     def dataReceived(self, data):
         # Check for a successful connection
         if not self.isConnected:
-            if data.startswith("ERROR"):
+            if data.startswith('ERROR'):
                 self._errmsg = data[6:]
                 # I2P connection failed
                 self.transport.loseConnection()
@@ -436,7 +445,7 @@ class I2PClientTunnelProtocol(Protocol):
                 self.isConnected = True
 
         # Pass all received data to the wrapped Protocol.
-        self.wrappedProto.dataReceived(data)
+        self.wrappedProto.dataReceived(data.encode('utf-8'))
 
     def connectionLost(self, reason):
         if self._errmsg:

@@ -49,7 +49,7 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
         session._autoClose = True
         endpoint = endpoints.SAMI2PStreamClientEndpoint(session, 'foo.i2p')
         endpoint.connect(None)
-        self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())
+        self.assertSubstring('HELLO VERSION', samEndpoint.transport.value().decode('utf-8'))
 
 
 
@@ -85,4 +85,4 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
         session._autoClose = True
         endpoint = endpoints.SAMI2PStreamServerEndpoint(session)
         endpoint.listen(None)
-        self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())
+        self.assertSubstring('HELLO VERSION', str(samEndpoint.transport.value()))

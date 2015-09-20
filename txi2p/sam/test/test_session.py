@@ -32,7 +32,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         self.assertEquals(
             'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=%s\n' % DEFAULT_SIGTYPE,
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
 
     def test_sessionCreateAfterHelloWith3point0(self):
         fac, proto = self.makeProto()
@@ -40,7 +40,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.0\n')
         self.assertEquals(
-            'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT\n',
+            b'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT\n',
             proto.transport.value())
 
     def test_sessionCreateAfterHelloWithSigType(self):
@@ -50,7 +50,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         self.assertEquals(
-            'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=foobar\n',
+            b'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=foobar\n',
             proto.transport.value())
 
     def test_sessionCreateWithAutoNickAfterHello(self):
@@ -61,7 +61,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         self.assertEquals(
             'SESSION CREATE STYLE=STREAM ID=txi2p-%s DESTINATION=TRANSIENT SIGNATURE_TYPE=%s\n' % (os.getpid(), DEFAULT_SIGTYPE),
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
 
     def test_sessionCreateWithPortAfterHello(self):
         fac, proto = self.makeProto()
@@ -71,7 +71,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         self.assertEquals(
             'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=%s FROM_PORT=81\n' % DEFAULT_SIGTYPE,
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
 
     def test_sessionCreateWithOptionsAfterHello(self):
         fac, proto = self.makeProto()
@@ -81,7 +81,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         self.assertEquals(
             'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=%s bar=baz\n' % DEFAULT_SIGTYPE,
-            proto.transport.value())
+            proto.transport.value().decode('utf-8'))
 
     def test_sessionCreateFallbackForUnsupportedDest(self):
         fac, proto = self.makeProto()
@@ -91,7 +91,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('SESSION STATUS RESULT=I2P_ERROR MESSAGE="SIGNATURE_TYPE foobar unsupported"\n')
         self.assertEquals(
-            'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=ECDSA_SHA256_P256\n',
+            b'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=ECDSA_SHA256_P256\n',
             proto.transport.value())
 
     def test_sessionCreateSecondFallbackForUnsupportedDest(self):
@@ -102,7 +102,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('SESSION STATUS RESULT=I2P_ERROR MESSAGE="SIGNATURE_TYPE ECDSA_SHA256_P256 unsupported"\n')
         self.assertEquals(
-            'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=DSA_SHA1\n',
+            b'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT SIGNATURE_TYPE=DSA_SHA1\n',
             proto.transport.value())
 
     def test_sessionCreateReturnsUnsupportedDestWithSigType(self):
@@ -142,7 +142,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived('SESSION STATUS RESULT=OK DESTINATION=%s\n' % TEST_B64)
         self.assertEquals(
-            'NAMING LOOKUP NAME=ME\n',
+            b'NAMING LOOKUP NAME=ME\n',
             proto.transport.value())
 
     def test_sessionCreatedAfterNamingLookup(self):
@@ -360,20 +360,20 @@ class TestDestGenerateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         fac, proto = self.makeProto()
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
-        self.assertEquals('DEST GENERATE SIGNATURE_TYPE=%s\n' % DEFAULT_SIGTYPE, proto.transport.value())
+        self.assertEquals('DEST GENERATE SIGNATURE_TYPE=%s\n' % DEFAULT_SIGTYPE, proto.transport.value().decode('utf-8'))
 
     def test_destGenerateAfterHelloWith3point0(self):
         fac, proto = self.makeProto()
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.0\n')
-        self.assertEquals('DEST GENERATE\n', proto.transport.value())
+        self.assertEquals(b'DEST GENERATE\n', proto.transport.value())
 
     def test_destGenerateAfterHelloWithSigType(self):
         fac, proto = self.makeProto()
         fac.sigType = 'foobar'
         proto.transport.clear()
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
-        self.assertEquals('DEST GENERATE SIGNATURE_TYPE=foobar\n', proto.transport.value())
+        self.assertEquals(b'DEST GENERATE SIGNATURE_TYPE=foobar\n', proto.transport.value())
 
     def test_destGeneratedFallbackForUnsupportedDest(self):
         fac, proto = self.makeProto()
@@ -381,7 +381,7 @@ class TestDestGenerateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         proto.transport.clear()
         proto.dataReceived('DEST REPLY RESULT=I2P_ERROR MESSAGE="SIGNATURE_TYPE %s unsupported"\n' % DEFAULT_SIGTYPE)
-        self.assertEquals('DEST GENERATE SIGNATURE_TYPE=ECDSA_SHA256_P256\n', proto.transport.value())
+        self.assertEquals(b'DEST GENERATE SIGNATURE_TYPE=ECDSA_SHA256_P256\n', proto.transport.value())
 
     def test_destGeneratedSecondFallbackForUnsupportedDest(self):
         fac, proto = self.makeProto()
@@ -389,7 +389,7 @@ class TestDestGenerateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         proto.transport.clear()
         proto.dataReceived('DEST REPLY RESULT=I2P_ERROR MESSAGE="SIGNATURE_TYPE ECDSA_SHA256_P256 unsupported"\n')
-        self.assertEquals('DEST GENERATE SIGNATURE_TYPE=DSA_SHA1\n', proto.transport.value())
+        self.assertEquals(b'DEST GENERATE SIGNATURE_TYPE=DSA_SHA1\n', proto.transport.value())
 
     def test_destGeneratedReturnsError(self):
         fac, proto = self.makeProto()
@@ -397,7 +397,7 @@ class TestDestGenerateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
         proto.transport.clear()
         proto.dataReceived('DEST REPLY RESULT=I2P_ERROR MESSAGE="foo bar baz"\n')
-	fac.resultNotOK.assert_called_with('I2P_ERROR', 'foo bar baz')
+        fac.resultNotOK.assert_called_with('I2P_ERROR', 'foo bar baz')
 
     def test_destGenerated(self):
         fac, proto = self.makeProto()

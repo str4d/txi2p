@@ -25,8 +25,8 @@ class BOBProtoTestMixin(object):
         fac = ClientFactory(*a, **kw)
         fac.protocol = protoClass
         fac.options = {}
-        def raise_(ex):
-            raise ex
+        def raise_(reason):
+            raise reason.value
         fac.bobConnectionFailed = lambda reason: raise_(reason)
         proto = fac.buildProtocol(None)
         transport = proto_helpers.StringTransport()
@@ -37,7 +37,7 @@ class BOBProtoTestMixin(object):
     def test_initBOBListsTunnels(self):
         fac, proto = self.makeProto()
         proto.dataReceived('BOB 00.00.10\nOK\n')
-        self.assertEqual(proto.transport.value(), 'list\n')
+        self.assertEqual(proto.transport.value(), b'list\n')
 
     def TODO_test_quitDoesNotErrback(self):
         fac, proto = self.makeProto()
@@ -116,7 +116,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         proto.transport.clear()
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
-        self.assertEqual(proto.transport.value(), 'setnick txi2p-%d\n' % os.getpid())
+        self.assertEqual(proto.transport.value().decode('utf-8'), 'setnick txi2p-%d\n' % os.getpid())
 
     def test_newNickSetsNick(self):
         fac, proto = self.makeProto()
@@ -124,7 +124,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         proto.transport.clear()
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
-        self.assertEqual(proto.transport.value(), 'setnick spam\n')
+        self.assertEqual(proto.transport.value(), b'setnick spam\n')
 
     def test_nickSetSendsOptions(self):
         fac, proto = self.makeProto()
@@ -135,7 +135,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'option foo=bar spam=eggs\n')
+        self.assertEqual(proto.transport.value(), b'option foo=bar spam=eggs\n')
 
     def test_nickSetWithKeypair(self):
         fac, proto = self.makeProto()
@@ -148,7 +148,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418 options set\n')
-        self.assertEqual(proto.transport.value(), 'setkeys eggs\n')
+        self.assertEqual(proto.transport.value(), b'setkeys eggs\n')
 
     def test_destFetchedAfterNickSetWithKeypair(self):
         fac, proto = self.makeProto()
@@ -163,7 +163,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'getdest\n')
+        self.assertEqual(proto.transport.value(), b'getdest\n')
 
     def test_nickSetWithNoKeypair(self):
         fac, proto = self.makeProto()
@@ -175,7 +175,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418 options set\n')
-        self.assertEqual(proto.transport.value(), 'newkeys\n')
+        self.assertEqual(proto.transport.value(), b'newkeys\n')
 
     def test_keypairFetchedAfterNickSetWithNoKeypair(self):
         fac, proto = self.makeProto()
@@ -189,7 +189,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
-        self.assertEqual(proto.transport.value(), 'getkeys\n')
+        self.assertEqual(proto.transport.value(), b'getkeys\n')
 
     def test_existingNickGetsNick(self):
         fac, proto = self.makeProto()
@@ -197,7 +197,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         proto.transport.clear()
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
-        self.assertEqual(proto.transport.value(), 'getnick spam\n')
+        self.assertEqual(proto.transport.value(), b'getnick spam\n')
 
     def test_stopRequestedForRunningTunnel(self):
         fac, proto = self.makeProto()
@@ -207,7 +207,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'stop\n')
+        self.assertEqual(proto.transport.value(), b'stop\n')
 
     def test_stopNotRequestedForStoppedTunnel(self):
         fac, proto = self.makeProto()
@@ -217,7 +217,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: false STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertNotEqual(proto.transport.value(), 'stop\n') # TODO: Refactor to test against what is actually expected
+        self.assertNotEqual(proto.transport.value(), b'stop\n') # TODO: Refactor to test against what is actually expected
 
     def test_quitRequestedAfterStart(self):
         fac, proto = self.makeProto()
@@ -227,7 +227,7 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.receiver.currentRule = 'State_start'
         proto._parser._setupInterp()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual((called, proto.transport.value()), ([True], 'quit\n'))
+        self.assertEqual((called, proto.transport.value()), ([True], b'quit\n'))
 
 class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestCase):
     protocol = I2PClientTunnelCreatorBOBClient
@@ -240,7 +240,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.receiver.currentRule = 'State_inhost'
         proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel is active\n')
-        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'inhost camelot\n')
 
     def test_inhostRequestRepeatedIfShuttingDown(self):
         fac, proto = self.makeProto()
@@ -250,7 +250,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.receiver.currentRule = 'State_inhost'
         proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel shutting down\n')
-        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'inhost camelot\n')
 
     def test_inhostSetAfterNickSetWithKeypair(self):
         fac, proto = self.makeProto()
@@ -268,7 +268,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The Destination
-        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'inhost camelot\n')
 
     def test_inhostSetAfterNickSetWithNoKeypair(self):
         fac, proto = self.makeProto()
@@ -285,7 +285,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
-        self.assertEqual(proto.transport.value(), 'inhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'inhost camelot\n')
 
     def test_defaultInportSet(self):
         fac, proto = self.makeProto()
@@ -304,7 +304,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'inport %d\n' % DEFAULT_INPORT)
+        self.assertEqual(proto.transport.value().decode('utf-8'), 'inport %d\n' % DEFAULT_INPORT)
 
     def test_inportSet(self):
         fac, proto = self.makeProto()
@@ -324,7 +324,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'inport 1234\n')
+        self.assertEqual(proto.transport.value(), b'inport 1234\n')
 
     def test_startRequested(self):
         fac, proto = self.makeProto()
@@ -346,7 +346,7 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'start\n')
+        self.assertEqual(proto.transport.value(), b'start\n')
 
 
 class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestCase):
@@ -360,7 +360,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.receiver.currentRule = 'State_outhost'
         proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel is active\n')
-        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'outhost camelot\n')
 
     def test_outhostRequestRepeatedIfShuttingDown(self):
         fac, proto = self.makeProto()
@@ -370,7 +370,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.receiver.currentRule = 'State_outhost'
         proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel shutting down\n')
-        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'outhost camelot\n')
 
     def test_outhostSetAfterNickSetWithKeypair(self):
         fac, proto = self.makeProto()
@@ -388,7 +388,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The Destination
-        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'outhost camelot\n')
 
     def test_outhostSetAfterNickSetWithNoKeypair(self):
         fac, proto = self.makeProto()
@@ -405,7 +405,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
-        self.assertEqual(proto.transport.value(), 'outhost camelot\n')
+        self.assertEqual(proto.transport.value(), b'outhost camelot\n')
 
     def test_defaultOutportSet(self):
         fac, proto = self.makeProto()
@@ -424,7 +424,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'outport %d\n' % DEFAULT_OUTPORT)
+        self.assertEqual(proto.transport.value().decode('utf-8'), 'outport %d\n' % DEFAULT_OUTPORT)
 
     def test_outportSet(self):
         fac, proto = self.makeProto()
@@ -444,7 +444,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'outport 1234\n')
+        self.assertEqual(proto.transport.value(), b'outport 1234\n')
 
     def test_startRequested(self):
         fac, proto = self.makeProto()
@@ -466,7 +466,7 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'start\n')
+        self.assertEqual(proto.transport.value(), b'start\n')
 
 
 class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
@@ -478,7 +478,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         proto.transport.clear()
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
-        self.assertEqual(proto.transport.value(), '')
+        self.assertEqual(proto.transport.value(), b'')
 
     def test_tunnelExistsGetsNick(self):
         fac, proto = self.makeProto()
@@ -486,7 +486,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.dataReceived('BOB 00.00.10\nOK\n')
         proto.transport.clear()
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
-        self.assertEqual(proto.transport.value(), 'getnick spam\n')
+        self.assertEqual(proto.transport.value(), b'getnick spam\n')
 
     def test_stopRequested(self):
         fac, proto = self.makeProto()
@@ -496,7 +496,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.dataReceived('DATA NICKNAME: spam STARTING: false RUNNING: true STOPPING: false KEYS: true QUIET: false INPORT: 12345 INHOST: localhost OUTPORT: 23456 OUTHOST: localhost\nOK Listing done\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'stop\n')
+        self.assertEqual(proto.transport.value(), b'stop\n')
 
     def test_clearRequested(self):
         fac, proto = self.makeProto()
@@ -508,7 +508,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'clear\n')
+        self.assertEqual(proto.transport.value(), b'clear\n')
 
     def test_clearRequestRepeatedIfActive(self):
         fac, proto = self.makeProto()
@@ -517,7 +517,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.receiver.currentRule = 'State_clear'
         proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel is active\n')
-        self.assertEqual(proto.transport.value(), 'clear\n')
+        self.assertEqual(proto.transport.value(), b'clear\n')
 
     def test_clearRequestRepeatedIfShuttingDown(self):
         fac, proto = self.makeProto()
@@ -526,7 +526,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.receiver.currentRule = 'State_clear'
         proto._parser._setupInterp()
         proto.dataReceived('ERROR tunnel shutting down\n')
-        self.assertEqual(proto.transport.value(), 'clear\n')
+        self.assertEqual(proto.transport.value(), b'clear\n')
 
     def test_quitRequestedAfterClearSuccess(self):
         fac, proto = self.makeProto()
@@ -536,7 +536,7 @@ class TestI2PTunnelRemoverBOBClient(BOBProtoTestMixin, unittest.TestCase):
         proto.receiver.currentRule = 'State_clear'
         proto._parser._setupInterp()
         proto.dataReceived('OK HTTP 418\n')
-        self.assertEqual(proto.transport.value(), 'quit\n')
+        self.assertEqual(proto.transport.value(), b'quit\n')
 
 
 class FakeDisconnectingFactory(object):
@@ -556,7 +556,7 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
 
     def test_destRequested(self):
         proto = self.makeProto()
-        self.assertEqual(proto.transport.value(), '%s\n' % TEST_B64)
+        self.assertEqual(proto.transport.value().decode('utf-8'), '%s\n' % TEST_B64)
 
     def test_wrappedProtoConnectionMade(self):
         proto = self.makeProto()
@@ -575,7 +575,7 @@ class TestI2PClientTunnelProtocol(unittest.TestCase):
     def test_dataPassed(self):
         proto = self.makeProto()
         proto.dataReceived('shrubbery')
-        self.assertEqual(proto.wrappedProto.data, 'shrubbery')
+        self.assertEqual(proto.wrappedProto.data, b'shrubbery')
 
 
 class TestI2PServerTunnelProtocol(unittest.TestCase):
@@ -600,4 +600,4 @@ class TestI2PServerTunnelProtocol(unittest.TestCase):
         proto = self.makeProto()
         proto.dataReceived('%s\n' % TEST_B64)
         proto.dataReceived('shrubbery')
-        self.assertEqual(proto.wrappedProto.data, 'shrubbery')
+        self.assertEqual(proto.wrappedProto.data, b'shrubbery')

@@ -154,7 +154,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('SESSION STATUS RESULT=OK DESTINATION=%s\n' % TEST_B64)
         proto.transport.clear()
         proto.dataReceived('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64)
-        fac.sessionCreated.assert_called()
+        fac.sessionCreated.assert_called_with(proto.receiver, TEST_B64)
 
     def test_sessionCreatedAndKeepaliveStartedAfterNamingLookupWith3_2(self):
         fac, proto = self.makeProto()

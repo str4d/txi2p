@@ -2,18 +2,19 @@
 # See COPYING for details.
 
 from setuptools import setup
+from os import path
 
 
-with open('README.rst', 'rb') as infile:
-    long_description = infile.read()
+here = path.abspath(path.dirname(__file__))
 
-with open('requirements.txt', 'rb') as infile:
-    install_requires = infile.read().split()
+def readme():
+    with open(path.join(here, 'README.rst')) as f:
+        return f.read()
 
 setup(
     name='txi2p',
     description='I2P bindings for Twisted',
-    long_description=long_description,
+    long_description=readme(),
     author='str4d',
     author_email='str4d@i2pmail.org',
     url='https://github.com/str4d/txi2p',
@@ -25,7 +26,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 2 :: Only',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Internet',
     ],
     license='ISC',
@@ -38,7 +39,10 @@ setup(
     vcversioner={
         'version_module_paths': ['txi2p/_version.py'],
     },
-    install_requires=install_requires,
+    install_requires=[
+        'Twisted>=10.1',
+        'Parsley>=1.2',
+    ],
     packages=[
         'txi2p',
         'txi2p.bob',

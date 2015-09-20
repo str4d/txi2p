@@ -1,6 +1,6 @@
 from twisted.internet.endpoints import clientFromString
 
-from txi2p.sam import api as samApi
+from txi2p import sam
 
 
 DEFAULT_ENDPOINT = {
@@ -27,7 +27,7 @@ def getApi(api, apiEndpoint, apiDict):
 
 
 _apiGenerators = {
-    'SAM': samApi.generateDestination,
+    'SAM': sam.generateDestination,
 }
 
 def generateDestination(reactor, keyfile, api=None, apiEndpoint=None):

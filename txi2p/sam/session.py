@@ -91,6 +91,11 @@ class SessionCreateFactory(SAMFactory):
                 f.close()
             except IOError:
                 log.msg('Could not save private key to %s' % self._keyfile)
+        # Help keep the session open
+        try:
+            proto.sender.transport.setTcpKeepAlive(1)
+        except AttributeError as e:
+            print e
         # Now continue on with creation of SAMSession
         self.deferred.callback((self.samVersion, self.style, self.nickname, proto, pubKey))
 

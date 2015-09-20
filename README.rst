@@ -18,6 +18,75 @@ or by downloading the source and running::
 
     $ python setup.py install
 
+Quickstart
+==========
+
+If you are not familiar with using endpoints or endpoint strings, read the
+`Twisted endpoints`_ documentation.
+
+.. _Twisted endpoints: https://twistedmatrix.com/documents/current/core/howto/endpoints.html
+
+Using endpoint classes
+----------------------
+
+To connect to an I2P site::
+
+    from twisted.internet import reactor
+    from twisted.internet.endpoints import clientFromString
+    from txi2p.sam import SAMI2PStreamClientEndpoint
+
+    samEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:7656')
+    endpoint = SAMI2PStreamClientEndpoint.new(reactor, samEndpoint, 'stats.i2p')
+    d = endpoint.connect(factory)
+
+To have a server listen on an I2P Destination::
+
+    from twisted.internet import reactor
+    from twisted.internet.endpoints import clientFromString
+    from txi2p.sam import SAMI2PStreamServerEndpoint
+
+    samEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:7656')
+    endpoint = SAMI2PStreamServerEndpoint.new(reactor, samEndpoint, '/path/to/keyfile')
+    d = endpoint.listen(factory)
+
+Using endpoint strings
+----------------------
+
+Requires `Twisted`_ 14.0 or greater.
+
+To connect to an I2P site::
+
+    from twisted.internet import reactor
+    from twisted.internet.endpoints import clientFromString
+
+    endpoint = clientFromString(reactor, 'i2p:stats.i2p')
+    d = endpoint.connect(factory)
+
+To have a server listen on an I2P Destination::
+
+    from twisted.internet import reactor
+    from twisted.internet.endpoints import serverFromString
+
+    endpoint = serverFromString(reactor, 'i2p:/path/to/keyfile')
+    d = endpoint.listen(factory)
+
+To connect using a specific API::
+
+    from twisted.internet import reactor
+    from twisted.internet.endpoints import clientFromString
+
+    endpoint = clientFromString(reactor, 'i2p:stats.i2p:api=BOB')
+    d = endpoint.connect(factory)
+
+To connect using a non-standard API host or port::
+
+    from twisted.internet import reactor
+    from twisted.internet.endpoints import clientFromString
+
+    endpoint = clientFromString(reactor, 'i2p:stats.i2p:api=SAM:apiEndpoint=tcp\:127.0.0.1\:31337')
+    d = endpoint.connect(factory)
+
+
 Endpoint strings
 ================
 

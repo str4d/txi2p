@@ -8,6 +8,8 @@ from twisted.internet.protocol import ClientFactory
 from twisted.python import failure
 from twisted.test import proto_helpers
 
+from txi2p.sam import constants as c
+
 connectionLostFailure = failure.Failure(ConnectionLost())
 connectionRefusedFailure = failure.Failure(ConnectionRefusedError())
 
@@ -77,3 +79,8 @@ class SAMFactoryTestMixin(object):
         fac, proto = self.makeProto(*self.blankFactoryArgs)
         fac.clientConnectionFailed(None, connectionRefusedFailure)
         return self.assertFailure(fac.deferred, ConnectionRefusedError)
+
+    def test_resultNotOK(self):
+        fac, proto = self.makeProto(*self.blankFactoryArgs)
+        for result, error in c.samErrorMap.items():
+            self.assertRaises(error, fac.resultNotOK, result, '')

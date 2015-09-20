@@ -311,3 +311,16 @@ class TestDestGenerateFactory(SAMFactoryTestMixin, unittest.TestCase):
         self.assertIsInstance(self.failureResultOf(fac.deferred).value, ValueError)
         os.remove(tmp)
     test_destGenerated_keyfileExists.skip = skipSRO
+
+
+class TestGenerateDestination(unittest.TestCase):
+    def test_generateDestination(self):
+        proto = proto_helpers.AccumulatingProtocol()
+        samEndpoint = FakeEndpoint()
+        samEndpoint.deferred = defer.succeed(None)
+        samEndpoint.facDeferred = defer.succeed(I2PAddress(TEST_B64))
+        d = session.generateDestination('', samEndpoint)
+        s = self.successResultOf(d)
+        self.assertEqual(1, samEndpoint.called)
+        self.assertEqual(I2PAddress(TEST_B64), s)
+    test_generateDestination.skip = skipSRO

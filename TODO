@@ -1,9 +1,3 @@
-- Reorganize code to group by API (for when SAM is added)
-  - Mostly done
-  - Split grammar?
-
-- Work out how state can be shared between endpoint instances (for SAM)
-
 - Use Twisted for logging/debug
 
 - Handle more errors properly

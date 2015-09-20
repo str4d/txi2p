@@ -17,6 +17,7 @@ class BOBI2PClientEndpoint(object):
     """I2P client endpoint backed by the BOB API.
 
     Args:
+        reactor: The client endpoint will be constructed with this reactor.
         bobEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
             endpoint that will connect to the BOB API.
         host (str): The I2P hostname or Destination to connect to.
@@ -82,6 +83,7 @@ class BOBI2PServerEndpoint(object):
     """I2P server endpoint backed by the BOB API.
 
     Args:
+        reactor: The server endpoint will be constructed with this reactor.
         bobEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
             endpoint that will connect to the BOB API.
         keyfile (str): Path to a local file containing the keypair to use for

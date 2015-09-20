@@ -109,6 +109,7 @@ class SAMI2PStreamServerEndpoint(object):
     """I2P server endpoint backed by the SAM API.
 
     Args:
+        reactor: The server endpoint will be constructed with this reactor.
         session (txi2p.sam.SAMSession): The SAM session to listen on.
         port (int): The port to listen on inside I2P. If unset or `None`, the
             default (null) port is used. Ignored because SAM doesn't support
@@ -126,6 +127,7 @@ class SAMI2PStreamServerEndpoint(object):
         the same SAM session.
 
         Args:
+            reactor: The server endpoint will be constructed with this reactor.
             samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
                 endpoint that will connect to the SAM API.
             keyfile (str): Path to a local file containing the keypair to use

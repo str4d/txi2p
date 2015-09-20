@@ -37,11 +37,14 @@ def generateDestination(reactor, keyfile, api=None, apiEndpoint=None):
     callbacks to receive the return value or errors.
 
     Args:
+        reactor: The API endpoint will be constructed with this reactor.
         keyfile (str): Path to a local file where the keypair for the new
             Destination should be stored.
         api (str): The API to use.
-        apiEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
-            endpoint that will connect to the API.
+        apiEndpoint (str): An endpoint string that will connect to the API.
+            Alternatively, the caller can directly provide an
+            :class:`twisted.internet.interfaces.IStreamClientEndpoint`, and the
+            ``reactor`` will be ignored.
 
     Returns:
         txi2p.I2PAddress: The new Destination. Once this is received via the

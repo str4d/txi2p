@@ -13,7 +13,6 @@ def readme():
         return f.read()
 
 install_requires = [
-    'Twisted>=10.1',
     'Parsley>=1.2',
 ]
 
@@ -23,6 +22,9 @@ install_requires = [
 # http://python-future.org/standard_library_imports.html#list-standard-library-refactored
 if sys.version_info[0] < 3:
     install_requires.append('future>=0.14.0')
+    install_requires.append('Twisted>=10.1')
+else:
+    install_requires.append('Twisted>=15.4')
 
 setup(
     name='txi2p',

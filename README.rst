@@ -13,6 +13,8 @@ txi2p
 |txi2p| is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
 10.1 or greater. It currently requires Python 2.
 
+|txi2p| will run on Python 3.3+ (requiring `Twisted`_ 15.4 or greater).
+
 |txi2p| supports both the SAM and BOB APIs for I2P. The default API is SAM.
 
 Installation

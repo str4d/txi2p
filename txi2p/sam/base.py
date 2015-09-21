@@ -44,11 +44,27 @@ class SAMParserProtocol(ParserProtocol):
         ParserProtocol.__init__(self, *args)
 
     def dataReceived(self, data):
+        """
+        Receive and parse some data.
+
+        :param data: A ``bytes`` from Twisted.
+        """
+
+        if self._disconnecting:
+            return
+
         if self.receiver.currentRule == 'State_readData':
             # Shortcut for efficiency
             self.receiver.dataReceived(data)
         else:
-            ParserProtocol.dataReceived(self, data)
+            # Duplicated from Parsley because it expects a str but Twisted
+            # provides a bytes.
+            try:
+                self._parser.receive(data.decode('utf-8'))
+            except Exception:
+                self.connectionLost(Failure())
+                self.transport.abortConnection()
+                return
 
 
 def makeSAMProtocol(senderFactory, receiverFactory):

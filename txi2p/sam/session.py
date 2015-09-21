@@ -4,7 +4,6 @@ from __future__ import print_function
 
 from builtins import object
 import os
-from parsley import makeProtocol
 import sys
 from twisted.internet import defer, error
 from twisted.python import failure, log
@@ -12,8 +11,13 @@ from twisted.python import failure, log
 from txi2p import grammar
 from txi2p.address import I2PAddress
 from txi2p.sam import constants as c
-from txi2p.sam.base import cmpSAM, SAMSender, SAMReceiver, SAMFactory
-
+from txi2p.sam.base import (
+    cmpSAM,
+    makeSAMProtocol,
+    SAMSender,
+    SAMReceiver,
+    SAMFactory,
+)
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -89,8 +93,7 @@ class SessionCreateReceiver(SAMReceiver):
 
 
 # A Protocol for making a SAM session
-SessionCreateProtocol = makeProtocol(
-    grammar.samGrammarSource,
+SessionCreateProtocol = makeSAMProtocol(
     SessionCreateSender,
     SessionCreateReceiver)
 
@@ -296,8 +299,7 @@ class DestGenerateReceiver(SAMReceiver):
 
 
 # A Protocol for generating an I2P Destination via SAM
-DestGenerateProtocol = makeProtocol(
-    grammar.samGrammarSource,
+DestGenerateProtocol = makeSAMProtocol(
     DestGenerateSender,
     DestGenerateReceiver)
 
@@ -359,8 +361,7 @@ class TestAPIReceiver(SAMReceiver):
 
 
 # A Protocol for testing whether a SAM API is reachable
-TestAPIProtocol = makeProtocol(
-    grammar.samGrammarSource,
+TestAPIProtocol = makeSAMProtocol(
     SAMSender,
     TestAPIReceiver)
 

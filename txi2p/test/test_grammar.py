@@ -104,3 +104,11 @@ class TestSAMGrammar(unittest.TestCase):
         self._test('SAM_dest_reply',
                    'DEST REPLY PUB=foo PRIV=foobar\n',
                    {'pub': 'foo', 'priv': 'foobar'})
+
+    def test_SAM_ping(self):
+        self._test('SAM_ping', 'PING\n', None)
+        self._test('SAM_ping', 'PING 1234567890\n', '1234567890')
+
+    def test_SAM_pong(self):
+        self._test('SAM_pong', 'PONG\n', None)
+        self._test('SAM_pong', 'PONG 1234567890\n', '1234567890')

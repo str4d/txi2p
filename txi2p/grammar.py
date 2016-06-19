@@ -114,4 +114,11 @@ State_forward = SAM_stream_status:options  -> receiver.forward(**options)
 State_naming  = SAM_naming_reply:options   -> receiver.lookupReply(**options)
 State_dest    = SAM_dest_reply:options     -> receiver.destGenerated(**options)
 State_readData = anything:data             -> receiver.dataReceived(data)
+
+KEEPALIVE_DATA = (' '+ <(~'\n' anything)+>:data -> data) | -> None
+SAM_ping = 'PING' KEEPALIVE_DATA:data '\n' -> data
+SAM_pong = 'PONG' KEEPALIVE_DATA:data '\n' -> data
+
+State_keepalive = ((SAM_ping:data -> receiver.ping(data))
+                  |(SAM_pong:data -> receiver.pong(data)))
 """

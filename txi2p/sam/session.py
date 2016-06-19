@@ -9,7 +9,7 @@ from twisted.python import failure, log
 from txi2p import grammar
 from txi2p.address import I2PAddress
 from txi2p.sam import constants as c
-from txi2p.sam.base import SAMSender, SAMReceiver, SAMFactory
+from txi2p.sam.base import cmpSAM, SAMSender, SAMReceiver, SAMFactory
 
 
 class SessionCreateSender(SAMSender):
@@ -48,6 +48,14 @@ class SessionCreateReceiver(SAMReceiver):
         self.currentRule = 'State_naming'
 
     def postLookup(self, dest):
+        # Help keep the session open
+        if cmpSAM(self.factory.samVersion, '3.2') >= 0:
+            self.startPinging()
+        else:
+            try:
+                self.sender.transport.setTcpKeepAlive(1)
+            except AttributeError as e:
+                print e
         self.factory.sessionCreated(self, dest)
 
 
@@ -91,11 +99,6 @@ class SessionCreateFactory(SAMFactory):
                 f.close()
             except IOError:
                 log.msg('Could not save private key to %s' % self._keyfile)
-        # Help keep the session open
-        try:
-            proto.sender.transport.setTcpKeepAlive(1)
-        except AttributeError as e:
-            print e
         # Now continue on with creation of SAMSession
         self.deferred.callback((self.samVersion, self.style, self.nickname, proto, pubKey))
 

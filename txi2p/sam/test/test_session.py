@@ -84,6 +84,21 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.dataReceived('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64)
         fac.sessionCreated.assert_called()
 
+    def test_sessionCreatedAndKeepaliveStartedAfterNamingLookupWith3_2(self):
+        fac, proto = self.makeProto()
+        fac.style = 'STREAM'
+        fac.sessionCreated = Mock()
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.2\n')
+        proto.transport.clear()
+        proto.dataReceived('SESSION STATUS RESULT=OK DESTINATION=%s\n' % TEST_B64)
+        proto.transport.clear()
+        proto.dataReceived('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64)
+        self.assertEquals('State_keepalive', proto.receiver.currentRule)
+        fac.sessionCreated.assert_called()
+        # Cleanup
+        self.addCleanup(proto.receiver.stopPinging)
+
 
 class FakeEndpoint(object):
     def __init__(self, failure=None):
@@ -135,6 +150,7 @@ class TestSessionCreateFactory(SAMFactoryTestMixin, unittest.TestCase):
         tmp = '/tmp/TestSessionCreateFactory.privKey'
         mreactor = proto_helpers.MemoryReactor()
         fac, proto = self.makeProto('foo', keyfile=tmp)
+        fac.samVersion = '3.1'
         fac.privKey = 'bar'
         fac._writeKeypair = True
         # Shortcut to end of SAM session create protocol
@@ -145,6 +161,7 @@ class TestSessionCreateFactory(SAMFactoryTestMixin, unittest.TestCase):
         privKey = f.read()
         f.close()
         self.assertEqual('bar', privKey)
+        # Cleanup
         os.remove(tmp)
 
 

@@ -1,6 +1,9 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+import re
+import time
+from twisted.internet import reactor
 from twisted.internet.interfaces import IListeningPort, IProtocolFactory
 from twisted.internet.protocol import ClientFactory
 from twisted.python.failure import Failure
@@ -13,6 +16,14 @@ from txi2p.address import (
 )
 from txi2p.sam import constants as c
 
+KEEPALIVE_TIMEOUT = 2 * 60
+
+
+def cmpSAM(a, b):
+    def normalize(v):
+        return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
+    return cmp(normalize(a), normalize(b))
+
 
 class SAMSender(object):
     def __init__(self, transport):
@@ -24,10 +35,25 @@ class SAMSender(object):
     def sendNamingLookup(self, name):
         self.transport.write('NAMING LOOKUP NAME=%s\n' % name)
 
+    def sendPing(self, data):
+        if data:
+            self.transport.write('PING %s\n' % data)
+        else:
+            self.transport.write('PING\n')
+
+    def sendPong(self, data):
+        if data:
+            self.transport.write('PONG %s\n' % data)
+        else:
+            self.transport.write('PONG\n')
+
 
 class SAMReceiver(object):
     wrappedProto = None
     currentRule = 'State_hello'
+    pinger = None
+    lastPing = ''
+    pingTimeout = None
 
     def __init__(self, sender):
         self.sender = sender
@@ -69,6 +95,33 @@ class SAMReceiver(object):
             return
         self.postLookup(value)
 
+    def _sendPing(self):
+        self.lastPing = str(time.time())
+        self.sender.sendPing(self.lastPing)
+        self.pingTimeout = reactor.callLater(KEEPALIVE_TIMEOUT, self.sender.transport.loseConnection)
+
+    def _resetPingTimeout(self):
+        if self.pingTimeout:
+            self.pingTimeout.cancel()
+        self.pinger = reactor.callLater(KEEPALIVE_TIMEOUT, self._sendPing)
+
+    def ping(self, data):
+        self.sender.sendPong(data)
+        self._resetPingTimeout()
+
+    def pong(self, data):
+        if (data == str(self.lastPing)):
+            self._resetPingTimeout()
+
+    def startPinging(self):
+        self.pinger = reactor.callLater(KEEPALIVE_TIMEOUT, self._sendPing)
+        self.currentRule = 'State_keepalive'
+
+    def stopPinging(self):
+        if self.pinger and self.pinger.active():
+            self.pinger.cancel()
+        if self.pingTimeout and self.pingTimeout.active():
+            self.pingTimeout.cancel()
 
 class SAMFactory(ClientFactory):
     currentCandidate = None

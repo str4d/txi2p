@@ -42,6 +42,81 @@ class SAMProtocolTestMixin(object):
         proto.dataReceived('HELLO REPLY RESULT=I2P_ERROR MESSAGE="foo bar baz"\n')
         fac.resultNotOK.assert_called_with('I2P_ERROR', 'foo bar baz')
 
+    def test_pingReceived(self):
+        fac, proto = self.makeProto()
+        self.addCleanup(proto.receiver.stopPinging)
+        proto.transport.clear()
+        # Enable keepalive
+        proto.receiver.currentRule = 'State_keepalive'
+        proto._parser._setupInterp()
+        proto.dataReceived('PING\n')
+        self.assertEquals(
+            'PONG\n',
+            proto.transport.value())
+
+    def test_pingReceivedWithData(self):
+        fac, proto = self.makeProto()
+        self.addCleanup(proto.receiver.stopPinging)
+        proto.transport.clear()
+        # Enable keepalive
+        proto.receiver.currentRule = 'State_keepalive'
+        proto._parser._setupInterp()
+        proto.dataReceived('PING some random data\n')
+        self.assertEquals(
+            'PONG some random data\n',
+            proto.transport.value())
+
+    def test_pingReceivedResetsTimeout(self):
+        fac, proto = self.makeProto()
+        self.addCleanup(proto.receiver.stopPinging)
+        proto.transport.clear()
+        # Enable keepalive
+        proto.receiver.currentRule = 'State_keepalive'
+        proto._parser._setupInterp()
+        proto.receiver._sendPing()
+        self.assertEquals(
+            'PING %s\n' % proto.receiver.lastPing,
+            proto.transport.value())
+        self.assertTrue(proto.receiver.pingTimeout.active())
+        proto.transport.clear()
+        proto.dataReceived('PING\n')
+        self.assertEquals(
+            'PONG\n',
+            proto.transport.value())
+        self.assertFalse(proto.receiver.pingTimeout.active())
+
+    def test_validPongResponseResetsTimeout(self):
+        fac, proto = self.makeProto()
+        self.addCleanup(proto.receiver.stopPinging)
+        proto.transport.clear()
+        # Enable keepalive
+        proto.receiver.currentRule = 'State_keepalive'
+        proto._parser._setupInterp()
+        proto.receiver._sendPing()
+        self.assertEquals(
+            'PING %s\n' % proto.receiver.lastPing,
+            proto.transport.value())
+        self.assertTrue(proto.receiver.pingTimeout.active())
+        proto.transport.clear()
+        proto.dataReceived('PONG %s\n' % proto.receiver.lastPing)
+        self.assertFalse(proto.receiver.pingTimeout.active())
+
+    def test_invalidPongResponseDoesNotResetTimeout(self):
+        fac, proto = self.makeProto()
+        self.addCleanup(proto.receiver.stopPinging)
+        proto.transport.clear()
+        # Enable keepalive
+        proto.receiver.currentRule = 'State_keepalive'
+        proto._parser._setupInterp()
+        proto.receiver._sendPing()
+        self.assertEquals(
+            'PING %s\n' % proto.receiver.lastPing,
+            proto.transport.value())
+        self.assertTrue(proto.receiver.pingTimeout.active())
+        proto.transport.clear()
+        proto.dataReceived('PONG not what was expected\n')
+        self.assertTrue(proto.receiver.pingTimeout.active())
+
 
 class SAMFactoryTestMixin(object):
     def setUp(self):

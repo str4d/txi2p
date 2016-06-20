@@ -4,7 +4,7 @@
 import re
 import time
 from twisted.internet import reactor
-from twisted.internet.interfaces import IListeningPort, IProtocolFactory
+from twisted.internet.interfaces import IProtocolFactory
 from twisted.internet.protocol import ClientFactory
 from twisted.python.failure import Failure
 from zope.interface import implementer
@@ -174,21 +174,3 @@ class I2PFactoryWrapper(object):
 
     def __getattr__(self, attr):
         return getattr(self.w, attr)
-
-
-@implementer(IListeningPort)
-class I2PListeningPort(object):
-    def __init__(self, listeningPort, forwardingProto, serverAddr):
-        self._listeningPort = listeningPort
-        self._forwardingProto = forwardingProto
-        self._serverAddr = serverAddr
-
-    def startListening(self):
-        self._listeningPort.startListening()
-
-    def stopListening(self):
-        self._listeningPort.stopListening()
-        self._forwardingProto.sender.transport.loseConnection()
-
-    def getHost(self):
-        return self._serverAddr

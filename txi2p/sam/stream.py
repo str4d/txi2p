@@ -4,6 +4,8 @@
 from parsley import makeProtocol
 from twisted.internet.defer import Deferred
 from twisted.internet.error import ConnectError, UnknownHostError
+from twisted.internet.interfaces import IListeningPort
+from zope.interface import implementer
 
 from txi2p import grammar
 from txi2p.address import I2PAddress
@@ -123,3 +125,21 @@ class StreamForwardFactory(SAMFactory):
     def streamForwardEstablished(self, forwardingProto):
         self.session.addStream(forwardingProto)
         self.deferred.callback(forwardingProto)
+
+
+@implementer(IListeningPort)
+class StreamForwardPort(object):
+    def __init__(self, listeningPort, forwardingProto, serverAddr):
+        self._listeningPort = listeningPort
+        self._forwardingProto = forwardingProto
+        self._serverAddr = serverAddr
+
+    def startListening(self):
+        self._listeningPort.startListening()
+
+    def stopListening(self):
+        self._listeningPort.stopListening()
+        self._forwardingProto.sender.transport.loseConnection()
+
+    def getHost(self):
+        return self._serverAddr

@@ -5,9 +5,9 @@ from twisted.internet import defer, error, interfaces
 from twisted.internet.endpoints import serverFromString
 from zope.interface import implementer
 
-from txi2p.sam.base import I2PFactoryWrapper, I2PListeningPort
+from txi2p.sam.base import I2PFactoryWrapper
 from txi2p.sam.session import SAMSession, getSession
-from txi2p.sam.stream import StreamConnectFactory, StreamForwardFactory
+from txi2p.sam.stream import StreamConnectFactory, StreamForwardFactory, StreamForwardPort
 
 
 def _parseHost(host):
@@ -173,7 +173,7 @@ class SAMI2PStreamServerEndpoint(object):
         will immediately close.
         """
 
-        def createStream(val):
+        def createForwardingStream(val):
             if self._session.style != 'STREAM':
                 raise error.UnsupportedSocketType()
 
@@ -191,18 +191,18 @@ class SAMI2PStreamServerEndpoint(object):
                 return d2
 
             def handlePort((port, forwardingProto)):
-                return I2PListeningPort(port, forwardingProto, self._session.address)
+                return StreamForwardPort(port, forwardingProto, self._session.address)
 
             d.addCallback(setupForward)
             d.addCallback(handlePort)
             return d
 
         if self._session:
-            return createStream(None)
+            return createForwardingStream(None)
 
         def saveSession(session):
             self._session = session
             return None
         self._sessionDeferred.addCallback(saveSession)
-        self._sessionDeferred.addCallback(createStream)
+        self._sessionDeferred.addCallback(createForwardingStream)
         return self._sessionDeferred

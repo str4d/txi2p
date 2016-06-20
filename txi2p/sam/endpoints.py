@@ -120,9 +120,6 @@ class SAMI2PStreamServerEndpoint(object):
     Args:
         reactor: The server endpoint will be constructed with this reactor.
         session (txi2p.sam.SAMSession): The SAM session to listen on.
-        port (int): The port to listen on inside I2P. If unset or `None`, the
-            default (null) port is used. Ignored because SAM doesn't support
-            ports yet.
     """
 
     @classmethod
@@ -143,8 +140,8 @@ class SAMI2PStreamServerEndpoint(object):
                 for the session Destination. If non-existent, new keys will be
                 generated and stored.
             port (int): The port to listen on inside I2P. If unset or `None`,
-                the default (null) port is used. Ignored because SAM doesn't
-                support ports yet.
+                the default (null) port is used. Ignored if the SAM server
+                doesn't support SAM v3.2 or higher.
             nickname (str): The SAM session nickname.
             autoClose (bool): `true` if the session should close automatically
                 once no more connections are using it.
@@ -154,12 +151,12 @@ class SAMI2PStreamServerEndpoint(object):
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        keyfile=keyfile,
+                       localPort=port,
                        options=_parseOptions(options))
-        return cls(reactor, d, port)
+        return cls(reactor, d)
 
-    def __init__(self, reactor, session, port=None):
+    def __init__(self, reactor, session):
         self._reactor = reactor
-        self._port = port
         if isinstance(session, SAMSession):
             self._session = session
         else:

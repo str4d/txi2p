@@ -553,7 +553,7 @@ class TestI2PServerTunnelProtocol(unittest.TestCase):
     def test_peerDestStored(self):
         proto = self.makeProto()
         proto.dataReceived('%s\n' % TEST_B64)
-        self.assertEqual(proto.peer, TEST_B64)
+        self.assertEqual(proto.peer.destination, TEST_B64)
 
     def test_dataAfterPeerDestPassed(self):
         proto = self.makeProto()

@@ -94,8 +94,11 @@ class I2PServerTunnelProtocol(Protocol):
             self.wrappedProto.dataReceived(data)
         else:
             # First line is the peer's Destination.
-            self.peer = data.split('\n')[0]
-            self.transport.peerAddr = I2PAddress(self.peer)
+            self.setPeer(data)
+
+    def setPeer(self, data):
+        self.peer = I2PAddress(data.split('\n')[0])
+        self.transport.peerAddr = self.peer
 
     def connectionLost(self, reason):
         self.wrappedProto.connectionLost(reason)

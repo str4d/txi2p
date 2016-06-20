@@ -42,6 +42,16 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
             'SESSION CREATE STYLE=STREAM ID=txi2p-%s DESTINATION=TRANSIENT\n' % os.getpid(),
             proto.transport.value())
 
+    def test_sessionCreateWithPortAfterHello(self):
+        fac, proto = self.makeProto()
+        fac.style = 'STREAM'
+        fac.localPort = 81
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        self.assertEquals(
+            'SESSION CREATE STYLE=STREAM ID=foo DESTINATION=TRANSIENT FROM_PORT=81\n',
+            proto.transport.value())
+
     def test_sessionCreateWithOptionsAfterHello(self):
         fac, proto = self.makeProto()
         fac.style = 'STREAM'
@@ -143,7 +153,7 @@ class TestSessionCreateFactory(SAMFactoryTestMixin, unittest.TestCase):
         proto._parser._setupInterp()
         proto.dataReceived('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64)
         s = self.successResultOf(fac.deferred)
-        self.assertEqual(('3.1', 'STREAM', 'foo', proto.receiver, TEST_B64), s)
+        self.assertEqual(('3.1', 'STREAM', 'foo', proto.receiver, TEST_B64, None), s)
     test_sessionCreated.skip = skipSRO
 
     def test_sessionCreatedWithKeyfile(self):
@@ -219,7 +229,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64, None))
         d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         self.assertEqual(1, samEndpoint.called)
@@ -227,13 +237,29 @@ class TestGetSession(unittest.TestCase):
         self.assertEqual('nick', s.id)
         self.assertEqual(proto, s._proto)
         self.assertEqual(TEST_B64, s.address.destination)
+        self.assertEqual(None, s.address.port)
+    test_getSession_newNickname.skip = skipSRO
+
+    def test_getSession_newNickname_withPort(self):
+        proto = proto_helpers.AccumulatingProtocol()
+        samEndpoint = FakeEndpoint()
+        samEndpoint.deferred = defer.succeed(None)
+        samEndpoint.facDeferred = defer.succeed(('3.2', 'STREAM', 'nick', proto, TEST_B64, 81))
+        d = session.getSession('nick', samEndpoint)
+        s = self.successResultOf(d)
+        self.assertEqual(1, samEndpoint.called)
+        self.assertEqual('nick', s.nickname)
+        self.assertEqual('nick', s.id)
+        self.assertEqual(proto, s._proto)
+        self.assertEqual(TEST_B64, s.address.destination)
+        self.assertEqual(81, s.address.port)
     test_getSession_newNickname.skip = skipSRO
 
     def test_getSession_newNickname_withoutEndpoint(self):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64, None))
         self.assertRaises(ValueError, session.getSession, 'nick')
     test_getSession_newNickname_withoutEndpoint.skip = skipSRO
 
@@ -241,7 +267,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64, None))
         d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         d2 = session.getSession('nick', samEndpoint)
@@ -254,7 +280,7 @@ class TestGetSession(unittest.TestCase):
         proto = proto_helpers.AccumulatingProtocol()
         samEndpoint = FakeEndpoint()
         samEndpoint.deferred = defer.succeed(None)
-        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64))
+        samEndpoint.facDeferred = defer.succeed(('3.1', 'STREAM', 'nick', proto, TEST_B64, None))
         d = session.getSession('nick', samEndpoint)
         s = self.successResultOf(d)
         d2 = session.getSession('nick')

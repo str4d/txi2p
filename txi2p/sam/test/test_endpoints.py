@@ -57,7 +57,7 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
         return self.assertFailure(d, ConnectionRefusedError)
 
 
-    def test_streamConnect(self):
+    def test_streamListen(self):
         reactor = proto_helpers.MemoryReactor()
         samEndpoint = FakeEndpoint()
         session = SAMSession()
@@ -66,6 +66,6 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
         session.samVersion = '3.1'
         session.id = 'foo'
         session._autoClose = True
-        endpoint = endpoints.SAMI2PStreamServerEndpoint(reactor, session, '')
+        endpoint = endpoints.SAMI2PStreamServerEndpoint(reactor, session)
         endpoint.listen(None)
         self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())

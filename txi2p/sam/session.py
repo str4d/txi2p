@@ -13,11 +13,13 @@ from txi2p.sam.base import cmpSAM, SAMSender, SAMReceiver, SAMFactory
 
 
 class SessionCreateSender(SAMSender):
-    def sendSessionCreate(self, style, id, privKey=None, options={}):
+    def sendSessionCreate(self, style, id, privKey=None, localPort=None, options={}):
         msg = 'SESSION CREATE'
         msg += ' STYLE=%s' % style
         msg += ' ID=%s' % id
         msg += ' DESTINATION=%s' % (privKey if privKey else 'TRANSIENT')
+        if localPort:
+            msg += ' FROM_PORT=%d' % localPort
         for key in options:
             msg += ' %s=%s' % (key, options[key])
         msg += '\n'
@@ -35,6 +37,7 @@ class SessionCreateReceiver(SAMReceiver):
             self.factory.style,
             self.factory.nickname,
             self.factory.privKey,
+            self.factory.localPort,
             self.factory.options)
         self.currentRule = 'State_create'
 
@@ -69,12 +72,13 @@ SessionCreateProtocol = makeProtocol(
 class SessionCreateFactory(SAMFactory):
     protocol = SessionCreateProtocol
 
-    def __init__(self, nickname, style='STREAM', keyfile=None, options={}):
+    def __init__(self, nickname, style='STREAM', keyfile=None, localPort=None, options={}):
         if style != 'STREAM':
             raise error.UnsupportedSocketType()
         self.nickname = nickname
         self.style = style
         self._keyfile = keyfile
+        self.localPort = localPort
         self.options = options
         self.deferred = defer.Deferred(self._cancel)
         self.samVersion = None
@@ -100,7 +104,7 @@ class SessionCreateFactory(SAMFactory):
             except IOError:
                 log.msg('Could not save private key to %s' % self._keyfile)
         # Now continue on with creation of SAMSession
-        self.deferred.callback((self.samVersion, self.style, self.nickname, proto, pubKey))
+        self.deferred.callback((self.samVersion, self.style, self.nickname, proto, pubKey, self.localPort))
 
 
 # Dictionary containing all active SAM sessions
@@ -185,14 +189,14 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
     if not samEndpoint:
         raise ValueError('A new session cannot be created without an API Endpoint')
 
-    def createSession((samVersion, style, id, proto, pubKey)):
+    def createSession((samVersion, style, id, proto, pubKey, localPort)):
         s = SAMSession()
         s.nickname = nickname
         s.samEndpoint = samEndpoint
         s.samVersion = samVersion
         s.style = style
         s.id = id
-        s.address = I2PAddress(pubKey)
+        s.address = I2PAddress(pubKey, port=localPort)
         s._proto = proto
         s._autoClose = autoClose
         _sessions[nickname] = s

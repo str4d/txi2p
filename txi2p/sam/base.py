@@ -149,9 +149,18 @@ class SAMFactory(ClientFactory):
         raise c.samErrorMap.get(result)(string=(message if message else result))
 
 
+class SAMI2PServerTunnelProtocol(I2PServerTunnelProtocol):
+    def setPeer(self, data):
+        peerInfo = data.split('\n')[0].split(' ')
+        peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
+        fromPort = peerOptions['FROM_PORT'] if peerOptions.has_key('FROM_PORT') else None
+        self.peer = I2PAddress(peerInfo[0], port=fromPort)
+        self.transport.peerAddr = self.peer
+
+
 @implementer(IProtocolFactory)
 class I2PFactoryWrapper(object):
-    protocol = I2PServerTunnelProtocol
+    protocol = SAMI2PServerTunnelProtocol
 
     def __init__(self, wrappedFactory, serverAddr):
         self.w = wrappedFactory

@@ -3,8 +3,6 @@ from twisted.internet import reactor
 from twisted.internet.endpoints import clientFromString
 from twisted.internet.protocol import ClientFactory, Protocol
 
-from txi2p.bob.endpoints import BOBI2PClientEndpoint
-
 
 class Eepsite(Protocol):
     def connectionMade(self):
@@ -23,7 +21,7 @@ class EepsiteFactory(ClientFactory):
     protocol = Eepsite
 
 
-endpoint = clientFromString(reactor, 'i2p:stats.i2p')
+endpoint = clientFromString(reactor, 'i2p:stats.i2p:81')
 d = endpoint.connect(EepsiteFactory())
 
 reactor.run()

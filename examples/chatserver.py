@@ -3,8 +3,6 @@ from twisted.internet.endpoints import serverFromString
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 
-from txi2p.bob.endpoints import BOBI2PServerEndpoint
-
 
 class Chat(LineReceiver):
 

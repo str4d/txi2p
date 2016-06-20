@@ -148,7 +148,7 @@ Supported arguments:
 Documentation
 =============
 
-Will be available soon at https://txi2p.readthedocs.org
+API documentation is available at https://txi2p.readthedocs.org
 
 .. |txi2p| replace:: ``txi2p``
 .. |clientFromString| replace:: ``clientFromString()``

@@ -253,7 +253,7 @@ class TestGetSession(unittest.TestCase):
         self.assertEqual(proto, s._proto)
         self.assertEqual(TEST_B64, s.address.destination)
         self.assertEqual(81, s.address.port)
-    test_getSession_newNickname.skip = skipSRO
+    test_getSession_newNickname_withPort.skip = skipSRO
 
     def test_getSession_newNickname_withoutEndpoint(self):
         proto = proto_helpers.AccumulatingProtocol()

@@ -12,11 +12,15 @@ from txi2p.sam.base import SAMSender, SAMReceiver, SAMFactory
 
 
 class StreamConnectSender(SAMSender):
-    def sendStreamConnect(self, id, destination):
+    def sendStreamConnect(self, id, destination, port=None, localPort=None):
         msg = 'STREAM CONNECT'
         msg += ' ID=%s' % id
         msg += ' DESTINATION=%s' % destination
         msg += ' SILENT=false'
+        if port:
+            msg += ' TO_PORT=%d' % port
+        if localPort:
+            msg += ' FROM_PORT=%d' % localPort
         msg += '\n'
         self.transport.write(msg)
 
@@ -35,7 +39,8 @@ class StreamConnectReceiver(SAMReceiver):
 
     def doConnect(self):
         self.sender.sendStreamConnect(
-            self.factory.session.id, self.factory.dest)
+            self.factory.session.id, self.factory.dest,
+            self.factory.port, self.factory.localPort)
         self.currentRule = 'State_connect'
 
     def connect(self, result, message=None):
@@ -56,16 +61,18 @@ StreamConnectProtocol = makeProtocol(
 class StreamConnectFactory(SAMFactory):
     protocol = StreamConnectProtocol
 
-    def __init__(self, clientFactory, session, host, dest):
+    def __init__(self, clientFactory, session, host, dest, port=None, localPort=None):
         self._clientFactory = clientFactory
         self.session = session
         self.host = host
         self.dest = dest
+        self.port = port
+        self.localPort = localPort
         self.deferred = Deferred(self._cancel);
 
     def streamConnectionEstablished(self, streamProto):
         self.session.addStream(streamProto)
-        proto = self._clientFactory.buildProtocol(I2PAddress(self.dest, self.host))
+        proto = self._clientFactory.buildProtocol(I2PAddress(self.dest, self.host, self.port))
         if proto is None:
             self.deferred.cancel()
             return

@@ -33,6 +33,30 @@ class TestStreamConnectProtocol(SAMProtocolTestMixin, unittest.TestCase):
             'STREAM CONNECT ID=foo DESTINATION=bar SILENT=false\n',
             proto.transport.value())
 
+    def test_streamConnectWithPortAfterHello(self):
+        fac, proto = self.makeProto()
+        fac.session = Mock()
+        fac.session.id = 'foo'
+        fac.dest = 'bar'
+        fac.port = 80
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        self.assertEquals(
+            'STREAM CONNECT ID=foo DESTINATION=bar SILENT=false TO_PORT=80\n',
+            proto.transport.value())
+
+    def test_streamConnectWithLocalPortAfterHello(self):
+        fac, proto = self.makeProto()
+        fac.session = Mock()
+        fac.session.id = 'foo'
+        fac.dest = 'bar'
+        fac.localPort = 34444
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        self.assertEquals(
+            'STREAM CONNECT ID=foo DESTINATION=bar SILENT=false FROM_PORT=34444\n',
+            proto.transport.value())
+
     def test_namingLookupAfterHello(self):
         fac, proto = self.makeProto()
         fac.dest = None

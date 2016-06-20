@@ -28,6 +28,21 @@ class TestI2PAddress(unittest.TestCase):
         addr = I2PAddress(TEST_B64, 'spam.i2p', '81')
         self.assertEqual((addr.destination, addr.host, addr.port), (TEST_B64, 'spam.i2p', 81))
 
+    def test_address_host_noPort(self):
+        addr = I2PAddress(TEST_B64, 'spam.i2p', 81)
+        addr2 = I2PAddress(addr, host='eggs.i2p')
+        self.assertEqual((addr2.destination, addr2.host, addr2.port), (TEST_B64, 'eggs.i2p', None))
+
+    def test_address_noHost_port(self):
+        addr = I2PAddress(TEST_B64, 'spam.i2p', 81)
+        addr2 = I2PAddress(addr, port=82)
+        self.assertEqual((addr2.destination, addr2.host, addr2.port), (TEST_B64, 'spam.i2p', 82))
+
+    def test_address_host_port(self):
+        addr = I2PAddress(TEST_B64, 'spam.i2p', 81)
+        addr2 = I2PAddress(addr, host='eggs.i2p', port=82)
+        self.assertEqual((addr2.destination, addr2.host, addr2.port), (TEST_B64, 'eggs.i2p', 82))
+
     def test_reprWithNoHostNoPort(self):
         addr = I2PAddress(TEST_B64)
         self.assertEqual(repr(addr), 'I2PAddress(%s)' % TEST_B32)

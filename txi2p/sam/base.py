@@ -67,8 +67,8 @@ class SAMReceiver(object):
         self.wrappedProto = proto
         self.transportWrapper = I2PTunnelTransport(
             self.sender.transport,
-            self.factory.session.address,
-            I2PAddress(self.factory.dest, self.factory.host))
+            I2PAddress(self.factory.session.address, port=self.factory.localPort),
+            I2PAddress(self.factory.dest, self.factory.host, self.factory.port))
         proto.makeConnection(self.transportWrapper)
 
     def dataReceived(self, data):

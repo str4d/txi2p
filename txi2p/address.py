@@ -14,7 +14,9 @@ class I2PAddress(FancyEqMixin, object):
     """An :class:`IAddress` that represents the address of an I2P Destination.
 
     Args:
-        destination (str): An I2P Destination string in I2P-style B64 format.
+        destination (str): An I2P Destination string in I2P-style B64 format, or
+            an :class:`I2PAddress`. In the latter case, the default host is also
+            taken from the provided address.
         host (str): An I2P host string; for example, ``'example.i2p'``.
         port (int): An integer representing the port number.
 
@@ -29,11 +31,16 @@ class I2PAddress(FancyEqMixin, object):
     compareAttributes = ('destination', 'port')
 
     def __init__(self, destination, host=None, port=None):
-        self.destination = destination
+        if hasattr(destination, 'destination'):
+            self.destination = destination.destination
+        else:
+            self.destination = destination
         self.port = int(port) if port else None
 
         if host:
             self.host = host
+        elif hasattr(destination, 'host'):
+            self.host = destination.host
         else:
             raw_key = base64.b64decode(destination, '-~')
             hash = hashlib.sha256(raw_key)

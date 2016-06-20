@@ -20,6 +20,8 @@ class SAMProtocolTestMixin(object):
         fac = ClientFactory(*a, **kw)
         fac.nickname = 'foo'
         fac.privKey = None
+        fac.port = None
+        fac.localPort = None
         fac.options = {}
         fac.protocol = protoClass
         fac.resultNotOK = Mock()

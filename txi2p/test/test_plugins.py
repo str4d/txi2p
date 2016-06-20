@@ -78,10 +78,11 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     def test_stringDescription_SAM(self):
         from twisted.internet.endpoints import clientFromString
         ep = clientFromString(
-            MemoryReactor(), "i2p:stats.i2p:81:api=SAM")
+            MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444")
         self.assertIsInstance(ep, SAMI2PStreamClientEndpoint)
         self.assertEqual(ep._host, "stats.i2p")
         self.assertEqual(ep._port, 81)
+        self.assertEqual(ep._localPort, 34444)
 
 
 class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):

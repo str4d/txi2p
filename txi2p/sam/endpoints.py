@@ -26,12 +26,16 @@ class SAMI2PStreamClientEndpoint(object):
         session (txi2p.sam.SAMSession): The SAM session to connect with.
         host (str): The I2P hostname or Destination to connect to.
         port (int): The port to connect to inside I2P. If unset or `None`, the
-            default (null) port is used. Ignored because SAM doesn't support
-            ports yet.
+            default (null) port is used. Ignored if the SAM server doesn't
+            support SAM v3.2 or higher.
+        localPort (int): The port to connect from inside I2P. This can be used
+            to distinguish between multiple connections to the same server. If
+            unset or `None`, the default (null) port is used. Ignored if the SAM
+            server doesn't support SAM v3.2 or higher.
     """
 
     @classmethod
-    def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, keyfile=None, options=None):
+    def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, keyfile=None, localPort=None, options=None):
         """Create an I2P client endpoint backed by the SAM API.
 
         If a SAM session for ``nickname`` already exists, it will be used, and
@@ -45,14 +49,18 @@ class SAMI2PStreamClientEndpoint(object):
                 endpoint that will connect to the SAM API.
             host (str): The I2P hostname or Destination to connect to.
             port (int): The port to connect to inside I2P. If unset or `None`,
-                the default (null) port is used. Ignored because SAM doesn't
-                support ports yet.
+                the default (null) port is used. Ignored if the SAM server
+                doesn't support SAM v3.2 or higher.
             nickname (str): The SAM session nickname.
             autoClose (bool): `true` if the session should close automatically
                 once no more connections are using it.
             keyfile (str): Path to a local file containing the keypair to use
                 for the session Destination. If non-existent, new keys will be
                 generated and stored.
+            localPort (int): The port to connect from inside I2P. This can be
+                used to distinguish between multiple connections to the same
+                server. If unset or `None`, the default (null) port is used.
+                Ignored if the SAM server doesn't support SAM v3.2 or higher.
             options (dict): I2CP options to configure the session with.
         """
         d = getSession(nickname,
@@ -60,11 +68,12 @@ class SAMI2PStreamClientEndpoint(object):
                        autoClose=autoClose,
                        keyfile=keyfile,
                        options=_parseOptions(options))
-        return cls(d, host, port)
+        return cls(d, host, port, localPort)
 
-    def __init__(self, session, host, port=None):
+    def __init__(self, session, host, port=None, localPort=None):
         self._host, self._dest = _parseHost(host)
         self._port = port
+        self._localPort = localPort
         if isinstance(session, SAMSession):
             self._session = session
         else:
@@ -85,7 +94,7 @@ class SAMI2PStreamClientEndpoint(object):
             if self._session.style != 'STREAM':
                 raise error.UnsupportedSocketType()
 
-            i2pFac = StreamConnectFactory(fac, self._session, self._host, self._dest)
+            i2pFac = StreamConnectFactory(fac, self._session, self._host, self._dest, self._port, self._localPort)
             d = self._session.samEndpoint.connect(i2pFac)
             # Once the SAM IProtocol is returned, wait for the
             # real IProtocol to be returned after tunnel creation,

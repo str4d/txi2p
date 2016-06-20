@@ -113,6 +113,7 @@ Supported arguments:
 * ``nickname``
 * ``autoClose``
 * ``keyfile``
+* ``localPort``
 * ``options``
 
 **BOB**

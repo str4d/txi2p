@@ -30,7 +30,7 @@ class SAMSender(object):
         self.transport = transport
 
     def sendHello(self):
-        self.transport.write('HELLO VERSION MIN=3.0 MAX=3.1\n')
+        self.transport.write('HELLO VERSION MIN=3.0 MAX=3.2\n')
 
     def sendNamingLookup(self, name):
         self.transport.write('NAMING LOOKUP NAME=%s\n' % name)

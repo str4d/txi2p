@@ -24,6 +24,12 @@ def cmpSAM(a, b):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
     return cmp(normalize(a), normalize(b))
 
+def peerSAM(data):
+    peerInfo = data.split('\n')[0].split(' ')
+    peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
+    fromPort = peerOptions['FROM_PORT'] if peerOptions.has_key('FROM_PORT') else None
+    return I2PAddress(peerInfo[0], port=fromPort)
+
 
 class SAMSender(object):
     def __init__(self, transport):
@@ -63,12 +69,16 @@ class SAMReceiver(object):
         self.factory = parser.factory
         self.sender.sendHello()
 
-    def wrapProto(self, proto):
+    def wrapProto(self, proto, peerAddress):
         self.wrappedProto = proto
+        if hasattr(self.factory, 'localPort'):
+            localAddress = I2PAddress(self.factory.session.address,
+                                      port=self.factory.localPort)
+        else:
+            localAddress = self.factory.session.address
         self.transportWrapper = I2PTunnelTransport(
             self.sender.transport,
-            I2PAddress(self.factory.session.address, port=self.factory.localPort),
-            I2PAddress(self.factory.dest, self.factory.host, self.factory.port))
+            localAddress, peerAddress)
         proto.makeConnection(self.transportWrapper)
 
     def dataReceived(self, data):
@@ -151,10 +161,7 @@ class SAMFactory(ClientFactory):
 
 class SAMI2PServerTunnelProtocol(I2PServerTunnelProtocol):
     def setPeer(self, data):
-        peerInfo = data.split('\n')[0].split(' ')
-        peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
-        fromPort = peerOptions['FROM_PORT'] if peerOptions.has_key('FROM_PORT') else None
-        self.peer = I2PAddress(peerInfo[0], port=fromPort)
+        self.peer = peerSAM(data)
         self.transport.peerAddr = self.peer
 
 

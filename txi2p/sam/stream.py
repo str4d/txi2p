@@ -10,7 +10,13 @@ from zope.interface import implementer
 from txi2p import grammar
 from txi2p.address import I2PAddress
 from txi2p.sam import constants as c
-from txi2p.sam.base import SAMSender, SAMReceiver, SAMFactory
+from txi2p.sam.base import (
+    cmpSAM,
+    peerSAM,
+    SAMSender,
+    SAMReceiver,
+    SAMFactory,
+)
 
 
 class StreamConnectSender(SAMSender):
@@ -81,6 +87,109 @@ class StreamConnectFactory(SAMFactory):
             return
         streamProto.wrapProto(proto, peerAddress)
         self.deferred.callback(proto)
+
+
+class StreamAcceptSender(SAMSender):
+    def sendStreamAccept(self, id):
+        msg = 'STREAM ACCEPT'
+        msg += ' ID=%s' % id
+        msg += ' SILENT=false'
+        msg += '\n'
+        self.transport.write(msg)
+
+
+class StreamAcceptReceiver(SAMReceiver):
+    peer = None
+    initialData = ''
+
+    def command(self):
+        self.sender.sendStreamAccept(
+            self.factory.session.id)
+        self.currentRule = 'State_accept'
+
+    def accept(self, result, message=None):
+        if result != c.RESULT_OK:
+            self.factory.resultNotOK(result, message)
+            return
+        self.factory.streamAcceptEstablished(self)
+        self.currentRule = 'State_readData'
+
+    def dataReceived(self, data):
+        if self.peer:
+            # Pass all other data to the wrapped Protocol.
+            if self.initialData:
+                data = self.initialData + data
+                self.initialData = None
+            self.wrappedProto.dataReceived(data)
+        else:
+            self.initialData += data
+            if '\n' in self.initialData:
+                # First line is the peer's Destination.
+                data, self.initialData = self.initialData.split('\n', 1)
+                self.peer = peerSAM(data)
+                self.factory.streamAcceptIncoming(self)
+
+
+StreamAcceptProtocol = makeProtocol(
+    grammar.samGrammarSource,
+    StreamAcceptSender,
+    StreamAcceptReceiver)
+
+
+class StreamAcceptFactory(SAMFactory):
+    protocol = StreamAcceptProtocol
+
+    def __init__(self, clientFactory, session, listeningPort):
+        self._clientFactory = clientFactory
+        self.session = session
+        self.listeningPort = listeningPort
+        self.deferred = Deferred(self._cancel);
+
+    def streamAcceptEstablished(self, streamProto):
+        self.session.addStream(streamProto)
+        self.listeningPort.addAccept(streamProto)
+
+    def streamAcceptIncoming(self, streamProto):
+        self.listeningPort.removeAccept(streamProto)
+        proto = self._clientFactory.buildProtocol(streamProto.peer)
+        if proto is None:
+            self.deferred.cancel()
+            return
+        streamProto.wrapProto(proto, streamProto.peer)
+
+
+@implementer(IListeningPort)
+class StreamAcceptPort(object):
+    def __init__(self, session, factory):
+        self.session = session
+        self.factory = StreamAcceptFactory(factory, session, self)
+        self.accepts = []
+
+    def startListening(self):
+        if cmpSAM(self.session.samVersion, '3.2') >= 0:
+            active = 8
+        else:
+            active = 1
+        for i in range(0, active):
+            self.openAccept()
+
+    def stopListening(self):
+        for pending in self.accepts:
+            pending.sender.transport.loseConnection()
+        self.accepts = []
+
+    def openAccept(self):
+        self.session.samEndpoint.connect(self.factory)
+
+    def addAccept(self, proto):
+        self.accepts.append(proto)
+
+    def removeAccept(self, proto):
+        self.accepts.remove(proto)
+        self.openAccept()
+
+    def getHost(self):
+        return self.session.address
 
 
 class StreamForwardSender(SAMSender):

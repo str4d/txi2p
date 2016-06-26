@@ -7,7 +7,12 @@ from zope.interface import implementer
 
 from txi2p.sam.base import I2PFactoryWrapper
 from txi2p.sam.session import SAMSession, getSession
-from txi2p.sam.stream import StreamConnectFactory, StreamForwardFactory, StreamForwardPort
+from txi2p.sam.stream import (
+    StreamConnectFactory,
+    StreamAcceptPort,
+    StreamForwardFactory,
+    StreamForwardPort,
+)
 
 
 def _parseHost(host):
@@ -173,6 +178,14 @@ class SAMI2PStreamServerEndpoint(object):
         will immediately close.
         """
 
+        def createAcceptingStream(val):
+            if self._session.style != 'STREAM':
+                raise error.UnsupportedSocketType()
+
+            p = StreamAcceptPort(self._session, fac)
+            p.startListening()
+            return p
+
         def createForwardingStream(val):
             if self._session.style != 'STREAM':
                 raise error.UnsupportedSocketType()
@@ -198,11 +211,11 @@ class SAMI2PStreamServerEndpoint(object):
             return d
 
         if self._session:
-            return createForwardingStream(None)
+            return createAcceptingStream(None)
 
         def saveSession(session):
             self._session = session
             return None
         self._sessionDeferred.addCallback(saveSession)
-        self._sessionDeferred.addCallback(createForwardingStream)
+        self._sessionDeferred.addCallback(createAcceptingStream)
         return self._sessionDeferred

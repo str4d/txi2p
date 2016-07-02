@@ -152,8 +152,10 @@ Important changes
 ---
 
 * Ports are now supported on the SAM API.
+
   * Previous ``port`` options are no longer ignored.
   * New ``localPort`` option for setting the client's local port.
+
 * The ``SAMI2PStreamServerEndpoint`` API has changed to no longer require a
   reactor.
 

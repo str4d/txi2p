@@ -123,12 +123,11 @@ class SAMI2PStreamServerEndpoint(object):
     """I2P server endpoint backed by the SAM API.
 
     Args:
-        reactor: The server endpoint will be constructed with this reactor.
         session (txi2p.sam.SAMSession): The SAM session to listen on.
     """
 
     @classmethod
-    def new(cls, reactor, samEndpoint, keyfile, port=None, nickname=None, autoClose=False, options=None):
+    def new(cls, samEndpoint, keyfile, port=None, nickname=None, autoClose=False, options=None):
         """Create an I2P server endpoint backed by the SAM API.
 
         If a SAM session for ``nickname`` already exists, it will be used, and
@@ -138,7 +137,6 @@ class SAMI2PStreamServerEndpoint(object):
         the same SAM session.
 
         Args:
-            reactor: The server endpoint will be constructed with this reactor.
             samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
                 endpoint that will connect to the SAM API.
             keyfile (str): Path to a local file containing the keypair to use
@@ -158,10 +156,9 @@ class SAMI2PStreamServerEndpoint(object):
                        keyfile=keyfile,
                        localPort=port,
                        options=_parseOptions(options))
-        return cls(reactor, d)
+        return cls(d)
 
-    def __init__(self, reactor, session):
-        self._reactor = reactor
+    def __init__(self, session):
         if isinstance(session, SAMSession):
             self._session = session
         else:
@@ -186,29 +183,29 @@ class SAMI2PStreamServerEndpoint(object):
             p.startListening()
             return p
 
-        def createForwardingStream(val):
-            if self._session.style != 'STREAM':
-                raise error.UnsupportedSocketType()
-
-            serverEndpoint = serverFromString(self._reactor,
-                                              'tcp:0:interface=127.0.0.1')
-            wrappedFactory = I2PFactoryWrapper(fac, self._session.address)
-            d = serverEndpoint.listen(wrappedFactory)
-
-            def setupForward(port):
-                local_port = port.getHost().port
-                i2pFac = StreamForwardFactory(self._session, local_port)
-                d2 = self._session.samEndpoint.connect(i2pFac)
-                d2.addCallback(lambda proto: i2pFac.deferred)
-                d2.addCallback(lambda forwardingProto: (port, forwardingProto))
-                return d2
-
-            def handlePort((port, forwardingProto)):
-                return StreamForwardPort(port, forwardingProto, self._session.address)
-
-            d.addCallback(setupForward)
-            d.addCallback(handlePort)
-            return d
+#        def createForwardingStream(val):
+#            if self._session.style != 'STREAM':
+#                raise error.UnsupportedSocketType()
+#
+#            serverEndpoint = serverFromString(self._reactor,
+#                                              'tcp:0:interface=127.0.0.1')
+#            wrappedFactory = I2PFactoryWrapper(fac, self._session.address)
+#            d = serverEndpoint.listen(wrappedFactory)
+#
+#            def setupForward(port):
+#                local_port = port.getHost().port
+#                i2pFac = StreamForwardFactory(self._session, local_port)
+#                d2 = self._session.samEndpoint.connect(i2pFac)
+#                d2.addCallback(lambda proto: i2pFac.deferred)
+#                d2.addCallback(lambda forwardingProto: (port, forwardingProto))
+#                return d2
+#
+#            def handlePort((port, forwardingProto)):
+#                return StreamForwardPort(port, forwardingProto, self._session.address)
+#
+#            d.addCallback(setupForward)
+#            d.addCallback(handlePort)
+#            return d
 
         if self._session:
             return createAcceptingStream(None)

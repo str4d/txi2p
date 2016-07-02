@@ -36,7 +36,7 @@ To connect to an I2P site::
     from txi2p.sam import SAMI2PStreamClientEndpoint
 
     samEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:7656')
-    endpoint = SAMI2PStreamClientEndpoint.new(reactor, samEndpoint, 'stats.i2p')
+    endpoint = SAMI2PStreamClientEndpoint.new(samEndpoint, 'stats.i2p')
     d = endpoint.connect(factory)
 
 To have a server listen on an I2P Destination::
@@ -46,7 +46,7 @@ To have a server listen on an I2P Destination::
     from txi2p.sam import SAMI2PStreamServerEndpoint
 
     samEndpoint = clientFromString(reactor, 'tcp:127.0.0.1:7656')
-    endpoint = SAMI2PStreamServerEndpoint.new(reactor, samEndpoint, '/path/to/keyfile')
+    endpoint = SAMI2PStreamServerEndpoint.new(samEndpoint, '/path/to/keyfile')
     d = endpoint.listen(factory)
 
 Using endpoint strings

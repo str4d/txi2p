@@ -82,7 +82,7 @@ class I2PServerParser(object):
                      nickname=None,
                      autoClose=False,
                      options=None):
-        return SAMI2PStreamServerEndpoint.new(reactor,
+        return SAMI2PStreamServerEndpoint.new(
             clientFromString(reactor, samEndpoint),
             keyfile, port, nickname, autoClose, options)
 

@@ -22,7 +22,6 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
     """
 
     def test_samConnectionFailed(self):
-        reactor = object()
         samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
         endpoint = endpoints.SAMI2PStreamClientEndpoint.new(samEndpoint, '')
         d = endpoint.connect(None)
@@ -30,7 +29,6 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
 
 
     def test_streamConnect(self):
-        reactor = object()
         samEndpoint = FakeEndpoint()
         session = SAMSession()
         session.nickname = 'foo'
@@ -50,15 +48,13 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
     """
 
     def test_samConnectionFailed(self):
-        reactor = object()
         samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
-        endpoint = endpoints.SAMI2PStreamServerEndpoint.new(reactor, samEndpoint, '')
+        endpoint = endpoints.SAMI2PStreamServerEndpoint.new(samEndpoint, '')
         d = endpoint.listen(None)
         return self.assertFailure(d, ConnectionRefusedError)
 
 
     def test_streamListen(self):
-        reactor = proto_helpers.MemoryReactor()
         samEndpoint = FakeEndpoint()
         session = SAMSession()
         session.nickname = 'foo'
@@ -66,6 +62,6 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
         session.samVersion = '3.1'
         session.id = 'foo'
         session._autoClose = True
-        endpoint = endpoints.SAMI2PStreamServerEndpoint(reactor, session)
+        endpoint = endpoints.SAMI2PStreamServerEndpoint(session)
         endpoint.listen(None)
         self.assertSubstring('HELLO VERSION', samEndpoint.transport.value())

@@ -130,4 +130,3 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         ep = serverFromString(
             MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM")
         self.assertIsInstance(ep, SAMI2PStreamServerEndpoint)
-        self.assertIsInstance(ep._reactor, MemoryReactor)

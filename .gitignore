@@ -3,7 +3,12 @@
 *.swp
 *~
 
+.coverage
+.eggs/
+.tox/
+coverage/
 dropin.cache
+env/
 _trial_temp/
 
 build/

@@ -10,7 +10,7 @@ env:
   - TWISTED=Twisted==14.0
   - TWISTED=Twisted==15.2
   - TWISTED=Twisted==16.4
-  - TWISTED=https://github.com/twisted/twisted.git
+  - TWISTED=git+https://github.com/twisted/twisted.git
 
 python:
   - 2.7

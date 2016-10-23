@@ -8,7 +8,8 @@ env:
   - TWISTED=Twisted==13.2
   - TWISTED=Twisted==14.0
   - TWISTED=Twisted==15.2
-  - TWISTED=Twisted==16.4
+  - TWISTED=Twisted==16.2
+  - TWISTED=Twisted==16.3
   - TWISTED=git+https://github.com/twisted/twisted.git
 
 python:

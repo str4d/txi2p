@@ -2,6 +2,14 @@
 txi2p
 =====
 
+.. image:: https://api.travis-ci.org/str4d/txi2p.svg?branch=master
+    :target: https://www.travis-ci.org/str4d/txi2p
+    :alt: travis
+
+.. image:: https://coveralls.io/repos/github/str4d/txi2p/badge.svg?branch=master
+    :target: https://coveralls.io/github/str4d/txi2p?branch=master
+    :alt: coveralls
+
 |txi2p| is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
 10.1 or greater.
 

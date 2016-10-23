@@ -39,4 +39,14 @@ matrix:
     - env: TOX_ENV=py27-twtrunk
     - env: TOX_ENV=pypy-twtrunk
     # pypy is a bit sporadic
-    - python: pypy
+    - env: TOX_ENV=pypy-tw102
+    - env: TOX_ENV=pypy-tw111
+    - env: TOX_ENV=pypy-tw120
+    - env: TOX_ENV=pypy-tw123
+    - env: TOX_ENV=pypy-tw132
+    - env: TOX_ENV=pypy-tw140
+    - env: TOX_ENV=pypy-tw152
+    - env: TOX_ENV=pypy-tw162
+    - env: TOX_ENV=pypy-tw163
+    - env: TOX_ENV=pypy-tw164
+    - env: TOX_ENV=pypy-twcurrent

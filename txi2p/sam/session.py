@@ -277,3 +277,45 @@ def generateDestination(keyfile, samEndpoint):
     d = samEndpoint.connect(destFac)
     d.addCallback(lambda proto: destFac.deferred)
     return d
+
+
+class TestAPIReceiver(SAMReceiver):
+    def command(self):
+        self.factory.samConnected()
+        self.sender.transport.loseConnection()
+
+
+# A Protocol for testing whether a SAM API is reachable
+TestAPIProtocol = makeProtocol(
+    grammar.samGrammarSource,
+    SAMSender,
+    TestAPIReceiver)
+
+
+class TestAPIFactory(SAMFactory):
+    protocol = TestAPIProtocol
+
+    def __init__(self):
+        self.deferred = defer.Deferred(self._cancel)
+
+    def samConnected(self):
+        self.deferred.callback(True)
+
+
+def testAPI(samEndpoint):
+    """Test whether a SAM API is reachable.
+
+    The function returns a :class:`twisted.internet.defer.Deferred`; register
+    callbacks to receive the return value or errors.
+
+    Args:
+        samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
+            endpoint that may connect to the SAM API.
+
+    Returns:
+        True if the API is reachable.
+    """
+    testFac = TestAPIFactory()
+    d = samEndpoint.connect(testFac)
+    d.addCallback(lambda proto: testFac.deferred)
+    return d

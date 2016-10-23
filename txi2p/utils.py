@@ -26,6 +26,36 @@ def getApi(api, apiEndpoint, apiDict):
     return (api, apiEndpoint)
 
 
+_apiTesters = {
+    'SAM': sam.testAPI,
+}
+
+def testAPI(reactor, api=None, apiEndpoint=None):
+    """Test whether an API is reachable.
+
+    The function returns a :class:`twisted.internet.defer.Deferred`; register
+    callbacks to receive the return value or errors.
+
+    Args:
+        reactor: The API endpoint will be constructed with this reactor.
+        api (str): The API to test.
+        apiEndpoint (str): An endpoint string that may connect to the API.
+            Alternatively, the caller can directly provide an
+            :class:`twisted.internet.interfaces.IStreamClientEndpoint`, and the
+            ``reactor`` will be ignored.
+
+    Returns:
+        True if the API is reachable.
+
+    Raises:
+        ValueError: if the API doesn't support this method.
+    """
+    api, apiEndpoint = getApi(api, apiEndpoint, _apiTesters)
+    if isinstance(apiEndpoint, str):
+        apiEndpoint = clientFromString(reactor, apiEndpoint)
+    return _apiTesters[api](apiEndpoint)
+
+
 _apiGenerators = {
     'SAM': sam.generateDestination,
 }

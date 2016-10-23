@@ -367,3 +367,40 @@ class TestGenerateDestination(unittest.TestCase):
         self.assertEqual(1, samEndpoint.called)
         self.assertEqual(I2PAddress(TEST_B64), s)
     test_generateDestination.skip = skipSRO
+
+
+class TestTestAPIProtocol(SAMProtocolTestMixin, unittest.TestCase):
+    protocol = session.TestAPIProtocol
+
+    def test_samConnected(self):
+        fac, proto = self.makeProto()
+        fac.samConnected = Mock()
+        proto.transport.clear()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        fac.samConnected.assert_called_with()
+
+
+class TestTestAPIFactory(SAMFactoryTestMixin, unittest.TestCase):
+    factory = session.TestAPIFactory
+    blankFactoryArgs = []
+
+    def test_samConnected(self):
+        mreactor = proto_helpers.MemoryReactor()
+        fac, proto = self.makeProto()
+        proto.dataReceived('HELLO REPLY RESULT=OK VERSION=3.1\n')
+        s = self.successResultOf(fac.deferred)
+        self.assertEqual(True, s)
+    test_samConnected.skip = skipSRO
+
+
+class TestTestAPI(unittest.TestCase):
+    def test_testAPI(self):
+        proto = proto_helpers.AccumulatingProtocol()
+        samEndpoint = FakeEndpoint()
+        samEndpoint.deferred = defer.succeed(None)
+        samEndpoint.facDeferred = defer.succeed(True)
+        d = session.testAPI(samEndpoint)
+        s = self.successResultOf(d)
+        self.assertEqual(1, samEndpoint.called)
+        self.assertEqual(True, s)
+    test_testAPI.skip = skipSRO

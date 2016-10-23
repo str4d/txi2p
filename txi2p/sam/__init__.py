@@ -6,4 +6,5 @@ from .session import (
     SAMSession,
     generateDestination,
     getSession,
+    testAPI,
 )

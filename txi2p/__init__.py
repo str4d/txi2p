@@ -4,4 +4,4 @@ except ImportError:
     __version__ = __revision__ = None
 
 from txi2p.address import I2PAddress
-from txi2p.utils import generateDestination
+from txi2p.utils import generateDestination, testAPI

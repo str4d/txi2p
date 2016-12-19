@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+import mock
 from twisted.internet import interfaces
 from twisted.python.versions import Version
 from twisted.test.proto_helpers import MemoryReactor
@@ -17,6 +18,10 @@ if twisted.version < Version('twisted', 14, 0, 0):
     skip = 'txi2p.plugins requires twisted 14.0 or newer'
 else:
     skip = None
+
+
+def fakeSession(nickname, **kwargs):
+    return mock.Mock()
 
 
 class I2PPluginTestMixin(object):
@@ -61,8 +66,9 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
 
     def test_stringDescription_default(self):
         from twisted.internet.endpoints import clientFromString
-        ep = clientFromString(
-            MemoryReactor(), "i2p:stats.i2p")
+        with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
+            ep = clientFromString(
+                MemoryReactor(), "i2p:stats.i2p")
         self.assertIsInstance(ep, SAMI2PStreamClientEndpoint)
 
     def test_stringDescription_BOB(self):
@@ -77,8 +83,9 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
 
     def test_stringDescription_SAM(self):
         from twisted.internet.endpoints import clientFromString
-        ep = clientFromString(
-            MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444")
+        with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
+            ep = clientFromString(
+                MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444")
         self.assertIsInstance(ep, SAMI2PStreamClientEndpoint)
         self.assertEqual(ep._host, "stats.i2p")
         self.assertEqual(ep._port, 81)
@@ -111,8 +118,9 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
 
     def test_stringDescription_default(self):
         from twisted.internet.endpoints import serverFromString
-        ep = serverFromString(
-            MemoryReactor(), "i2p:/tmp/testkeys.foo")
+        with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
+            ep = serverFromString(
+                MemoryReactor(), "i2p:/tmp/testkeys.foo")
         self.assertIsInstance(ep, SAMI2PStreamServerEndpoint)
 
     def test_stringDescription_BOB(self):
@@ -127,6 +135,7 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
 
     def test_stringDescription_SAM(self):
         from twisted.internet.endpoints import serverFromString
-        ep = serverFromString(
-            MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM")
+        with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
+            ep = serverFromString(
+                MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM")
         self.assertIsInstance(ep, SAMI2PStreamServerEndpoint)

@@ -115,9 +115,6 @@ class StreamAcceptReceiver(SAMReceiver):
     def dataReceived(self, data):
         if self.peer:
             # Pass all other data to the wrapped Protocol.
-            if self.initialData:
-                data = self.initialData + data
-                self.initialData = None
             self.wrappedProto.dataReceived(data)
         else:
             self.initialData += data
@@ -125,7 +122,12 @@ class StreamAcceptReceiver(SAMReceiver):
                 # First line is the peer's Destination.
                 data, self.initialData = self.initialData.split('\n', 1)
                 self.peer = peerSAM(data)
+                # Create the wrapped Protocol...
                 self.factory.streamAcceptIncoming(self)
+                # ... and pass through any initial data.
+                if self.initialData:
+                    data, self.initialData = self.initialData, None
+                    self.wrappedProto.dataReceived(data)
 
 
 StreamAcceptProtocol = makeSAMProtocol(

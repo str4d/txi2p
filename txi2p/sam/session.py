@@ -109,6 +109,8 @@ class SessionCreateFactory(SAMFactory):
 
 # Dictionary containing all active SAM sessions
 _sessions = {}
+# Dictionary containing all pending SAM sessions
+_pending_sessions = {}
 
 
 class SAMSession(object):
@@ -185,6 +187,13 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
     """
     if _sessions.has_key(nickname):
         return defer.succeed(_sessions[nickname])
+    elif _pending_sessions.has_key(nickname):
+        def cancel(d):
+            if _pending_sessions.has_key(nickname) and d in _pending_sessions[nickname]:
+                _pending_sessions[nickname].remove(d)
+        d = defer.Deferred(cancel)
+        _pending_sessions[nickname].append(d)
+        return d
 
     if not samEndpoint:
         raise ValueError('A new session cannot be created without an API Endpoint')
@@ -200,13 +209,26 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
         s._proto = proto
         s._autoClose = autoClose
         _sessions[nickname] = s
+
+        waiting = _pending_sessions.pop(nickname, [])
+        for d in waiting:
+            d.callback(s)
+
         return s
 
+    def errbackPending(f):
+        waiting = _pending_sessions.pop(nickname, [])
+        for d in waiting:
+            d.errback(f)
+        return f
+
+    _pending_sessions[nickname] = []
     sessionFac = SessionCreateFactory(nickname, **kwargs)
     d = samEndpoint.connect(sessionFac)
     # Force caller to wait until the session is actually created
     d.addCallback(lambda proto: sessionFac.deferred)
     d.addCallback(createSession)
+    d.addErrback(errbackPending)
     return d
 
 

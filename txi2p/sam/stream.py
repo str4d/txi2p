@@ -1,18 +1,17 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-from parsley import makeProtocol
 from twisted.internet.defer import Deferred
 from twisted.internet.error import ConnectError, UnknownHostError
 from twisted.internet.interfaces import IListeningPort
 from zope.interface import implementer
 
-from txi2p import grammar
 from txi2p.address import I2PAddress
 from txi2p.sam import constants as c
 from txi2p.sam.base import (
     cmpSAM,
     peerSAM,
+    makeSAMProtocol,
     SAMSender,
     SAMReceiver,
     SAMFactory,
@@ -60,8 +59,7 @@ class StreamConnectReceiver(SAMReceiver):
         self.currentRule = 'State_readData'
 
 
-StreamConnectProtocol = makeProtocol(
-    grammar.samGrammarSource,
+StreamConnectProtocol = makeSAMProtocol(
     StreamConnectSender,
     StreamConnectReceiver)
 
@@ -130,8 +128,7 @@ class StreamAcceptReceiver(SAMReceiver):
                 self.factory.streamAcceptIncoming(self)
 
 
-StreamAcceptProtocol = makeProtocol(
-    grammar.samGrammarSource,
+StreamAcceptProtocol = makeSAMProtocol(
     StreamAcceptSender,
     StreamAcceptReceiver)
 
@@ -218,8 +215,7 @@ class StreamForwardReceiver(SAMReceiver):
         self.factory.streamForwardEstablished(self)
 
 
-StreamForwardProtocol = makeProtocol(
-    grammar.samGrammarSource,
+StreamForwardProtocol = makeSAMProtocol(
     StreamForwardSender,
     StreamForwardReceiver)
 

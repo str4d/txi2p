@@ -1,6 +1,9 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+import functools
+from ometa.grammar import OMeta
+from ometa.protocol import ParserProtocol
 import re
 import time
 from twisted.internet import reactor
@@ -9,6 +12,7 @@ from twisted.internet.protocol import ClientFactory
 from twisted.python.failure import Failure
 from zope.interface import implementer
 
+from txi2p import grammar
 from txi2p.address import (
     I2PAddress,
     I2PServerTunnelProtocol,
@@ -29,6 +33,24 @@ def peerSAM(data):
     peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
     fromPort = peerOptions['FROM_PORT'] if peerOptions.has_key('FROM_PORT') else None
     return I2PAddress(peerInfo[0], port=fromPort)
+
+
+class SAMParserProtocol(ParserProtocol):
+    def __init__(self, *args):
+        ParserProtocol.__init__(self, *args)
+
+    def dataReceived(self, data):
+        if self.receiver.currentRule == 'State_readData':
+            # Shortcut for efficiency
+            self.receiver.dataReceived(data)
+        else:
+            ParserProtocol.dataReceived(self, data)
+
+
+def makeSAMProtocol(senderFactory, receiverFactory):
+    g = OMeta(grammar.samGrammarSource).parseGrammar('Grammar')
+    return functools.partial(
+        SAMParserProtocol, g, senderFactory, receiverFactory, {})
 
 
 class SAMSender(object):

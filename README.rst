@@ -159,7 +159,7 @@ Important changes
 =================
 
 0.3.2 (upcoming)
----
+----------------
 
 * The default signature type for new Destinations is Ed25519.
 

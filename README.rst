@@ -123,6 +123,7 @@ Supported arguments:
 * ``keyfile``
 * ``localPort``
 * ``options``
+* ``sigType``
 
 **BOB**
 
@@ -145,6 +146,7 @@ Supported arguments:
 * ``nickname``
 * ``autoClose``
 * ``options``
+* ``sigType``
 
 **BOB**
 

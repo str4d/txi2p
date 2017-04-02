@@ -23,6 +23,7 @@ class SAMProtocolTestMixin(object):
         fac.port = None
         fac.localPort = None
         fac.options = {}
+        fac.sigType = None
         fac.protocol = protoClass
         fac.resultNotOK = Mock()
         def raise_(ex):

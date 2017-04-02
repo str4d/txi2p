@@ -40,7 +40,7 @@ class SAMI2PStreamClientEndpoint(object):
     """
 
     @classmethod
-    def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, keyfile=None, localPort=None, options=None):
+    def new(cls, samEndpoint, host, port=None, nickname=None, autoClose=False, keyfile=None, localPort=None, options=None, sigType=None):
         """Create an I2P client endpoint backed by the SAM API.
 
         If a SAM session for ``nickname`` already exists, it will be used, and
@@ -67,12 +67,16 @@ class SAMI2PStreamClientEndpoint(object):
                 server. If unset or `None`, the default (null) port is used.
                 Ignored if the SAM server doesn't support SAM v3.2 or higher.
             options (dict): I2CP options to configure the session with.
+            sigType (str): The SigType to use if generating a new Destination.
+                Defaults to Ed25519 if supported, falling back to
+                ECDSA_SHA256_P256 and then DSA_SHA1.
         """
         d = getSession(nickname,
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        keyfile=keyfile,
-                       options=_parseOptions(options))
+                       options=_parseOptions(options),
+                       sigType=sigType)
         return cls(d, host, port, localPort)
 
     def __init__(self, session, host, port=None, localPort=None):
@@ -127,7 +131,7 @@ class SAMI2PStreamServerEndpoint(object):
     """
 
     @classmethod
-    def new(cls, samEndpoint, keyfile, port=None, nickname=None, autoClose=False, options=None):
+    def new(cls, samEndpoint, keyfile, port=None, nickname=None, autoClose=False, options=None, sigType=None):
         """Create an I2P server endpoint backed by the SAM API.
 
         If a SAM session for ``nickname`` already exists, it will be used, and
@@ -149,13 +153,17 @@ class SAMI2PStreamServerEndpoint(object):
             autoClose (bool): `true` if the session should close automatically
                 once no more connections are using it.
             options (dict): I2CP options to configure the session with.
+            sigType (str): The SigType to use if generating a new Destination.
+                Defaults to Ed25519 if supported, falling back to
+                ECDSA_SHA256_P256 and then DSA_SHA1.
         """
         d = getSession(nickname,
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        keyfile=keyfile,
                        localPort=port,
-                       options=_parseOptions(options))
+                       options=_parseOptions(options),
+                       sigType=sigType)
         return cls(d)
 
     def __init__(self, session):

@@ -21,7 +21,10 @@ else:
 
 
 def fakeSession(nickname, **kwargs):
-    return mock.Mock()
+    m = mock.Mock()
+    m.nickname = nickname
+    m.kwargs = kwargs
+    return m
 
 
 class I2PPluginTestMixin(object):
@@ -85,11 +88,12 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         from twisted.internet.endpoints import clientFromString
         with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
             ep = clientFromString(
-                MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444")
+                MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444:sigType=foobar")
         self.assertIsInstance(ep, SAMI2PStreamClientEndpoint)
         self.assertEqual(ep._host, "stats.i2p")
         self.assertEqual(ep._port, 81)
         self.assertEqual(ep._localPort, 34444)
+        self.assertEqual(ep._sessionDeferred.kwargs['sigType'], 'foobar')
 
 
 class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
@@ -137,5 +141,6 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
         from twisted.internet.endpoints import serverFromString
         with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
             ep = serverFromString(
-                MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM")
+                MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM:sigType=foobar")
         self.assertIsInstance(ep, SAMI2PStreamServerEndpoint)
+        self.assertEqual(ep._sessionDeferred.kwargs['sigType'], 'foobar')

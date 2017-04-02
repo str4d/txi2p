@@ -13,11 +13,13 @@ from txi2p.sam.base import cmpSAM, SAMSender, SAMReceiver, SAMFactory
 
 
 class SessionCreateSender(SAMSender):
-    def sendSessionCreate(self, style, id, privKey=None, localPort=None, options={}):
+    def sendSessionCreate(self, samVersion, style, id, privKey=None, localPort=None, options={}, sigType=None):
         msg = 'SESSION CREATE'
         msg += ' STYLE=%s' % style
         msg += ' ID=%s' % id
         msg += ' DESTINATION=%s' % (privKey if privKey else 'TRANSIENT')
+        if cmpSAM(samVersion, '3.1') >= 0 and not privKey:
+            msg += ' SIGNATURE_TYPE=%s' % (sigType and sigType or c.DEFAULT_SIGTYPE)
         if localPort:
             msg += ' FROM_PORT=%d' % localPort
         for key in options:
@@ -34,16 +36,32 @@ class SessionCreateReceiver(SAMReceiver):
             self.factory.nickname = 'txi2p-%d' % os.getpid()
 
         self.sender.sendSessionCreate(
+            self.factory.samVersion,
             self.factory.style,
             self.factory.nickname,
             self.factory.privKey,
             self.factory.localPort,
-            self.factory.options)
+            self.factory.options,
+            self.factory.sigType)
         self.currentRule = 'State_create'
 
     def create(self, result, destination=None, message=None):
         if result != c.RESULT_OK:
-            self.factory.resultNotOK(result, message)
+            # If the user didn't specify a SigType, try falling back
+            if cmpSAM(self.factory.samVersion, '3.1') >= 0 and \
+                    message.startswith('SIGNATURE_TYPE') and \
+                    not self.factory.sigType:
+                fallback = 'ECDSA_SHA256_P256' in message and 'DSA_SHA1' or 'ECDSA_SHA256_P256'
+                self.sender.sendSessionCreate(
+                    self.factory.samVersion,
+                    self.factory.style,
+                    self.factory.nickname,
+                    self.factory.privKey,
+                    self.factory.localPort,
+                    self.factory.options,
+                    fallback)
+            else:
+                self.factory.resultNotOK(result, message)
             return
 
         self.factory.privKey = destination
@@ -72,7 +90,7 @@ SessionCreateProtocol = makeProtocol(
 class SessionCreateFactory(SAMFactory):
     protocol = SessionCreateProtocol
 
-    def __init__(self, nickname, style='STREAM', keyfile=None, localPort=None, options={}):
+    def __init__(self, nickname, style='STREAM', keyfile=None, localPort=None, options={}, sigType=None):
         if style != 'STREAM':
             raise error.UnsupportedSocketType()
         self.nickname = nickname
@@ -80,6 +98,7 @@ class SessionCreateFactory(SAMFactory):
         self._keyfile = keyfile
         self.localPort = localPort
         self.options = options
+        self.sigType = sigType
         self.deferred = defer.Deferred(self._cancel)
         self.samVersion = None
         self.privKey = None
@@ -233,16 +252,35 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
 
 
 class DestGenerateSender(SAMSender):
-    def sendDestGenerate(self):
-        self.transport.write('DEST GENERATE\n')
+    def sendDestGenerate(self, samVersion, sigType=None):
+        msg = 'DEST GENERATE'
+        if cmpSAM(samVersion, '3.1') >= 0:
+            msg += ' SIGNATURE_TYPE=%s' % (sigType and sigType or 'EdDSA_SHA512_Ed25519')
+        msg += '\n'
+        self.transport.write(msg)
 
 
 class DestGenerateReceiver(SAMReceiver):
     def command(self):
-        self.sender.sendDestGenerate()
+        self.sender.sendDestGenerate(
+            self.factory.samVersion,
+            self.factory.sigType)
         self.currentRule = 'State_dest'
 
-    def destGenerated(self, pub, priv):
+    def destGenerated(self, result=None, pub=None, priv=None, message=None):
+        if result:
+            # If the user didn't specify a SigType, try falling back
+            if cmpSAM(self.factory.samVersion, '3.1') >= 0 and \
+                    message.startswith('SIGNATURE_TYPE') and \
+                    not self.factory.sigType:
+                fallback = 'ECDSA_SHA256_P256' in message and 'DSA_SHA1' or 'ECDSA_SHA256_P256'
+                self.sender.sendDestGenerate(
+                    self.factory.samVersion,
+                    fallback)
+            else:
+                self.factory.resultNotOK(result, message)
+            return
+
         self.factory.destGenerated(pub, priv)
         self.sender.transport.loseConnection()
 
@@ -257,8 +295,9 @@ DestGenerateProtocol = makeProtocol(
 class DestGenerateFactory(SAMFactory):
     protocol = DestGenerateProtocol
 
-    def __init__(self, keyfile):
+    def __init__(self, keyfile, sigType=None):
         self._keyfile = keyfile
+        self.sigType = sigType
         self.deferred = defer.Deferred(self._cancel)
 
     def destGenerated(self, pubKey, privKey):
@@ -275,7 +314,7 @@ class DestGenerateFactory(SAMFactory):
             self.deferred.errback(failure.Failure(e))
 
 
-def generateDestination(keyfile, samEndpoint):
+def generateDestination(keyfile, samEndpoint, sigType=None):
     """Generate a new I2P Destination.
 
     The function returns a :class:`twisted.internet.defer.Deferred`; register
@@ -286,6 +325,8 @@ def generateDestination(keyfile, samEndpoint):
             Destination should be stored.
         samEndpoint (twisted.internet.interfaces.IStreamClientEndpoint): An
             endpoint that will connect to the SAM API.
+        sigType (str): The SigType to generate. Defaults to Ed25519 if
+            supported, falling back to ECDSA_SHA256_P256 and then DSA_SHA1.
 
     Returns:
         txi2p.I2PAddress: The new Destination. Once this is received via the
@@ -295,7 +336,7 @@ def generateDestination(keyfile, samEndpoint):
         ValueError: if the ``keyfile`` already exists.
         IOError: if the ``keyfile`` write fails.
     """
-    destFac = DestGenerateFactory(keyfile)
+    destFac = DestGenerateFactory(keyfile, sigType)
     d = samEndpoint.connect(destFac)
     d.addCallback(lambda proto: destFac.deferred)
     return d

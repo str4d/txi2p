@@ -11,7 +11,7 @@ txi2p
     :alt: coveralls
 
 |txi2p| is a set of I2P bindings for `Twisted <https://twistedmatrix.com/>`_
-10.1 or greater.
+10.1 or greater. It currently requires Python 2.
 
 |txi2p| supports both the SAM and BOB APIs for I2P. The default API is SAM.
 
@@ -20,11 +20,13 @@ Installation
 
 You can install |txi2p| from PyPI::
 
-    $ pip install txi2p
+    $ pip2 install txi2p
 
 or by downloading the source and running::
 
-    $ python setup.py install
+    $ pip2 install .
+
+inside the source directory.
 
 Quickstart
 ==========

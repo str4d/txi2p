@@ -1,8 +1,10 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
+from __future__ import print_function
 
 import os
 from parsley import makeProtocol
+import sys
 from twisted.internet import defer, error
 from twisted.python import failure, log
 
@@ -10,6 +12,10 @@ from txi2p import grammar
 from txi2p.address import I2PAddress
 from txi2p.sam import constants as c
 from txi2p.sam.base import cmpSAM, SAMSender, SAMReceiver, SAMFactory
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 
 class SessionCreateSender(SAMSender):
@@ -52,6 +58,7 @@ class SessionCreateReceiver(SAMReceiver):
                     message.startswith('SIGNATURE_TYPE') and \
                     not self.factory.sigType:
                 fallback = 'ECDSA_SHA256_P256' in message and 'DSA_SHA1' or 'ECDSA_SHA256_P256'
+                eprint('Warning: %s, falling back to %s' % (message, fallback))
                 self.sender.sendSessionCreate(
                     self.factory.samVersion,
                     self.factory.style,
@@ -76,7 +83,7 @@ class SessionCreateReceiver(SAMReceiver):
             try:
                 self.sender.transport.setTcpKeepAlive(1)
             except AttributeError as e:
-                print e
+                eprint(e)
         self.factory.sessionCreated(self, dest)
 
 
@@ -274,6 +281,7 @@ class DestGenerateReceiver(SAMReceiver):
                     message.startswith('SIGNATURE_TYPE') and \
                     not self.factory.sigType:
                 fallback = 'ECDSA_SHA256_P256' in message and 'DSA_SHA1' or 'ECDSA_SHA256_P256'
+                eprint('Warning: %s, falling back to %s' % (message, fallback))
                 self.sender.sendDestGenerate(
                     self.factory.samVersion,
                     fallback)

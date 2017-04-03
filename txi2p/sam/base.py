@@ -91,7 +91,7 @@ class SAMReceiver(object):
         self.factory = parser.factory
         self.sender.sendHello()
 
-    def wrapProto(self, proto, peerAddress):
+    def wrapProto(self, proto, peerAddress, invertTLS=False):
         self.wrappedProto = proto
         if hasattr(self.factory, 'localPort'):
             localAddress = I2PAddress(self.factory.session.address,
@@ -100,7 +100,8 @@ class SAMReceiver(object):
             localAddress = self.factory.session.address
         self.transportWrapper = I2PTunnelTransport(
             self.sender.transport,
-            localAddress, peerAddress)
+            localAddress, peerAddress,
+            invertTLS)
         proto.makeConnection(self.transportWrapper)
 
     def dataReceived(self, data):

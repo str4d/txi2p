@@ -154,7 +154,7 @@ class StreamAcceptFactory(SAMFactory):
         if proto is None:
             self.deferred.cancel()
             return
-        streamProto.wrapProto(proto, streamProto.peer)
+        streamProto.wrapProto(proto, streamProto.peer, True)
 
 
 @implementer(IListeningPort)

@@ -62,10 +62,17 @@ class I2PAddress(FancyEqMixin, object):
 
 @implementer(ITransport)
 class I2PTunnelTransport(object):
-    def __init__(self, wrappedTransport, localAddr, peerAddr=None):
+    def __init__(self, wrappedTransport, localAddr, peerAddr=None, invertTLS=False):
         self.t = wrappedTransport
         self._localAddr = localAddr
         self.peerAddr = peerAddr
+
+        # Workaround for https://tahoe-lafs.org/trac/tahoe-lafs/ticket/2861
+        if invertTLS and hasattr(self.t, 'startTLS'):
+            import types
+            def startTLSWrapper(self, ctx, normal=True):
+                self.t.startTLS(ctx, not normal)
+            self.startTLS = types.MethodType(startTLSWrapper, self)
 
     def __getattr__(self, attr):
         return getattr(self.t, attr)

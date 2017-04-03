@@ -160,12 +160,12 @@ Supported arguments:
 Important changes
 =================
 
-0.3.2 (upcoming)
-----------------
+0.3.2
+-----
 
 * The default signature type for new Destinations is Ed25519.
 
-  * If the SAM server does not support that (Java I2P 0.9.14 and earlier), txi2p
+  * If the SAM server does not support that (Java I2P 0.9.16 and earlier), txi2p
     will fall back on ECDSA_SHA256_P256, followed by the old default DSA_SHA1.
 
 0.3

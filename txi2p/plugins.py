@@ -22,6 +22,9 @@ else:
         pass
 
 
+def _parseOptions(options):
+    return dict([option.split(':') for option in options.split(',')]) if options else {}
+
 @implementer(IPlugin, IStreamClientEndpointStringParserWithReactor)
 class I2PClientParser(object):
     prefix = 'i2p'
@@ -33,7 +36,8 @@ class I2PClientParser(object):
                      options=None):
         return BOBI2PClientEndpoint(reactor, clientFromString(reactor, bobEndpoint),
                                     host, port, tunnelNick, inhost,
-                                    inport and int(inport) or None, options)
+                                    inport and int(inport) or None,
+                                    _parseOptions(options))
 
     def _parseSAMClient(self, reactor, host, port, samEndpoint,
                      nickname=None,
@@ -45,7 +49,7 @@ class I2PClientParser(object):
         return SAMI2PStreamClientEndpoint.new(
             clientFromString(reactor, samEndpoint),
             host, port, nickname, autoClose, keyfile,
-            localPort and int(localPort) or None, options, sigType)
+            localPort and int(localPort) or None, _parseOptions(options), sigType)
 
     _apiParsers = {
         'BOB': _parseBOBClient,
@@ -77,7 +81,8 @@ class I2PServerParser(object):
                      options=None):
         return BOBI2PServerEndpoint(reactor, clientFromString(reactor, bobEndpoint),
                                     keyfile, port, tunnelNick, outhost,
-                                    outport and int(outport) or None, options)
+                                    outport and int(outport) or None,
+                                    _parseOptions(options))
 
     def _parseSAMServer(self, reactor, keyfile, port, samEndpoint,
                      nickname=None,
@@ -86,7 +91,7 @@ class I2PServerParser(object):
                      sigType=None):
         return SAMI2PStreamServerEndpoint.new(
             clientFromString(reactor, samEndpoint),
-            keyfile, port, nickname, autoClose, options, sigType)
+            keyfile, port, nickname, autoClose, _parseOptions(options), sigType)
 
     _apiParsers = {
         'BOB': _parseBOBServer,

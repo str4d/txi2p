@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+import mock
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.python import failure
 from twisted.test import proto_helpers
@@ -8,7 +9,7 @@ from twisted.trial import unittest
 
 from txi2p.sam import endpoints
 from txi2p.sam.session import SAMSession
-from txi2p.test.util import FakeEndpoint, FakeFactory
+from txi2p.test.util import FakeEndpoint, FakeFactory, fakeSession
 
 
 connectionLostFailure = failure.Failure(ConnectionLost())
@@ -20,6 +21,16 @@ class SAMI2PStreamClientEndpointTestCase(unittest.TestCase):
     """
     Tests for I2P client Endpoint backed by the SAM API.
     """
+
+    def test_newWithOptions(self):
+        samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
+        with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
+            endpoint = endpoints.SAMI2PStreamClientEndpoint.new(
+                samEndpoint, '',
+                options={'inbound.length': 5, 'outbound.length': 5})
+        self.assertEqual(endpoint._sessionDeferred.kwargs['options'],
+                         {'inbound.length': 5, 'outbound.length': 5})
+
 
     def test_samConnectionFailed(self):
         samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
@@ -46,6 +57,16 @@ class SAMI2PStreamServerEndpointTestCase(unittest.TestCase):
     """
     Tests for I2P server Endpoint backed by the SAM API.
     """
+
+    def test_newWithOptions(self):
+        samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)
+        with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
+            endpoint = endpoints.SAMI2PStreamServerEndpoint.new(
+                samEndpoint, '',
+                options={'inbound.length': 5, 'outbound.length': 5})
+        self.assertEqual(endpoint._sessionDeferred.kwargs['options'],
+                         {'inbound.length': 5, 'outbound.length': 5})
+
 
     def test_samConnectionFailed(self):
         samEndpoint = FakeEndpoint(failure=connectionRefusedFailure)

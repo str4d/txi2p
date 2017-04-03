@@ -19,9 +19,6 @@ def _parseHost(host):
     # TODO: Validate I2P domain, B32 etc.
     return (host, None) if host[-4:] == '.i2p' else (None, host)
 
-def _parseOptions(options):
-    return dict([option.split(':') for option in options.split(',')]) if options else {}
-
 
 @implementer(interfaces.IStreamClientEndpoint)
 class SAMI2PStreamClientEndpoint(object):
@@ -75,7 +72,7 @@ class SAMI2PStreamClientEndpoint(object):
                        samEndpoint=samEndpoint,
                        autoClose=autoClose,
                        keyfile=keyfile,
-                       options=_parseOptions(options),
+                       options=options,
                        sigType=sigType)
         return cls(d, host, port, localPort)
 
@@ -162,7 +159,7 @@ class SAMI2PStreamServerEndpoint(object):
                        autoClose=autoClose,
                        keyfile=keyfile,
                        localPort=port,
-                       options=_parseOptions(options),
+                       options=options,
                        sigType=sigType)
         return cls(d)
 

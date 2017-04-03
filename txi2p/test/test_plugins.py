@@ -13,18 +13,12 @@ from txi2p.bob.endpoints import (BOBI2PClientEndpoint,
                                  BOBI2PServerEndpoint)
 from txi2p.sam.endpoints import (SAMI2PStreamClientEndpoint,
                                  SAMI2PStreamServerEndpoint)
+from txi2p.test.util import fakeSession
 
 if twisted.version < Version('twisted', 14, 0, 0):
     skip = 'txi2p.plugins requires twisted 14.0 or newer'
 else:
     skip = None
-
-
-def fakeSession(nickname, **kwargs):
-    m = mock.Mock()
-    m.nickname = nickname
-    m.kwargs = kwargs
-    return m
 
 
 class I2PPluginTestMixin(object):
@@ -77,23 +71,26 @@ class I2PClientEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     def test_stringDescription_BOB(self):
         from twisted.internet.endpoints import clientFromString
         ep = clientFromString(
-            MemoryReactor(), "i2p:stats.i2p:api=BOB:tunnelNick=spam:inport=12345")
+            MemoryReactor(), "i2p:stats.i2p:api=BOB:tunnelNick=spam:inport=12345:options=inbound.length\:5,outbound.length\:5")
         self.assertIsInstance(ep, BOBI2PClientEndpoint)
         self.assertIsInstance(ep._reactor, MemoryReactor)
         self.assertEqual(ep._dest,"stats.i2p")
         self.assertEqual(ep._tunnelNick,"spam")
         self.assertEqual(ep._inport,12345)
+        self.assertEqual(ep._options, {'inbound.length': '5', 'outbound.length': '5'})
 
     def test_stringDescription_SAM(self):
         from twisted.internet.endpoints import clientFromString
         with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
             ep = clientFromString(
-                MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444:sigType=foobar")
+                MemoryReactor(), "i2p:stats.i2p:81:api=SAM:localPort=34444:options=inbound.length\:5,outbound.length\:5:sigType=foobar")
         self.assertIsInstance(ep, SAMI2PStreamClientEndpoint)
         self.assertEqual(ep._host, "stats.i2p")
         self.assertEqual(ep._port, 81)
         self.assertEqual(ep._localPort, 34444)
-        self.assertEqual(ep._sessionDeferred.kwargs['sigType'], 'foobar')
+        s = ep._sessionDeferred
+        self.assertEqual(s.kwargs['options'], {'inbound.length': '5', 'outbound.length': '5'})
+        self.assertEqual(s.kwargs['sigType'], 'foobar')
 
 
 class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
@@ -130,17 +127,20 @@ class I2PServerEndpointPluginTest(I2PPluginTestMixin, unittest.TestCase):
     def test_stringDescription_BOB(self):
         from twisted.internet.endpoints import serverFromString
         ep = serverFromString(
-            MemoryReactor(), "i2p:/tmp/testkeys.foo:api=BOB:tunnelNick=spam:outport=23456")
+            MemoryReactor(), "i2p:/tmp/testkeys.foo:api=BOB:tunnelNick=spam:outport=23456:options=inbound.length\:5,outbound.length\:5")
         self.assertIsInstance(ep, BOBI2PServerEndpoint)
         self.assertIsInstance(ep._reactor, MemoryReactor)
         self.assertEqual(ep._keyfile, "/tmp/testkeys.foo")
         self.assertEqual(ep._tunnelNick, "spam")
         self.assertEqual(ep._outport, 23456)
+        self.assertEqual(ep._options, {'inbound.length': '5', 'outbound.length': '5'})
 
     def test_stringDescription_SAM(self):
         from twisted.internet.endpoints import serverFromString
         with mock.patch('txi2p.sam.endpoints.getSession', fakeSession):
             ep = serverFromString(
-                MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM:sigType=foobar")
+                MemoryReactor(), "i2p:/tmp/testkeys.foo:81:api=SAM:options=inbound.length\:5,outbound.length\:5:sigType=foobar")
         self.assertIsInstance(ep, SAMI2PStreamServerEndpoint)
-        self.assertEqual(ep._sessionDeferred.kwargs['sigType'], 'foobar')
+        s = ep._sessionDeferred
+        self.assertEqual(s.kwargs['options'], {'inbound.length': '5', 'outbound.length': '5'})
+        self.assertEqual(s.kwargs['sigType'], 'foobar')

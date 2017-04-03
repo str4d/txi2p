@@ -108,6 +108,11 @@ Both client and server strings support the following keyword arguments:
 * ``api=<apiName>`` - Either ``SAM`` or ``BOB``.
 * ``apiEndpoint=<endpointString>`` - An escaped client endpoint string pointing
   to the API, e.g. ``tcp\:127.0.0.1\:2827``.
+* ``options=keyOne\:valueOne,keyTwo\:valueTwo`` - I2CP options as a
+  comma-separated key:value list. See the `I2CP specification` for available
+  options.
+
+.. _I2CP specification: https://geti2p.net/en/docs/protocol/i2cp
 
 Clients
 -------
@@ -124,7 +129,6 @@ Supported arguments:
 * ``autoClose``
 * ``keyfile``
 * ``localPort``
-* ``options``
 * ``sigType``
 
 **BOB**
@@ -132,7 +136,6 @@ Supported arguments:
 * ``tunnelNick``
 * ``inhost``
 * ``inport``
-* ``options``
 
 Servers
 -------
@@ -147,7 +150,6 @@ Supported arguments:
 
 * ``nickname``
 * ``autoClose``
-* ``options``
 * ``sigType``
 
 **BOB**
@@ -155,7 +157,6 @@ Supported arguments:
 * ``tunnelNick``
 * ``outhost``
 * ``outport``
-* ``options``
 
 Important changes
 =================

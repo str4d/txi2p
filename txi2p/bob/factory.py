@@ -28,7 +28,7 @@ class BOBI2PClientFactory(ClientFactory):
                  tunnelNick=None,
                  inhost='localhost',
                  inport=None,
-                 options=None):
+                 options={}):
         self._reactor = reactor
         self._clientFactory = clientFactory
         self._bobEndpoint = bobEndpoint
@@ -88,7 +88,7 @@ class BOBI2PServerFactory(Factory):
                  tunnelNick=None,
                  outhost='localhost',
                  outport=None,
-                 options=None):
+                 options={}):
         self._reactor = reactor
         self._serverFactory = serverFactory
         self._bobEndpoint = bobEndpoint

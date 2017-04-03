@@ -23,6 +23,7 @@ class BOBProtoTestMixin(object):
         protoClass = kw.pop('_protoClass', self.protocol)
         fac = ClientFactory(*a, **kw)
         fac.protocol = protoClass
+        fac.options = {}
         def raise_(ex):
             raise ex
         fac.bobConnectionFailed = lambda reason: raise_(reason)
@@ -124,6 +125,17 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         self.assertEqual(proto.transport.value(), 'setnick spam\n')
 
+    def test_nickSetSendsOptions(self):
+        fac, proto = self.makeProto()
+        fac.tunnelNick = 'spam'
+        fac.options = {'foo': 'bar', 'spam': 'eggs'}
+        proto.dataReceived('BOB 00.00.10\nOK\n')
+        proto.transport.clear()
+        proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418\n')
+        self.assertEqual(proto.transport.value(), 'option foo=bar spam=eggs\n')
+
     def test_nickSetWithKeypair(self):
         fac, proto = self.makeProto()
         fac.tunnelNick = 'spam'
@@ -133,6 +145,8 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         self.assertEqual(proto.transport.value(), 'setkeys eggs\n')
 
     def test_destFetchedAfterNickSetWithKeypair(self):
@@ -145,6 +159,8 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         self.assertEqual(proto.transport.value(), 'getdest\n')
 
@@ -156,6 +172,8 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         self.assertEqual(proto.transport.value(), 'newkeys\n')
 
     def test_keypairFetchedAfterNickSetWithNoKeypair(self):
@@ -166,6 +184,8 @@ class BOBTunnelCreationMixin(BOBProtoTestMixin):
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         self.assertEqual(proto.transport.value(), 'getkeys\n')
@@ -242,6 +262,8 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The Destination
@@ -257,6 +279,8 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
@@ -271,6 +295,8 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
@@ -290,6 +316,8 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
@@ -307,6 +335,8 @@ class TestI2PClientTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
@@ -352,6 +382,8 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The Destination
@@ -367,6 +399,8 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
@@ -381,6 +415,8 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
@@ -400,6 +436,8 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
         proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
+        proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()
         proto.dataReceived('OK rubberyeggs\n') # The new keypair
@@ -417,6 +455,8 @@ class TestI2PServerTunnelCreatorBOBClient(BOBTunnelCreationMixin, unittest.TestC
         proto.dataReceived('OK Listing done\n') # No DATA, no tunnels
         proto.transport.clear()
         proto.dataReceived('OK HTTP 418\n')
+        proto.transport.clear()
+        proto.dataReceived('OK HTTP 418 options set\n')
         proto.transport.clear()
         proto.dataReceived('OK shrubbery\n') # The new Destination
         proto.transport.clear()

@@ -48,8 +48,12 @@ class BOBSender(object):
     def sendNewkeys(self):
         self.transport.write('newkeys\n')
 
-    def sendOption(self):
-        self.transport.write('option\n')
+    def sendOption(self, options={}):
+        msg = 'option'
+        for key in options:
+            msg += ' %s=%s' % (key, options[key])
+        msg += '\n'
+        self.transport.write(msg)
 
     def sendOuthost(self, outhost):
         self.transport.write('outhost %s\n' % outhost)
@@ -170,6 +174,14 @@ class BOBReceiver(object):
 
     def setnick(self, success, info):
         if success:
+            # Set the options
+            self.sender.sendOption(self.factory.options)
+            self.currentRule = 'State_option'
+        else:
+            print 'setnick ERROR: %s' % info
+
+    def option(self, success, info):
+        if success:
             if hasattr(self.factory, 'keypair') and self.factory.keypair: # If a keypair was provided, use it
                 self.sender.sendSetkeys(self.factory.keypair)
                 self.currentRule = 'State_setkeys'
@@ -177,7 +189,7 @@ class BOBReceiver(object):
                 self.sender.sendNewkeys()
                 self.currentRule = 'State_newkeys'
         else:
-            print 'setnick ERROR: %s' % info
+            print 'option ERROR: %s' % info
 
     def setkeys(self, success, info):
         if success:

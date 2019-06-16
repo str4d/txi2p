@@ -1,53 +1,69 @@
 language: python
-python: 2.7
 
-env:
-  # earliest and latest supported; last release of every year; 14.0 for txi2p.plugins
-  - TOX_ENV=py27-tw102
-  - TOX_ENV=py27-tw111
-  - TOX_ENV=py27-tw120
-  - TOX_ENV=py27-tw123
-  - TOX_ENV=py27-tw132
-  - TOX_ENV=py27-tw140
-  - TOX_ENV=py27-tw155
-  - TOX_ENV=py27-tw166
-  - TOX_ENV=py27-tw179
-  - TOX_ENV=py27-tw189
-  - TOX_ENV=py27-twcurrent
-  - TOX_ENV=py27-twtrunk
-  - TOX_ENV=pypy-tw102
-  - TOX_ENV=pypy-tw111
-  - TOX_ENV=pypy-tw120
-  - TOX_ENV=pypy-tw123
-  - TOX_ENV=pypy-tw132
-  - TOX_ENV=pypy-tw140
-  - TOX_ENV=pypy-tw155
-  - TOX_ENV=pypy-tw166
-  - TOX_ENV=pypy-tw179
-  - TOX_ENV=pypy-tw189
-  - TOX_ENV=pypy-twcurrent
-  - TOX_ENV=pypy-twtrunk
+# earliest and latest supported; last release of every year; 14.0 for txi2p.plugins
+matrix:
+  include:
+    - python: 2.7
+      env: TOX_ENV=py27-tw102
+    - python: 2.7
+      env: TOX_ENV=py27-tw111
+    - python: 2.7
+      env: TOX_ENV=py27-tw120
+    - python: 2.7
+      env: TOX_ENV=py27-tw123
+    - python: 2.7
+      env: TOX_ENV=py27-tw132
+    - python: 2.7
+      env: TOX_ENV=py27-tw140
+    - python: 2.7
+      env: TOX_ENV=py27-tw155
+    - python: 2.7
+      env: TOX_ENV=py27-tw166
+    - python: 2.7
+      env: TOX_ENV=py27-tw179
+    - python: 2.7
+      env: TOX_ENV=py27-tw189
+    - python: 2.7
+      env: TOX_ENV=py27-twcurrent
+
+    - python: pypy
+      env: TOX_ENV=pypy-tw102
+    - python: pypy
+      env: TOX_ENV=pypy-tw111
+    - python: pypy
+      env: TOX_ENV=pypy-tw120
+    - python: pypy
+      env: TOX_ENV=pypy-tw123
+    - python: pypy
+      env: TOX_ENV=pypy-tw132
+    - python: pypy
+      env: TOX_ENV=pypy-tw140
+    - python: pypy
+      env: TOX_ENV=pypy-tw155
+    - python: pypy
+      env: TOX_ENV=pypy-tw166
+    - python: pypy
+      env: TOX_ENV=pypy-tw179
+    - python: pypy
+      env: TOX_ENV=pypy-tw189
+    - python: pypy
+      env: TOX_ENV=pypy-twcurrent
+
+    # Test against Twisted trunk to detect potential future breakage early.
+    - python: 2.7
+      env: TOX_ENV=py27-twtrunk
+    - python: pypy
+      env: TOX_ENV=pypy-twtrunk
+
+  allow_failures:
+    # Don't fail on trunk versions.
+    - env: TOX_ENV=py27-twtrunk
+    - env: TOX_ENV=pypy-twtrunk
+    # pypy is a bit sporadic
+    - python: pypy
 
 install:
   - pip install tox
 
 script:
   - tox -e $TOX_ENV
-
-matrix:
-  allow_failures:
-    # Don't fail on trunk versions.
-    - env: TOX_ENV=py27-twtrunk
-    - env: TOX_ENV=pypy-twtrunk
-    # pypy is a bit sporadic
-    - env: TOX_ENV=pypy-tw102
-    - env: TOX_ENV=pypy-tw111
-    - env: TOX_ENV=pypy-tw120
-    - env: TOX_ENV=pypy-tw123
-    - env: TOX_ENV=pypy-tw132
-    - env: TOX_ENV=pypy-tw140
-    - env: TOX_ENV=pypy-tw155
-    - env: TOX_ENV=pypy-tw166
-    - env: TOX_ENV=pypy-tw179
-    - env: TOX_ENV=pypy-tw189
-    - env: TOX_ENV=pypy-twcurrent

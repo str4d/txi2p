@@ -1,4 +1,5 @@
 language: python
+python: 2.7
 
 env:
   # earliest and latest supported; last release of every year; 14.0 for txi2p.plugins

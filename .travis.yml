@@ -49,6 +49,10 @@ matrix:
     - python: pypy
       env: TOX_ENV=pypy-twcurrent
 
+    # Ubuntu Xenial packages Twisted 16.0.0
+    - python: 2.7
+      env: TOX_ENV=py27-tw160
+
     # Test against Twisted trunk to detect potential future breakage early.
     - python: 2.7
       env: TOX_ENV=py27-twtrunk

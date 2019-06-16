@@ -9,10 +9,10 @@ env:
   - TOX_ENV=py27-tw123
   - TOX_ENV=py27-tw132
   - TOX_ENV=py27-tw140
-  - TOX_ENV=py27-tw152
-  - TOX_ENV=py27-tw162
-  - TOX_ENV=py27-tw163
-  - TOX_ENV=py27-tw164
+  - TOX_ENV=py27-tw155
+  - TOX_ENV=py27-tw166
+  - TOX_ENV=py27-tw179
+  - TOX_ENV=py27-tw189
   - TOX_ENV=py27-twcurrent
   - TOX_ENV=py27-twtrunk
   - TOX_ENV=pypy-tw102
@@ -21,10 +21,10 @@ env:
   - TOX_ENV=pypy-tw123
   - TOX_ENV=pypy-tw132
   - TOX_ENV=pypy-tw140
-  - TOX_ENV=pypy-tw152
-  - TOX_ENV=pypy-tw162
-  - TOX_ENV=pypy-tw163
-  - TOX_ENV=pypy-tw164
+  - TOX_ENV=pypy-tw155
+  - TOX_ENV=pypy-tw166
+  - TOX_ENV=pypy-tw179
+  - TOX_ENV=pypy-tw189
   - TOX_ENV=pypy-twcurrent
   - TOX_ENV=pypy-twtrunk
 
@@ -46,8 +46,8 @@ matrix:
     - env: TOX_ENV=pypy-tw123
     - env: TOX_ENV=pypy-tw132
     - env: TOX_ENV=pypy-tw140
-    - env: TOX_ENV=pypy-tw152
-    - env: TOX_ENV=pypy-tw162
-    - env: TOX_ENV=pypy-tw163
-    - env: TOX_ENV=pypy-tw164
+    - env: TOX_ENV=pypy-tw155
+    - env: TOX_ENV=pypy-tw166
+    - env: TOX_ENV=pypy-tw179
+    - env: TOX_ENV=pypy-tw189
     - env: TOX_ENV=pypy-twcurrent

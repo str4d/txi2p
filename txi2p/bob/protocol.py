@@ -50,7 +50,7 @@ class BOBSender(object):
 
     def sendOption(self, options={}):
         msg = 'option'
-        for key in options:
+        for key in sorted(options):
             msg += ' %s=%s' % (key, options[key])
         msg += '\n'
         self.transport.write(msg)

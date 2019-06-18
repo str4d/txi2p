@@ -2,7 +2,12 @@
 # See COPYING for details.
 
 from builtins import object
-import mock
+try:
+    # Python 3
+    from unittest import mock
+except:
+    # Python 2 (library)
+    import mock
 import sys
 from twisted.internet import interfaces
 from twisted.python.versions import Version

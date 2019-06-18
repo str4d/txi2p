@@ -2,7 +2,12 @@
 # See COPYING for details.
 
 from builtins import object
-from mock import Mock
+try:
+    # Python 3
+    from unittest.mock import Mock
+except:
+    # Python 2 (library)
+    from mock import Mock
 from twisted.internet import defer
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.internet.protocol import ClientFactory

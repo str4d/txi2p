@@ -1,7 +1,12 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-import mock
+try:
+    # Python 3
+    from unittest import mock
+except:
+    # Python 2 (library)
+    import mock
 from twisted.internet.error import ConnectionLost, ConnectionRefusedError
 from twisted.python import failure
 from twisted.test import proto_helpers

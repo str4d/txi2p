@@ -2,7 +2,12 @@
 # See COPYING for details.
 
 from builtins import object
-import mock
+try:
+    # Python 3
+    from unittest import mock
+except:
+    # Python 2 (library)
+    import mock
 from twisted.internet import defer, protocol
 from twisted.test import proto_helpers
 

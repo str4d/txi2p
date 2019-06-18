@@ -26,6 +26,19 @@ matrix:
     - python: 2.7
       env: TOX_ENV=py27-twcurrent
 
+    - python: 3.4
+      env: TOX_ENV=py34-tw154
+    - python: 3.4
+      env: TOX_ENV=py34-tw155
+    - python: 3.4
+      env: TOX_ENV=py34-tw166
+    - python: 3.4
+      env: TOX_ENV=py34-tw179
+    - python: 3.4
+      env: TOX_ENV=py34-tw189
+    - python: 3.4
+      env: TOX_ENV=py34-twcurrent
+
     - python: pypy
       env: TOX_ENV=pypy-tw102
     - python: pypy
@@ -56,12 +69,15 @@ matrix:
     # Test against Twisted trunk to detect potential future breakage early.
     - python: 2.7
       env: TOX_ENV=py27-twtrunk
+    - python: 3.4
+      env: TOX_ENV=py34-twtrunk
     - python: pypy
       env: TOX_ENV=pypy-twtrunk
 
   allow_failures:
     # Don't fail on trunk versions.
     - env: TOX_ENV=py27-twtrunk
+    - env: TOX_ENV=py34-twtrunk
     - env: TOX_ENV=pypy-twtrunk
     # pypy is a bit sporadic
     - python: pypy

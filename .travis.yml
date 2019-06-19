@@ -1,3 +1,4 @@
+dist: xenial
 language: python
 
 # earliest and latest supported; last release of every year; 14.0 for txi2p.plugins

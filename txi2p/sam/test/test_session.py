@@ -173,7 +173,7 @@ class TestSessionCreateProtocol(SAMProtocolTestMixin, unittest.TestCase):
         proto.transport.clear()
         proto.dataReceived(('NAMING REPLY RESULT=OK NAME=ME VALUE=%s\n' % TEST_B64).encode('utf-8'))
         self.assertEquals('State_keepalive', proto.receiver.currentRule)
-        fac.sessionCreated.assert_called()
+        fac.sessionCreated.assert_called_with(proto.receiver, TEST_B64)
         # Cleanup
         self.addCleanup(proto.receiver.stopPinging)
 

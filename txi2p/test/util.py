@@ -1,7 +1,13 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
-import mock
+from builtins import object
+try:
+    # Python 3
+    from unittest import mock
+except:
+    # Python 2 (library)
+    import mock
 from twisted.internet import defer, protocol
 from twisted.test import proto_helpers
 

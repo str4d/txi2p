@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 from twisted.internet.endpoints import clientFromString
 from twisted.internet.interfaces import IStreamClientEndpointStringParserWithReactor
 from twisted.internet.interfaces import IStreamServerEndpointStringParser

@@ -2,8 +2,8 @@
 # See COPYING for details.
 from __future__ import print_function
 
+from builtins import object
 import os
-from parsley import makeProtocol
 import sys
 from twisted.internet import defer, error
 from twisted.python import failure, log
@@ -11,8 +11,13 @@ from twisted.python import failure, log
 from txi2p import grammar
 from txi2p.address import I2PAddress
 from txi2p.sam import constants as c
-from txi2p.sam.base import cmpSAM, SAMSender, SAMReceiver, SAMFactory
-
+from txi2p.sam.base import (
+    cmpSAM,
+    makeSAMProtocol,
+    SAMSender,
+    SAMReceiver,
+    SAMFactory,
+)
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -31,7 +36,7 @@ class SessionCreateSender(SAMSender):
         for key in options:
             msg += ' %s=%s' % (key, options[key])
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class SessionCreateReceiver(SAMReceiver):
@@ -88,8 +93,7 @@ class SessionCreateReceiver(SAMReceiver):
 
 
 # A Protocol for making a SAM session
-SessionCreateProtocol = makeProtocol(
-    grammar.samGrammarSource,
+SessionCreateProtocol = makeSAMProtocol(
     SessionCreateSender,
     SessionCreateReceiver)
 
@@ -125,7 +129,7 @@ class SessionCreateFactory(SAMFactory):
         if self._writeKeypair:
             try:
                 f = open(self._keyfile, 'w')
-                f.write(self.privKey)
+                f.write(str(self.privKey))
                 f.close()
             except IOError:
                 log.msg('Could not save private key to %s' % self._keyfile)
@@ -211,11 +215,11 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
         autoClose (bool): `true` if the session should close automatically once
             no more connections are using it.
     """
-    if _sessions.has_key(nickname):
+    if nickname in _sessions:
         return defer.succeed(_sessions[nickname])
-    elif _pending_sessions.has_key(nickname):
+    elif nickname in _pending_sessions:
         def cancel(d):
-            if _pending_sessions.has_key(nickname) and d in _pending_sessions[nickname]:
+            if nickname in _pending_sessions and d in _pending_sessions[nickname]:
                 _pending_sessions[nickname].remove(d)
         d = defer.Deferred(cancel)
         _pending_sessions[nickname].append(d)
@@ -224,7 +228,8 @@ def getSession(nickname, samEndpoint=None, autoClose=False, **kwargs):
     if not samEndpoint:
         raise ValueError('A new session cannot be created without an API Endpoint')
 
-    def createSession((samVersion, style, id, proto, pubKey, localPort)):
+    def createSession(xxx_todo_changeme):
+        (samVersion, style, id, proto, pubKey, localPort) = xxx_todo_changeme
         s = SAMSession()
         s.nickname = nickname
         s.samEndpoint = samEndpoint
@@ -264,7 +269,7 @@ class DestGenerateSender(SAMSender):
         if cmpSAM(samVersion, '3.1') >= 0:
             msg += ' SIGNATURE_TYPE=%s' % (sigType and sigType or 'EdDSA_SHA512_Ed25519')
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class DestGenerateReceiver(SAMReceiver):
@@ -294,8 +299,7 @@ class DestGenerateReceiver(SAMReceiver):
 
 
 # A Protocol for generating an I2P Destination via SAM
-DestGenerateProtocol = makeProtocol(
-    grammar.samGrammarSource,
+DestGenerateProtocol = makeSAMProtocol(
     DestGenerateSender,
     DestGenerateReceiver)
 
@@ -315,7 +319,7 @@ class DestGenerateFactory(SAMFactory):
 
         try:
             f = open(self._keyfile, 'w')
-            f.write(privKey)
+            f.write(str(privKey))
             f.close()
             self.deferred.callback(I2PAddress(pubKey))
         except IOError as e:
@@ -357,8 +361,7 @@ class TestAPIReceiver(SAMReceiver):
 
 
 # A Protocol for testing whether a SAM API is reachable
-TestAPIProtocol = makeProtocol(
-    grammar.samGrammarSource,
+TestAPIProtocol = makeSAMProtocol(
     SAMSender,
     TestAPIReceiver)
 

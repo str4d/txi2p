@@ -1,3 +1,4 @@
+from __future__ import print_function
 from twisted.internet import reactor, defer
 from twisted.internet.endpoints import serverFromString
 from twisted.internet.protocol import Factory
@@ -51,11 +52,11 @@ class ChatFactory(Factory):
 
 def printDest(port):
     # Print out the I2P Destination to copy to the client
-    print 'This server is listening on:'
-    print port.getHost().destination
+    print('This server is listening on:')
+    print(port.getHost().destination)
     # Handle Ctl+C
     def shutdown():
-        print 'Shutting down'
+        print('Shutting down')
         port.stopListening()
         d = defer.Deferred()
         reactor.callLater(3, d.callback, 1)

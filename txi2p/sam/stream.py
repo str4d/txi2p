@@ -1,6 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import range
+from builtins import object
 from twisted.internet.defer import Deferred
 from twisted.internet.error import ConnectError, UnknownHostError
 from twisted.internet.interfaces import IListeningPort
@@ -29,7 +31,7 @@ class StreamConnectSender(SAMSender):
         if localPort:
             msg += ' FROM_PORT=%d' % localPort
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class StreamConnectReceiver(SAMReceiver):
@@ -93,12 +95,12 @@ class StreamAcceptSender(SAMSender):
         msg += ' ID=%s' % id
         msg += ' SILENT=false'
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class StreamAcceptReceiver(SAMReceiver):
     peer = None
-    initialData = ''
+    initialData = b''
 
     def command(self):
         self.sender.sendStreamAccept(
@@ -118,9 +120,9 @@ class StreamAcceptReceiver(SAMReceiver):
             self.wrappedProto.dataReceived(data)
         else:
             self.initialData += data
-            if '\n' in self.initialData:
+            if b'\n' in self.initialData:
                 # First line is the peer's Destination.
-                data, self.initialData = self.initialData.split('\n', 1)
+                data, self.initialData = self.initialData.split(b'\n', 1)
                 self.peer = peerSAM(data)
                 # Create the wrapped Protocol...
                 self.factory.streamAcceptIncoming(self)
@@ -200,7 +202,7 @@ class StreamForwardSender(SAMSender):
             msg += ' HOST=%s' % host
         msg += ' SILENT=false'
         msg += '\n'
-        self.transport.write(msg)
+        self.transport.write(msg.encode('utf-8'))
 
 
 class StreamForwardReceiver(SAMReceiver):

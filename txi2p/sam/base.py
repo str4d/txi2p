@@ -1,6 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import str
+from builtins import object
 import functools
 from ometa.grammar import OMeta
 from ometa.protocol import ParserProtocol
@@ -26,12 +28,14 @@ KEEPALIVE_TIMEOUT = 2 * 60
 def cmpSAM(a, b):
     def normalize(v):
         return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
-    return cmp(normalize(a), normalize(b))
+    a_n = normalize(a)
+    b_n = normalize(b)
+    return (a_n > b_n) - (a_n < b_n)
 
 def peerSAM(data):
-    peerInfo = data.split('\n')[0].split(' ')
+    peerInfo = data.decode('utf-8').split('\n')[0].split(' ')
     peerOptions = {x: y for x, y in [x.split('=', 1) for x in peerInfo[1:] if x]}
-    fromPort = peerOptions['FROM_PORT'] if peerOptions.has_key('FROM_PORT') else None
+    fromPort = peerOptions['FROM_PORT'] if 'FROM_PORT' in peerOptions else None
     return I2PAddress(peerInfo[0], port=fromPort)
 
 
@@ -40,11 +44,27 @@ class SAMParserProtocol(ParserProtocol):
         ParserProtocol.__init__(self, *args)
 
     def dataReceived(self, data):
+        """
+        Receive and parse some data.
+
+        :param data: A ``bytes`` from Twisted.
+        """
+
+        if self._disconnecting:
+            return
+
         if self.receiver.currentRule == 'State_readData':
             # Shortcut for efficiency
             self.receiver.dataReceived(data)
         else:
-            ParserProtocol.dataReceived(self, data)
+            # Duplicated from Parsley because it expects a str but Twisted
+            # provides a bytes.
+            try:
+                self._parser.receive(data.decode('utf-8'))
+            except Exception:
+                self.connectionLost(Failure())
+                self.transport.abortConnection()
+                return
 
 
 def makeSAMProtocol(senderFactory, receiverFactory):
@@ -58,22 +78,23 @@ class SAMSender(object):
         self.transport = transport
 
     def sendHello(self):
-        self.transport.write('HELLO VERSION MIN=3.0 MAX=3.2\n')
+        self.transport.write(b'HELLO VERSION MIN=3.0 MAX=3.2\n')
 
     def sendNamingLookup(self, name):
-        self.transport.write('NAMING LOOKUP NAME=%s\n' % name)
+        msg = 'NAMING LOOKUP NAME=%s\n' % name
+        self.transport.write(msg.encode('utf-8'))
 
     def sendPing(self, data):
         if data:
-            self.transport.write('PING %s\n' % data)
+            self.transport.write(('PING %s\n' % data).encode('utf-8'))
         else:
-            self.transport.write('PING\n')
+            self.transport.write(b'PING\n')
 
     def sendPong(self, data):
         if data:
-            self.transport.write('PONG %s\n' % data)
+            self.transport.write(('PONG %s\n' % data).encode('utf-8'))
         else:
-            self.transport.write('PONG\n')
+            self.transport.write(b'PONG\n')
 
 
 class SAMReceiver(object):

@@ -1,6 +1,7 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from builtins import object
 import base64
 import hashlib
 from twisted.internet.interfaces import IAddress, ITransport
@@ -42,9 +43,9 @@ class I2PAddress(FancyEqMixin, object):
         elif hasattr(destination, 'host'):
             self.host = destination.host
         else:
-            raw_key = base64.b64decode(destination, '-~')
+            raw_key = base64.b64decode(destination.encode('utf-8'), b'-~')
             hash = hashlib.sha256(raw_key)
-            base32_hash = base64.b32encode(hash.digest())
+            base32_hash = base64.b32encode(hash.digest()).decode('utf-8')
             self.host = base32_hash.lower().replace('=', '')+'.b32.i2p'
 
 
@@ -98,7 +99,7 @@ class I2PServerTunnelProtocol(Protocol):
     def dataReceived(self, data):
         if self.peer:
             # Pass all other data to the wrapped Protocol.
-            self.wrappedProto.dataReceived(data)
+            self.wrappedProto.dataReceived(data.encode('utf-8'))
         else:
             # First line is the peer's Destination.
             self.setPeer(data)

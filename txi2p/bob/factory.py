@@ -1,6 +1,8 @@
 # Copyright (c) str4d <str4d@mail.i2p>
 # See COPYING for details.
 
+from __future__ import print_function
+from builtins import object
 from twisted.internet.defer import Deferred
 from twisted.internet.endpoints import TCP4ClientEndpoint, TCP4ServerEndpoint
 from twisted.internet.protocol import ClientFactory, Factory
@@ -130,7 +132,7 @@ class BOBI2PServerFactory(Factory):
                 f.write(self.keypair)
                 f.close()
             except IOError:
-                print 'Could not save keypair'
+                print('Could not save keypair')
         # BOB will now forward data to a listener.
         # BOB only forwards to TCP4 (for now).
         serverEndpoint = TCP4ServerEndpoint(self._reactor, self.outport)

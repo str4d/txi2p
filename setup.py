@@ -27,7 +27,7 @@ else:
     install_requires.append('Twisted>=15.4')
 
 setup(
-    name='txi2p',
+    name='txi2p-tahoe',
     description='I2P bindings for Twisted',
     long_description=readme(),
     author='str4d',

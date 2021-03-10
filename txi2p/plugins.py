@@ -5,7 +5,7 @@ from builtins import object
 from twisted.internet.endpoints import clientFromString
 from twisted.internet.interfaces import IStreamClientEndpointStringParserWithReactor
 from twisted.internet.interfaces import IStreamServerEndpointStringParser
-from twisted.python.compat import _PY3
+from six import PY3 as _PY3
 from zope.interface import implementer
 
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint

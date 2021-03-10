@@ -28,11 +28,11 @@ Installation
 
 You can install |txi2p| from PyPI::
 
-    $ pip2 install txi2p
+    $ pip install txi2p-tahoe
 
 or by downloading the source and running::
 
-    $ pip2 install .
+    $ pip install .
 
 inside the source directory.
 

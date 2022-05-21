@@ -5,7 +5,6 @@ from builtins import object
 from twisted.internet.endpoints import clientFromString
 from twisted.internet.interfaces import IStreamClientEndpointStringParserWithReactor
 from twisted.internet.interfaces import IStreamServerEndpointStringParser
-from six import PY3 as _PY3
 from zope.interface import implementer
 
 from txi2p.bob.endpoints import BOBI2PClientEndpoint, BOBI2PServerEndpoint
@@ -15,12 +14,7 @@ from txi2p.sam.endpoints import (
 )
 from txi2p.utils import getApi
 
-if not _PY3:
-    from twisted.plugin import IPlugin
-else:
-    from zope.interface import Interface
-    class IPlugin(Interface):
-        pass
+from twisted.plugin import IPlugin
 
 
 def _parseOptions(options):

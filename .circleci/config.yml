@@ -25,7 +25,7 @@ jobs:
       - run:
           name: "Run Tests"
           command: |
-            tox -e py<< parameters.python-version>-tw<< parameters.twisted-version >>
+            tox -e py<< parameters.python-version >>-tw<< parameters.twisted-version >>
 
 workflows:
   version: 2

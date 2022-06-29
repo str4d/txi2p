@@ -63,7 +63,7 @@ setup(
         'twisted.plugins',
     ],
     extras_require={
-        "tests": [
+        "test": [
             "mock; python_version < '3.0'",
         ],
     },

@@ -22,7 +22,7 @@ jobs:
       - run:
           name: "Setup Test Environment"
           command: |
-            python -m pip install coverage coveralls .
+            python -m pip install coverage coveralls .[test]
 
             case << parameters.twisted-version >> in
               current) TW="Twisted" ;;

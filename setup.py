@@ -46,15 +46,6 @@ setup(
         'Topic :: Internet',
     ],
     license='ISC',
-
-    # This is left to support installation with pip < 10 or with another tool.
-    # However, it is expected that modern installations will be performed with
-    # pip >= 10 and will look at pyproject.toml first, mooting this
-    # declaration.
-    setup_requires=['vcversioner>=1'],
-    vcversioner={
-        'version_module_paths': ['txi2p/_version.py'],
-    },
     install_requires=install_requires,
     packages=[
         'txi2p',
@@ -65,6 +56,11 @@ setup(
         'txi2p.sam.test',
         'twisted.plugins',
     ],
+    extras_require={
+        "test": [
+            "mock; python_version < '3.0'",
+        ],
+    },
 )
 
 # Make Twisted regenerate the dropin.cache, if possible.  This is necessary

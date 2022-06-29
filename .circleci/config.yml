@@ -93,6 +93,24 @@ jobs:
 workflows:
   version: 2
 
+  release:
+    jobs:
+      - "build-wheel":
+          filters:
+            tags:
+              only: "/^\\d+\\.\\d+\\.\\d+a\\d+rc0$/"
+            branches:
+              ignore: "/.*/"
+      - "pypi-upload":
+          filters:
+            tags:
+              only: "/^\\d+\\.\\d+\\.\\d+a\\d+rc0$/"
+            branches:
+              ignore: "/.*/"
+          repository: "testpypi"
+          requires:
+            - "build-wheel"
+
   tests:
     jobs:
       - "build-wheel"

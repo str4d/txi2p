@@ -37,10 +37,10 @@ workflows:
             parameters:
               python-version:
                 - "py"
-                - "3.7"
-                - "3.8"
-                - "3.9"
-                - "3.10"
+                - "37"
+                - "38"
+                - "39"
+                - "310"
 
               twisted-version:
                 - "trunk"

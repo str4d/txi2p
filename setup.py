@@ -62,6 +62,11 @@ setup(
         'txi2p.sam.test',
         'twisted.plugins',
     ],
+    extras_require={
+        "tests": [
+            "mock; python_version < '3.0'",
+        ],
+    },
 )
 
 # Make Twisted regenerate the dropin.cache, if possible.  This is necessary

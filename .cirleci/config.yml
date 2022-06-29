@@ -1,0 +1,49 @@
+version: 2.1
+
+orbs:
+  # Get easier access to the Windows machine executor.
+  win: "circleci/windows@4.1.1"
+
+jobs:
+  tests:
+    parameters:
+      python-version:
+        type: "string"
+      twisted-version:
+        type: "string"
+
+    docker:
+      - image: "cimg/python:3.10"
+
+    steps:
+      - "checkout"
+      - run:
+          name: "Setup Test Environment"
+          command: |
+            python -m pip install tox
+
+      - run:
+          name: "Run Tests"
+          command: |
+            tox -e py<< parameters.python-version>-tw<< parameters.twisted-version >>
+
+workflows:
+  version: 2
+
+  tests:
+    jobs:
+      - "tests":
+          matrix:
+            parameters:
+              python-version:
+                - "py"
+                - "3.7"
+                - "3.8"
+                - "3.9"
+                - "3.10"
+
+              twisted-version:
+                - "trunk"
+                - "current"
+                - "222"
+                - "192"

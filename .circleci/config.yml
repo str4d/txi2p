@@ -98,13 +98,13 @@ workflows:
       - "build-wheel":
           filters:
             tags:
-              only: "/^\\d+\\.\\d+\\.\\d+rc0$/"
+              only: "/^\\d+\\.\\d+\\.\\d+rc\d$/"
             branches:
               ignore: "/.*/"
       - "pypi-upload":
           filters:
             tags:
-              only: "/^\\d+\\.\\d+\\.\\d+rc0$/"
+              only: "/^\\d+\\.\\d+\\.\\d+rc\d$/"
             branches:
               ignore: "/.*/"
           repository: "testpypi"

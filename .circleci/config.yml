@@ -22,13 +22,15 @@ jobs:
       - run:
           name: "Setup Test Environment"
           command: |
-            python -m pip install tox
+            python -m pip install coverage coveralls .
 
       - run:
           name: "Run Tests"
           command: |
-            PY=$(echo "<< parameters.python-version >>" | sed -e s/\\.//)
-            python -m tox -e py"${PY}"-tw<< parameters.twisted-version >>
+            python -m pip install --upgrade twisted==<< parameters.twisted-version >>
+            coverage run --source=txi2p --omit=*/_version.py,*test* {envdir}/bin/trial txi2p
+            python run_coveralls.py
+
 
 workflows:
   version: 2

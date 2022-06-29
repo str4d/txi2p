@@ -7,13 +7,15 @@ orbs:
 jobs:
   tests:
     parameters:
+      image-base:
+        type: "string"
       python-version:
         type: "string"
       twisted-version:
         type: "string"
 
     docker:
-      - image: "cimg/python:<< parameters.python-version >>"
+      - image: "<< parameters.image-base >>:<< parameters.python-version >>"
 
     steps:
       - "checkout"
@@ -36,11 +38,31 @@ workflows:
       - "tests":
           matrix:
             parameters:
+              image-base:
+                - "cimg/python"
+
               python-version:
                 - "3.7"
                 - "3.8"
                 - "3.9"
                 - "3.10"
+
+              twisted-version:
+                - "trunk"
+                - "current"
+                - "222"
+                - "192"
+
+      - "tests":
+          matrix:
+            parameters:
+              image-base:
+                - "pypy"
+
+              python-version:
+                - "3.7"
+                - "3.8"
+                - "3.9"
 
               twisted-version:
                 - "trunk"

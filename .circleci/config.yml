@@ -7,21 +7,21 @@ orbs:
 jobs:
   build-wheel:
     docker:
-      image: "cimg/python:3.10"
+      - image: "cimg/python:3.10"
 
-  steps:
-    - "checkout"
-    - run:
-        name: "Build Wheel"
-        command: |
-          python -m pip install build
-          python -m build
-    - store_artifacts:
-        path: "./dist/"
-    - persist_to_workspace:
-        root: "./dist/"
-        paths:
-          - "*"
+    steps:
+      - "checkout"
+      - run:
+          name: "Build Wheel"
+          command: |
+            python -m pip install build
+            python -m build
+      - store_artifacts:
+          path: "./dist/"
+      - persist_to_workspace:
+          root: "./dist/"
+          paths:
+            - "*"
 
   tests:
     parameters:

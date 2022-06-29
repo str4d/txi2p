@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools", "setuptools_scm[toml]"]
 
 [tool.setuptools_scm]
 write_to = "txi2p/_version.py"

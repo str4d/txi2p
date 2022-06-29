@@ -37,7 +37,6 @@ workflows:
           matrix:
             parameters:
               python-version:
-                - "py"
                 - "3.7"
                 - "3.8"
                 - "3.9"

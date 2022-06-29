@@ -25,9 +25,9 @@ jobs:
             python -m pip install coverage coveralls .
 
             case << parameters.twisted-version >> in
-              current) TW="Twisted"
-              trunk)   TW="git+https://github.com/twisted/twisted.git"
-              *)       TW="Twisted==<< parameters.twisted-version >>"
+              current) TW="Twisted" ;;
+              trunk)   TW="git+https://github.com/twisted/twisted.git" ;;
+              *)       TW="Twisted==<< parameters.twisted-version >>" ;;
             esac
             python -m pip install --upgrade "$TW"
 

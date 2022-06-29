@@ -35,7 +35,7 @@ jobs:
           name: "Run Tests"
           command: |
 
-            coverage run --source=txi2p --omit=*/_version.py,*test* {envdir}/bin/trial txi2p
+            python -m coverage run --source=txi2p --omit=*/_version.py,*test* -m twisted.trial txi2p
             python run_coveralls.py
 
 

@@ -25,7 +25,7 @@ jobs:
       - run:
           name: "Run Tests"
           command: |
-            PY=$(echo "<< parameters.python-version >>" | sed -e s/\.//)
+            PY=$(echo "<< parameters.python-version >>" | sed -e s/\\.//)
             python -m tox -e py"${PY}"-tw<< parameters.twisted-version >>
 
 workflows:

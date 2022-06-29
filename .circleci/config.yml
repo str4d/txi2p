@@ -24,10 +24,17 @@ jobs:
           command: |
             python -m pip install coverage coveralls .
 
+            case << parameters.twisted-version >> in
+              current) TW="Twisted"
+              trunk)   TW="git+https://github.com/twisted/twisted.git"
+              *)       TW="Twisted==<< parameters.twisted-version >>"
+            esac
+            python -m pip install --upgrade "$TW"
+
       - run:
           name: "Run Tests"
           command: |
-            python -m pip install --upgrade twisted==<< parameters.twisted-version >>
+
             coverage run --source=txi2p --omit=*/_version.py,*test* {envdir}/bin/trial txi2p
             python run_coveralls.py
 
@@ -52,8 +59,8 @@ workflows:
               twisted-version:
                 - "trunk"
                 - "current"
-                - "222"
-                - "192"
+                - "22.2.0"
+                - "19.2.1"
 
       - "tests":
           matrix:
@@ -69,5 +76,5 @@ workflows:
               twisted-version:
                 - "trunk"
                 - "current"
-                - "222"
-                - "192"
+                - "22.2.0"
+                - "19.2.1"

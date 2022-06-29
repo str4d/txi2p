@@ -46,12 +46,6 @@ setup(
         'Topic :: Internet',
     ],
     license='ISC',
-
-    # This is left to support installation with pip < 10 or with another tool.
-    # However, it is expected that modern installations will be performed with
-    # pip >= 10 and will look at pyproject.toml first, mooting this
-    # declaration.
-    setup_requires=['setuptools_scm'],
     install_requires=install_requires,
     packages=[
         'txi2p',

@@ -1,2 +1,5 @@
 [build-system]
-requires = ["setuptools", "vcversioner>=1"]
+requires = ["setuptools", "setuptools_scm[toml]>=6.2"]
+
+[tool.setuptools_scm]
+write_to = "txi2p/_version.py"

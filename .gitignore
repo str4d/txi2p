@@ -14,3 +14,4 @@ build/
 dist/
 docs/_build
 txi2p.egg-info/
+_version.py

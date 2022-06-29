@@ -13,7 +13,7 @@ jobs:
         type: "string"
 
     docker:
-      - image: "cimg/python:3.10"
+      - image: "cimg/python:<< parameters.python-version >>"
 
     steps:
       - "checkout"
@@ -25,7 +25,8 @@ jobs:
       - run:
           name: "Run Tests"
           command: |
-            python -m tox -e py<< parameters.python-version >>-tw<< parameters.twisted-version >>
+            PY=$(echo "<< parameters.python-version >>" | sed -e s/\.//)
+            python -m tox -e py"${PY}"-tw<< parameters.twisted-version >>
 
 workflows:
   version: 2
@@ -37,10 +38,10 @@ workflows:
             parameters:
               python-version:
                 - "py"
-                - "37"
-                - "38"
-                - "39"
-                - "310"
+                - "3.7"
+                - "3.8"
+                - "3.9"
+                - "3.10"
 
               twisted-version:
                 - "trunk"

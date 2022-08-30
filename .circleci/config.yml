@@ -1,0 +1,168 @@
+version: 2.1
+
+orbs:
+  # Get easier access to the Windows machine executor.
+  win: "circleci/windows@4.1.1"
+
+jobs:
+  build-wheel:
+    docker:
+      - image: "cimg/python:3.10"
+
+    steps:
+      - "checkout"
+      - run:
+          name: "Build Wheel"
+          command: |
+            python -m pip install build
+            python -m build
+      - store_artifacts:
+          path: "./dist/"
+      - persist_to_workspace:
+          root: "./dist/"
+          paths:
+            - "*"
+
+  pypi-upload:
+    parameters:
+      repository:
+        type: "string"
+
+    docker:
+      - image: "cimg/python:3.10"
+
+    environment:
+      TWINE_REPOSITORY: "<< parameters.repository >>"
+      TWINE_USERNAME: "__token__"
+
+    steps:
+      - attach_workspace:
+          at: "release-workspace"
+
+      - run:
+          name: "Upload Wheel"
+          command: |
+            set -eux -o pipefail
+
+            if [ "<< parameters.repository >>" = "testpypi" ]; then
+              export TWINE_PASSWORD="${TESTPYPI_API_TOKEN}"
+            elif [ "<< parameters.repository >>" = "pypi" ]; then
+              export TWINE_PASSWORD="${PYPI_API_TOKEN}"
+            else
+              echo "Unknown repository: << parameters.repository >>"
+              exit 1
+            fi
+
+            python -m pip install twine
+            python -m twine upload --non-interactive release-workspace/*
+
+  tests:
+    parameters:
+      image-base:
+        type: "string"
+      python-version:
+        type: "string"
+      twisted-version:
+        type: "string"
+
+    docker:
+      - image: "<< parameters.image-base >>:<< parameters.python-version >>"
+
+    steps:
+      - "checkout"
+      - run:
+          name: "Setup Test Environment"
+          command: |
+            python -m pip install coverage coveralls .[test]
+
+            case << parameters.twisted-version >> in
+              current) TW="Twisted" ;;
+              trunk)   TW="git+https://github.com/twisted/twisted.git" ;;
+              *)       TW="Twisted==<< parameters.twisted-version >>" ;;
+            esac
+            python -m pip install --upgrade "$TW"
+
+      - run:
+          name: "Run Tests"
+          command: |
+
+            python -m coverage run --source=txi2p --omit=*/_version.py,*test* -m twisted.trial txi2p
+            python run_coveralls.py
+
+
+workflows:
+  version: 2
+
+  release:
+    jobs:
+      - "build-wheel":
+          filters:
+            tags:
+              only: "/^\\d+\\.\\d+\\.\\d+$/"
+            branches:
+              ignore: "/.*/"
+      - "pypi-upload":
+          filters:
+            tags:
+              only: "/^\\d+\\.\\d+\\.\\d+$/"
+            branches:
+              ignore: "/.*/"
+          repository: "pypi"
+          requires:
+            - "build-wheel"
+
+  tests:
+    jobs:
+      - "build-wheel"
+      - "pypi-upload":
+          repository: "testpypi"
+          requires:
+            - "build-wheel"
+
+      - "tests":
+          matrix:
+            parameters:
+              image-base:
+                - "cimg/python"
+
+              python-version:
+                - "3.7"
+                - "3.8"
+                - "3.9"
+                - "3.10"
+
+              twisted-version:
+                - "trunk"
+                - "current"
+                - "22.2.0"
+                - "19.2.1"
+
+      - "tests":
+          matrix:
+            parameters:
+              image-base:
+                - "pypy"
+
+              python-version:
+                - "3.7"
+                - "3.8"
+                - "3.9"
+
+              twisted-version:
+                - "trunk"
+                - "current"
+                - "22.2.0"
+                - "19.2.1"
+
+      - "tests":
+          matrix:
+            parameters:
+              image-base:
+                - "pypy"
+                - "cimg/python"
+
+              python-version:
+                - "2.7"
+
+              twisted-version:
+                - "20.3.0"

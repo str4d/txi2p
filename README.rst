@@ -1,6 +1,12 @@
-=====
-txi2p
-=====
+===========
+txi2p-tahoe
+===========
+
+This is a hopefully temporary fork of txi2p_, to help Tahoe-LAFS_
+project to get unstuck in Python 3 porting efforts.
+
+.. _txi2p: https://pypi.org/project/txi2p/
+.. _Tahoe-LAFS: https://pypi.org/project/tahoe-lafs/
 
 .. image:: https://api.travis-ci.org/str4d/txi2p.svg?branch=master
     :target: https://www.travis-ci.org/str4d/txi2p
@@ -22,11 +28,11 @@ Installation
 
 You can install |txi2p| from PyPI::
 
-    $ pip2 install txi2p
+    $ pip install txi2p-tahoe
 
 or by downloading the source and running::
 
-    $ pip2 install .
+    $ pip install .
 
 inside the source directory.
 
